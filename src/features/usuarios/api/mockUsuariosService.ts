@@ -1,6 +1,7 @@
 import type { EstadoUsuario, RolUsuario } from '@shared/domain/estados'
 import { delay } from '@shared/lib/delay'
 import { paginar } from '@shared/lib/paginar'
+import { normalizar } from '@shared/lib/texto'
 import type { UsuariosService } from './usuariosService'
 import type {
   ListadoUsuarios,
@@ -91,11 +92,11 @@ export const mockUsuariosService: UsuariosService = {
   async listar({ tab, q, pagina }: ParamsUsuarios): Promise<ListadoUsuarios> {
     await delay(300)
 
-    const texto = q.trim().toLowerCase()
+    const texto = normalizar(q.trim())
     const filtrados = USUARIOS.filter(
       (u) =>
         POR_TAB[tab](u) &&
-        (!texto || `${u.nombre} ${u.correo}`.toLowerCase().includes(texto)),
+        (!texto || normalizar(`${u.nombre} ${u.correo}`).includes(texto)),
     )
 
     return {

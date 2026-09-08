@@ -1,6 +1,7 @@
 import type { EstadoCotizacion } from '@shared/domain/estados'
 import { delay } from '@shared/lib/delay'
 import { paginar } from '@shared/lib/paginar'
+import { normalizar } from '@shared/lib/texto'
 import type { CotizacionesService } from './cotizacionesService'
 import type {
   Cotizacion,
@@ -102,14 +103,14 @@ export const mockCotizacionesService: CotizacionesService = {
   async listar({ tab, q, pagina }: ParamsCotizaciones): Promise<ListadoCotizaciones> {
     await delay(320)
 
-    const texto = q.trim().toLowerCase()
+    const texto = normalizar(q.trim())
     const filtradas = COTIZACIONES.filter(
       (c) =>
         POR_TAB[tab](c) &&
         (!texto ||
-          `${c.codigo} ${c.clienteNombre} ${c.servicioNombre}`
-            .toLowerCase()
-            .includes(texto)),
+          normalizar(
+            `${c.codigo} ${c.clienteNombre} ${c.servicioNombre}`,
+          ).includes(texto)),
     )
 
     const enNegociacion = COTIZACIONES.filter(

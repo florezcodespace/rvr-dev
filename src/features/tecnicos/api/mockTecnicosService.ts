@@ -1,5 +1,6 @@
 import type { EstadoTecnico } from '@shared/domain/estados'
 import { delay } from '@shared/lib/delay'
+import { normalizar } from '@shared/lib/texto'
 import type { TecnicosService } from './tecnicosService'
 import type { ListadoTecnicos, ParamsTecnicos, TabTecnico, Tecnico } from '../types'
 
@@ -138,14 +139,14 @@ export const mockTecnicosService: TecnicosService = {
   async listar({ tab, q }: ParamsTecnicos): Promise<ListadoTecnicos> {
     await delay(300)
 
-    const texto = q.trim().toLowerCase()
+    const texto = normalizar(q.trim())
     const items = TECNICOS.filter(
       (t) =>
         POR_TAB[tab](t) &&
         (!texto ||
-          `${t.nombre} ${t.zona} ${t.especialidad} ${t.habilidades.join(' ')}`
-            .toLowerCase()
-            .includes(texto)),
+          normalizar(
+            `${t.nombre} ${t.zona} ${t.especialidad} ${t.habilidades.join(' ')}`,
+          ).includes(texto)),
     )
 
     const activos = TECNICOS.filter((t) => t.estado !== 'fuera_turno')

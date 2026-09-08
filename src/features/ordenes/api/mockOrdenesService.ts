@@ -1,5 +1,6 @@
 import type { EstadoOrden } from '@shared/domain/estadoOrden'
 import { delay } from '@shared/lib/delay'
+import { normalizar } from '@shared/lib/texto'
 import type { OrdenesService } from './ordenesService'
 import type {
   BloqueAgenda,
@@ -166,14 +167,14 @@ function construirOrdenes(): OrdenResumen[] {
 const ORDENES = construirOrdenes()
 
 function aplicarFiltros(filtros: FiltrosOrdenes): OrdenResumen[] {
-  const texto = filtros.busqueda.trim().toLowerCase()
+  const texto = normalizar(filtros.busqueda.trim())
 
   return ORDENES.filter((orden) => {
     if (
       texto &&
-      !`${orden.codigo} ${orden.clienteNombre} ${orden.descripcionProblema}`
-        .toLowerCase()
-        .includes(texto)
+      !normalizar(
+        `${orden.codigo} ${orden.clienteNombre} ${orden.descripcionProblema}`,
+      ).includes(texto)
     )
       return false
 

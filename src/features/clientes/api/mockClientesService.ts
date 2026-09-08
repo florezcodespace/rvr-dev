@@ -1,6 +1,7 @@
 import type { EstadoCliente } from '@shared/domain/estados'
 import { delay } from '@shared/lib/delay'
 import { paginar } from '@shared/lib/paginar'
+import { normalizar } from '@shared/lib/texto'
 import type { ClientesService } from './clientesService'
 import type { Cliente, ListadoClientes, ParamsClientes, TabCliente } from '../types'
 
@@ -94,12 +95,12 @@ export const mockClientesService: ClientesService = {
   async listar({ tab, q, pagina }: ParamsClientes): Promise<ListadoClientes> {
     await delay(320)
 
-    const texto = q.trim().toLowerCase()
+    const texto = normalizar(q.trim())
     const filtrados = CLIENTES.filter(
       (c) =>
         POR_TAB[tab](c) &&
         (!texto ||
-          `${c.nombre} ${c.documento} ${c.sector}`.toLowerCase().includes(texto)),
+          normalizar(`${c.nombre} ${c.documento} ${c.sector}`).includes(texto)),
     )
 
     const conSaldo = CLIENTES.filter((c) => c.estado === 'con_saldo')

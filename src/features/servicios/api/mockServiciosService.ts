@@ -1,5 +1,6 @@
 import type { EstadoServicio } from '@shared/domain/estados'
 import { delay } from '@shared/lib/delay'
+import { normalizar } from '@shared/lib/texto'
 import type { ServiciosService } from './serviciosService'
 import type { ListadoServicios, ParamsServicios, Servicio, TabServicio } from '../types'
 
@@ -153,11 +154,11 @@ export const mockServiciosService: ServiciosService = {
   async listar({ tab, q }: ParamsServicios): Promise<ListadoServicios> {
     await delay(300)
 
-    const texto = q.trim().toLowerCase()
+    const texto = normalizar(q.trim())
     const items = SERVICIOS.filter(
       (s) =>
         POR_TAB[tab](s) &&
-        (!texto || `${s.nombre} ${s.descripcion}`.toLowerCase().includes(texto)),
+        (!texto || normalizar(`${s.nombre} ${s.descripcion}`).includes(texto)),
     )
 
     const masSolicitado = [...SERVICIOS].sort((a, b) => b.ordenes - a.ordenes)[0]!

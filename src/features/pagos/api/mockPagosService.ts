@@ -1,6 +1,7 @@
 import type { EstadoPago } from '@shared/domain/estados'
 import { delay } from '@shared/lib/delay'
 import { paginar } from '@shared/lib/paginar'
+import { normalizar } from '@shared/lib/texto'
 import type { PagosService } from './pagosService'
 import type { ListadoPagos, MedioPago, Pago, ParamsPagos, TabPago } from '../types'
 
@@ -83,12 +84,14 @@ export const mockPagosService: PagosService = {
   async listar({ tab, q, pagina }: ParamsPagos): Promise<ListadoPagos> {
     await delay(320)
 
-    const texto = q.trim().toLowerCase()
+    const texto = normalizar(q.trim())
     const filtrados = PAGOS.filter(
       (p) =>
         POR_TAB[tab](p) &&
         (!texto ||
-          `${p.recibo} ${p.clienteNombre} ${p.ordenCodigo}`.toLowerCase().includes(texto)),
+          normalizar(`${p.recibo} ${p.clienteNombre} ${p.ordenCodigo}`).includes(
+            texto,
+          )),
     )
 
     const porConciliar = PAGOS.filter(POR_TAB.por_conciliar)
