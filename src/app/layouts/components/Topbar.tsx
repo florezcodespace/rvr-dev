@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react'
 import { useAuth } from '@features/auth'
 import { IconBuscar, IconCampana, IconSalir } from '@shared/components/icons'
 import { ThemeToggle } from '@shared/components/theme/ThemeToggle'
 import { nombreLegible } from '@shared/lib/format'
+
+/** Texto único para los controles que esperan al backend. */
+const PENDIENTE = 'Disponible cuando se conecte el backend'
 
 function iniciales(nombre: string): string {
   return nombre
@@ -15,47 +17,42 @@ function iniciales(nombre: string): string {
 
 export function Topbar() {
   const { usuario, logout } = useAuth()
-  const buscador = useRef<HTMLInputElement>(null)
-
-  // ⌘K / Ctrl+K enfoca el buscador global.
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault()
-        buscador.current?.focus()
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
 
   return (
     <header className="flex h-16 flex-none items-center gap-[18px] border-b border-border-base bg-surface px-7">
-      <div className="flex h-[38px] max-w-[400px] flex-1 items-center gap-[9px] rounded-[9px] border border-border-base bg-bg px-3 focus-within:ring-focus">
+      {/*
+        El buscador global y la campana todavía no tienen a qué consultar: no
+        hay endpoint de búsqueda ni de notificaciones. Mientras tanto van
+        deshabilitados, con el motivo en el tooltip. Antes aceptaban texto y
+        clics y no pasaba nada, que es la peor de las tres opciones.
+      */}
+      <div
+        title={PENDIENTE}
+        className="flex h-[38px] max-w-[400px] flex-1 items-center gap-[9px] rounded-[9px] border border-border-base bg-bg px-3 opacity-60"
+      >
         <IconBuscar width="14" height="14" className="flex-none text-fg-faint" />
         <input
-          ref={buscador}
           type="search"
+          disabled
           placeholder="Buscar orden, cliente o técnico…"
-          aria-label="Buscar en el portal"
-          className="min-w-0 flex-1 bg-transparent text-[12.5px] text-fg outline-none placeholder:text-fg-faint"
+          aria-label={`Buscar en el portal. ${PENDIENTE}`}
+          className="min-w-0 flex-1 cursor-not-allowed bg-transparent text-[12.5px] text-fg outline-none placeholder:text-fg-faint"
         />
-        <kbd className="ml-auto rounded-[5px] border border-border-base bg-surface px-[5px] py-0.5 font-mono text-[10.5px] font-medium text-fg-faint">
-          ⌘K
-        </kbd>
       </div>
 
       <div className="ml-auto flex items-center gap-3.5">
         <ThemeToggle />
 
-        <button
-          type="button"
-          aria-label="Notificaciones (hay novedades sin leer)"
-          className="relative flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] border border-border-base text-fg-muted transition-colors hover:bg-surface-muted"
-        >
-          <IconCampana />
-          <span className="absolute top-1.5 right-1.5 size-[7px] rounded-full border-[1.5px] border-surface bg-danger" />
-        </button>
+        <span title={PENDIENTE}>
+          <button
+            type="button"
+            disabled
+            aria-label={`Notificaciones. ${PENDIENTE}`}
+            className="flex size-[34px] items-center justify-center rounded-[9px] border border-border-base text-fg-muted opacity-60"
+          >
+            <IconCampana />
+          </button>
+        </span>
 
         <div className="h-[26px] w-px bg-border-base" />
 
