@@ -1,0 +1,10 @@
+import { useContext } from 'react'
+import { ThemeContext, type ThemeContextValue } from '@app/providers/ThemeProvider'
+
+export function useTheme(): ThemeContextValue {
+  const context = useContext(ThemeContext)
+  if (!context) {
+    throw new Error('useTheme debe usarse dentro de <ThemeProvider>')
+  }
+  return context
+}

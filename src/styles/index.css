@@ -1,0 +1,102 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* El tema oscuro se activa por clase en <html>, no por preferencia del SO,
+   para que el toggle mande sobre la preferencia del sistema. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Mapea los tokens --rvr-* al namespace de Tailwind.
+   `inline` hace que las utilidades usen el var() del token, así el cambio
+   de tema es instantáneo sin regenerar clases. */
+@theme inline {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --color-bg: var(--rvr-bg);
+  --color-surface: var(--rvr-surface);
+  --color-surface-muted: var(--rvr-surface-muted);
+  --color-surface-raised: var(--rvr-surface-raised);
+
+  --color-border-base: var(--rvr-border);
+  --color-border-strong: var(--rvr-border-strong);
+
+  --color-fg: var(--rvr-fg);
+  --color-fg-muted: var(--rvr-fg-muted);
+  --color-fg-subtle: var(--rvr-fg-subtle);
+  --color-fg-faint: var(--rvr-fg-faint);
+
+  --color-primary: var(--rvr-primary);
+  --color-primary-hover: var(--rvr-primary-hover);
+  --color-primary-strong: var(--rvr-primary-strong);
+  --color-primary-soft: var(--rvr-primary-soft);
+  --color-primary-on-soft: var(--rvr-primary-on-soft);
+  --color-on-primary: var(--rvr-on-primary);
+  --color-link: var(--rvr-link);
+
+  --color-brand-bg: var(--rvr-brand-bg);
+  --color-brand-fg: var(--rvr-brand-fg);
+  --color-brand-fg-muted: var(--rvr-brand-fg-muted);
+  --color-brand-fg-subtle: var(--rvr-brand-fg-subtle);
+  --color-brand-list-fg: var(--rvr-brand-list-fg);
+
+  --color-success: var(--rvr-success);
+  --color-success-fg: var(--rvr-success-fg);
+  --color-success-soft: var(--rvr-success-soft);
+  --color-warning: var(--rvr-warning);
+  --color-warning-fg: var(--rvr-warning-fg);
+  --color-warning-soft: var(--rvr-warning-soft);
+  --color-danger: var(--rvr-danger);
+  --color-danger-fg: var(--rvr-danger-fg);
+  --color-danger-soft: var(--rvr-danger-soft);
+  --color-danger-border: var(--rvr-danger-border);
+  --color-info: var(--rvr-info);
+  --color-info-fg: var(--rvr-info-fg);
+  --color-info-soft: var(--rvr-info-soft);
+  --color-neutro-soft: var(--rvr-neutro-soft);
+  --color-neutro-fg: var(--rvr-neutro-fg);
+
+  --shadow-xs: var(--rvr-shadow-xs);
+  --shadow-sm: var(--rvr-shadow-sm);
+  --shadow-md: var(--rvr-shadow-md);
+  --shadow-lg: var(--rvr-shadow-lg);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--rvr-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--rvr-bg);
+    color: var(--rvr-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--rvr-ring-border);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--rvr-primary);
+    color: var(--rvr-on-primary);
+  }
+}
+
+@layer utilities {
+  /* Anillo de foco del mockup: borde primary + halo de 3px */
+  .ring-focus {
+    border-color: var(--rvr-ring-border);
+    box-shadow: 0 0 0 3px var(--rvr-ring);
+  }
+}

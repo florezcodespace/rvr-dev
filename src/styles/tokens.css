@@ -1,0 +1,228 @@
+/* ============================================================
+   Design tokens · Portal RvR Tecnologías
+   Extraídos 1:1 de los mockups (Vistas Web · Light + Dark).
+   Un solo set de nombres semánticos; solo cambian los valores.
+   ============================================================ */
+
+:root {
+  /* --- Superficies --- */
+  --rvr-bg: #f8fafc;
+  --rvr-surface: #ffffff;
+  --rvr-surface-muted: #f1f5f9;
+  --rvr-surface-raised: #ffffff;
+
+  /* --- Bordes --- */
+  --rvr-border: #e2e8f0;
+  --rvr-border-strong: #cbd5e1;
+
+  /* --- Texto --- */
+  --rvr-fg: #0f172a;
+  --rvr-fg-muted: #475569;
+  --rvr-fg-subtle: #526077;
+  --rvr-fg-faint: #64748b;
+
+  /* --- Primary (indigo) --- */
+  --rvr-primary: #4f46e5;
+  --rvr-primary-hover: #4338ca;
+  --rvr-primary-strong: #3730a3;
+  --rvr-primary-soft: #eef2ff;
+  --rvr-primary-on-soft: #4f46e5;
+  --rvr-on-primary: #ffffff;
+  --rvr-link: #4f46e5;
+
+  /* --- Acentos de marca (panel del login) --- */
+  --rvr-brand-bg: #3730a3;
+  --rvr-brand-blob-1: #4f46e5;
+  --rvr-brand-blob-2: #7c3aed;
+  --rvr-brand-fg: #ffffff;
+  --rvr-brand-fg-muted: #c7d2fe;
+  --rvr-brand-fg-subtle: #a5b4fc;
+  --rvr-brand-check-bg: rgb(255 255 255 / 0.16);
+  --rvr-brand-list-fg: #e0e7ff;
+
+  /* --- Estados semánticos --- */
+  --rvr-success: #10b981;
+  --rvr-success-fg: #047857;
+  --rvr-success-soft: #d1fae5;
+
+  --rvr-warning: #f59e0b;
+  --rvr-warning-fg: #b45309;
+  --rvr-warning-soft: #fef3c7;
+
+  --rvr-danger: #ef4444;
+  --rvr-danger-fg: #b91c1c;
+  --rvr-danger-soft: #fef2f2;
+  --rvr-danger-border: #fecaca;
+
+  --rvr-info: #7c3aed;
+  --rvr-info-fg: #6d28d9;
+  --rvr-info-soft: #f3e8ff;
+
+  /* --- Foco --- */
+  --rvr-ring: rgb(79 70 229 / 0.16);
+  --rvr-ring-border: #4f46e5;
+
+
+  /* --- Series de gráficos (paleta validada: CVD ΔE 31 sobre superficie clara) --- */
+  --rvr-chart-1: #4f46e5; /* órdenes creadas */
+  --rvr-chart-2: #10b981; /* órdenes completadas */
+  --rvr-chart-grid: #e2e8f0;
+
+  /* --- Estados de orden (enum estado_orden) --- */
+  --rvr-estado-nueva: #4f46e5;
+  --rvr-estado-pendiente: #f59e0b;
+  --rvr-estado-aprobada: #7c3aed;
+  --rvr-estado-programada: #06b6d4;
+  --rvr-estado-reprogramada: #f97316;
+  --rvr-estado-en-proceso: #818cf8;
+  --rvr-estado-completada: #10b981;
+  --rvr-estado-cancelada: #ef4444;
+
+  /* --- Badges de estado (fondo suave + texto) --- */
+  --rvr-estado-nueva-soft: #eef2ff;
+  --rvr-estado-nueva-fg: #4f46e5;
+  --rvr-estado-pendiente-soft: #fef3c7;
+  --rvr-estado-pendiente-fg: #b45309;
+  --rvr-estado-aprobada-soft: #f3e8ff;
+  --rvr-estado-aprobada-fg: #6d28d9;
+  --rvr-estado-programada-soft: #cffafe;
+  --rvr-estado-programada-fg: #0e7490;
+  --rvr-estado-reprogramada-soft: #ffedd5;
+  --rvr-estado-reprogramada-fg: #c2410c;
+  --rvr-estado-en-proceso-soft: #e0e7ff;
+  --rvr-estado-en-proceso-fg: #4338ca;
+  --rvr-estado-completada-soft: #d1fae5;
+  --rvr-estado-completada-fg: #047857;
+  --rvr-estado-cancelada-soft: #fee2e2;
+  --rvr-estado-cancelada-fg: #b91c1c;
+
+  /* --- Neutro (estados sin carga semántica: inactivo, fuera de turno) --- */
+  --rvr-neutro-soft: #f1f5f9;
+  --rvr-neutro-fg: #475569;
+
+  /* --- Acentos de avatar (se asignan por hash del nombre) --- */
+  --rvr-av-1: #4f46e5;
+  --rvr-av-2: #7c3aed;
+  --rvr-av-3: #0e7490;
+  --rvr-av-4: #047857;
+  --rvr-av-5: #b45309;
+  --rvr-av-6: #be123c;
+  --rvr-av-7: #475569;
+
+  /* --- Categóricas (medios de pago y series sin significado de estado) --- */
+  --rvr-cat-1: #4f46e5;
+  --rvr-cat-2: #0891b2;
+  --rvr-cat-3: #d97706;
+  --rvr-cat-4: #7c3aed;
+
+  /* --- Sombras --- */
+  --rvr-shadow-xs: 0 1px 2px rgb(15 23 42 / 0.08);
+  --rvr-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.1);
+  --rvr-shadow-md: 0 2px 10px rgb(15 23 42 / 0.09);
+  --rvr-shadow-lg: 0 8px 30px rgb(15 23 42 / 0.12);
+}
+
+.dark {
+  --rvr-bg: #09090b;
+  --rvr-surface: #111113;
+  --rvr-surface-muted: #18181b;
+  --rvr-surface-raised: #18181b;
+
+  --rvr-border: #27272a;
+  --rvr-border-strong: #3f3f46;
+
+  --rvr-fg: #f8fafc;
+  --rvr-fg-muted: #cbd5e1;
+  --rvr-fg-subtle: #a1adbe;
+  --rvr-fg-faint: #8f8f99;
+
+  --rvr-primary: #4f46e5;
+  --rvr-primary-hover: #6366f1;
+  --rvr-primary-strong: #818cf8;
+  --rvr-primary-soft: rgb(79 70 229 / 0.16);
+  --rvr-primary-on-soft: #a5b4fc;
+  --rvr-on-primary: #ffffff;
+  --rvr-link: #818cf8;
+
+  --rvr-brand-bg: #111113;
+  --rvr-brand-blob-1: #3730a3;
+  --rvr-brand-blob-2: #5b21b6;
+  --rvr-brand-fg: #f8fafc;
+  --rvr-brand-fg-muted: #94a3b8;
+  --rvr-brand-fg-subtle: #a5b4fc;
+  --rvr-brand-check-bg: rgb(79 70 229 / 0.22);
+  --rvr-brand-list-fg: #cbd5e1;
+
+  --rvr-success: #10b981;
+  --rvr-success-fg: #6ee7b7;
+  --rvr-success-soft: rgb(16 185 129 / 0.14);
+
+  --rvr-warning: #f59e0b;
+  --rvr-warning-fg: #fcd34d;
+  --rvr-warning-soft: rgb(245 158 11 / 0.14);
+
+  --rvr-danger: #ef4444;
+  --rvr-danger-fg: #fca5a5;
+  --rvr-danger-soft: rgb(239 68 68 / 0.1);
+  --rvr-danger-border: rgb(239 68 68 / 0.38);
+
+  --rvr-info: #a78bfa;
+  --rvr-info-fg: #c4b5fd;
+  --rvr-info-soft: rgb(124 58 237 / 0.18);
+
+  --rvr-ring: rgb(129 140 248 / 0.22);
+  --rvr-ring-border: #818cf8;
+
+
+  /* --- Series de gráficos: pasos propios para fondo oscuro, no un flip automático --- */
+  --rvr-chart-1: #6366f1;
+  --rvr-chart-2: #0ea57a;
+  --rvr-chart-grid: #27272a;
+
+  --rvr-estado-nueva: #4f46e5;
+  --rvr-estado-pendiente: #d97706;
+  --rvr-estado-aprobada: #8b5cf6;
+  --rvr-estado-programada: #0891b2;
+  --rvr-estado-reprogramada: #ea580c;
+  --rvr-estado-en-proceso: #6366f1;
+  --rvr-estado-completada: #0ea57a;
+  --rvr-estado-cancelada: #dc2626;
+
+  --rvr-estado-nueva-soft: rgb(79 70 229 / 0.18);
+  --rvr-estado-nueva-fg: #a5b4fc;
+  --rvr-estado-pendiente-soft: rgb(245 158 11 / 0.16);
+  --rvr-estado-pendiente-fg: #fcd34d;
+  --rvr-estado-aprobada-soft: rgb(124 58 237 / 0.2);
+  --rvr-estado-aprobada-fg: #c4b5fd;
+  --rvr-estado-programada-soft: rgb(6 182 212 / 0.16);
+  --rvr-estado-programada-fg: #67e8f9;
+  --rvr-estado-reprogramada-soft: rgb(249 115 22 / 0.16);
+  --rvr-estado-reprogramada-fg: #fdba74;
+  --rvr-estado-en-proceso-soft: rgb(129 140 248 / 0.2);
+  --rvr-estado-en-proceso-fg: #c7d2fe;
+  --rvr-estado-completada-soft: rgb(16 185 129 / 0.16);
+  --rvr-estado-completada-fg: #6ee7b7;
+  --rvr-estado-cancelada-soft: rgb(239 68 68 / 0.16);
+  --rvr-estado-cancelada-fg: #fca5a5;
+
+  --rvr-neutro-soft: rgb(148 163 184 / 0.14);
+  --rvr-neutro-fg: #94a3b8;
+
+  --rvr-av-1: #4f46e5;
+  --rvr-av-2: #6d28d9;
+  --rvr-av-3: #0e7490;
+  --rvr-av-4: #047857;
+  --rvr-av-5: #b45309;
+  --rvr-av-6: #be123c;
+  --rvr-av-7: #475569;
+
+  --rvr-cat-1: #6366f1;
+  --rvr-cat-2: #0891b2;
+  --rvr-cat-3: #d97706;
+  --rvr-cat-4: #8b5cf6;
+
+  --rvr-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --rvr-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
+  --rvr-shadow-md: 0 2px 10px rgb(0 0 0 / 0.5);
+  --rvr-shadow-lg: 0 8px 30px rgb(0 0 0 / 0.6);
+}
