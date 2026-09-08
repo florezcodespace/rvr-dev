@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { ESTADO_ORDEN_META, TRANSICIONES_ORDEN } from '@shared/domain/estadoOrden'
 import type { EstadoOrden } from '@shared/domain/estadoOrden'
 import { SelectorEstado } from '@shared/components/data'
@@ -15,12 +14,13 @@ import type { OpcionFiltro, OrdenResumen } from '../types'
  * La columna de tecnico va en ancho fijo: su contenido es un boton con nombre
  * variable, y como `fr` la rejilla se resolvia distinto en cada fila y el
  * encabezado dejaba de cuadrar con los datos.
+ *
+ * ANCHO_MINIMO = 822 px de columnas + 84 px de gaps + 32 px de padding lateral.
  */
-/** 922 px de columnas + 96 px de gaps + 32 px de padding lateral. */
-const ANCHO_MINIMO = 'min-w-[1050px]'
+const ANCHO_MINIMO = 'min-w-[938px]'
 
 const COLUMNAS = cn(
-  'grid grid-cols-[38px_86px_minmax(104px,1.25fr)_118px_96px_104px_minmax(128px,1.5fr)_148px_100px]',
+  'grid grid-cols-[38px_86px_minmax(104px,1.25fr)_118px_96px_104px_minmax(128px,1.5fr)_148px]',
   'items-center gap-3 px-4',
   ANCHO_MINIMO,
 )
@@ -108,7 +108,6 @@ export function TablaOrdenes({
         <span>Programada</span>
         <span>Diagnóstico inicial</span>
         <span>Estado</span>
-        <span className="text-right">Acciones</span>
       </div>
 
       <div
@@ -190,18 +189,6 @@ export function TablaOrdenes({
                   onCambiarEstado(orden, destino, estadoDe(orden.id, orden.estado))
                 }
               />
-
-              <span className="flex justify-end gap-2 text-[11.5px] font-semibold">
-                <Link to={`/ordenes/${orden.id}`} className="text-link hover:underline">
-                  Ver
-                </Link>
-                <Link
-                  to={`/ordenes/${orden.id}/editar`}
-                  className="text-fg-muted hover:underline"
-                >
-                  Editar
-                </Link>
-              </span>
             </div>
           )
         })}
