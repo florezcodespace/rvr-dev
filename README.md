@@ -161,15 +161,31 @@ del listado de órdenes.
 | Atajo | Qué hace |
 |---|---|
 | `/` | Enfoca la búsqueda de la vista actual |
-| `⌘K` / `Ctrl+K` | Enfoca el buscador global de la barra superior |
 | `↑` `↓` + `Enter` | Recorre y elige dentro de los menús de estado |
 | `Esc` | Cierra el menú abierto |
 | `⌘S` / `Ctrl+S` | Guarda en Configuración |
 | `←` `→` | Recorre los puntos de los gráficos de líneas |
 
+## Pendiente de backend
+
+Los controles que dependen de un endpoint que todavía no existe van
+deshabilitados, con el motivo en el tooltip (`PENDIENTE_BACKEND` en
+`shared/lib/pendiente.ts`): el buscador global y la campana de la barra superior,
+los botones de exportar/importar y de alta de cada listado, y el enlace de
+recuperar contraseña. La vista de detalle de una orden (`/ordenes/:id`) tampoco
+existe todavía, así que el listado no ofrece las acciones Ver y Editar.
+
+Mientras el portal siga en modo mock, cada módulo trae su propio juego de datos.
+Órdenes usa una lista de clientes y técnicos distinta a la de Clientes,
+Cotizaciones, Pagos y Técnicos; la serie de tendencia del dashboard y los totales
+de Reportes tampoco se derivan de las 80 órdenes del listado.
+
 ## Verificación
 
 Cada entrega se revisa con: `npm run build` (tsc + vite), `npm run lint`
-(0 avisos), recorrido automatizado de las 12 vistas en claro y oscuro, prueba de
-desborde horizontal a 1280/1024/768 px y auditoría de accesibilidad con axe-core
-(sin violaciones WCAG A/AA).
+(0 avisos), recorrido de las 12 vistas en claro y oscuro y auditoría de
+accesibilidad con axe-core (sin violaciones WCAG A/AA).
+
+El listado de órdenes necesita 938 px para sus columnas: por debajo de eso se
+desplaza en horizontal dentro de su tarjeta, sin desbordar la página. Se verifica
+a 1440, 1280, 1024 y 768 px.
