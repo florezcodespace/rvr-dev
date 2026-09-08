@@ -9,7 +9,7 @@ export const ESTADOS_INICIALES = ESTADOS_ORDEN.filter((estado) =>
 export const MAX_DIAGNOSTICO = 500
 export const MAX_OBSERVACIONES = 500
 
-export const nuevaOrdenSchema = z
+const baseNuevaOrdenSchema = z
   .object({
     clienteId: z.number().int().positive('Selecciona el cliente'),
     servicioId: z.number().int().positive('Selecciona el servicio'),
@@ -40,4 +40,24 @@ export const nuevaOrdenSchema = z
     },
   )
 
-export type NuevaOrdenFormValues = z.infer<typeof nuevaOrdenSchema>
+/**
+ * La tercera regla necesita saber qué técnicos están fuera de servicio hoy, y
+ * eso vive en el catálogo, no en el formulario: por eso el esquema se
+ * construye con esa lista en vez de ser un objeto suelto.
+ */
+export function crearNuevaOrdenSchema(tecnicosNoDisponibles: readonly number[] = []) {
+  return baseNuevaOrdenSchema.refine(
+    // Agendar a alguien que hoy no está disponible (novedad, incapacidad,
+    // fuera de turno) crea una visita que nadie va a atender.
+    (valores) =>
+      valores.estadoInicial !== 'programada' ||
+      valores.tecnicoId === null ||
+      !tecnicosNoDisponibles.includes(valores.tecnicoId),
+    {
+      path: ['tecnicoId'],
+      message: 'Ese técnico no está disponible hoy: elige otro o no la programes aún',
+    },
+  )
+}
+
+export type NuevaOrdenFormValues = z.infer<typeof baseNuevaOrdenSchema>

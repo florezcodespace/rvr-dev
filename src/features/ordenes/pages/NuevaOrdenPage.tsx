@@ -19,7 +19,7 @@ import {
   ESTADOS_INICIALES,
   MAX_DIAGNOSTICO,
   MAX_OBSERVACIONES,
-  nuevaOrdenSchema,
+  crearNuevaOrdenSchema,
   type NuevaOrdenFormValues,
 } from '../schemas/ordenSchema'
 
@@ -64,6 +64,16 @@ export default function NuevaOrdenPage() {
     [],
   )
 
+  // El esquema depende del catálogo: no se puede dejar programada una orden
+  // con un técnico que hoy está fuera de servicio.
+  const esquema = useMemo(
+    () =>
+      crearNuevaOrdenSchema(
+        (catalogos?.tecnicos ?? []).filter((t) => !t.disponible).map((t) => t.id),
+      ),
+    [catalogos],
+  )
+
   const {
     control,
     handleSubmit,
@@ -71,7 +81,7 @@ export default function NuevaOrdenPage() {
     setValue,
     formState: { errors, isDirty },
   } = useForm<NuevaOrdenFormValues>({
-    resolver: zodResolver(nuevaOrdenSchema),
+    resolver: zodResolver(esquema),
     mode: 'onBlur',
     defaultValues: borradorPrevio,
   })
