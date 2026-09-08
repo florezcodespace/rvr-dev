@@ -31,7 +31,7 @@ export const mockDashboardService: DashboardService = {
     return {
       fecha: new Date().toISOString(),
       serviciosAgendadosHoy: 8,
-      ordenesPorAprobar: 3,
+      ordenesPorAprobar: 6,
 
       kpis: [
         {
@@ -45,8 +45,8 @@ export const mockDashboardService: DashboardService = {
         {
           id: 'pendientes',
           etiqueta: 'Órdenes pendientes',
-          valor: '12',
-          detalle: '3 llevan más de 48 h sin asignar',
+          valor: '6',
+          detalle: '2 llevan más de 48 h sin asignar',
           detalleDestacado: true,
           glifo: '⏱',
           tono: 'warning',
@@ -54,7 +54,7 @@ export const mockDashboardService: DashboardService = {
         {
           id: 'completadas',
           etiqueta: 'Completadas (mes)',
-          valor: '148',
+          valor: '38',
           detalle: '92 % cerradas dentro del SLA',
           glifo: '✓',
           tono: 'success',
@@ -62,7 +62,7 @@ export const mockDashboardService: DashboardService = {
         {
           id: 'tecnicos',
           etiqueta: 'Técnicos disponibles',
-          valor: '7',
+          valor: '6',
           valorSecundario: ' / 11',
           detalle: 'Según horarios_tecnicos de hoy',
           glifo: '◍',
@@ -70,17 +70,17 @@ export const mockDashboardService: DashboardService = {
         },
         {
           id: 'cotizaciones',
-          etiqueta: 'Cotizaciones pendientes',
-          valor: '9',
-          detalle: `${formatearMoneda(24_850_000)} en negociación`,
+          etiqueta: 'Cotizaciones en negociación',
+          valor: '17',
+          detalle: `${formatearMoneda(105_894_000)} en juego`,
           glifo: '◈',
           tono: 'info',
         },
         {
           id: 'pagos',
-          etiqueta: 'Pagos pendientes',
-          valor: '5',
-          detalle: `${formatearMoneda(6_320_000)} por conciliar`,
+          etiqueta: 'Pagos por conciliar',
+          valor: '24',
+          detalle: `${formatearMoneda(95_796_000)} por conciliar`,
           glifo: '◑',
           tono: 'warning',
         },
@@ -88,15 +88,18 @@ export const mockDashboardService: DashboardService = {
 
       tendencia: construirTendencia(),
 
+      // Reparto real de las 80 órdenes de ordenes_servicio. Si estas cifras se
+      // inventan, el gráfico contradice al listado y a la propia tarjeta de
+      // "Órdenes activas" de este mismo dashboard.
       ordenesPorEstado: [
-        { estado: 'nueva', cantidad: 14 },
-        { estado: 'pendiente', cantidad: 12 },
-        { estado: 'aprobada', cantidad: 8 },
-        { estado: 'programada', cantidad: 10 },
-        { estado: 'reprogramada', cantidad: 3 },
-        { estado: 'en_proceso', cantidad: 9 },
-        { estado: 'completada', cantidad: 22 },
-        { estado: 'cancelada', cantidad: 2 },
+        { estado: 'nueva', cantidad: 6 },
+        { estado: 'pendiente', cantidad: 6 },
+        { estado: 'aprobada', cantidad: 6 },
+        { estado: 'programada', cantidad: 6 },
+        { estado: 'reprogramada', cantidad: 5 },
+        { estado: 'en_proceso', cantidad: 5 },
+        { estado: 'completada', cantidad: 38 },
+        { estado: 'cancelada', cantidad: 8 },
       ],
 
       serviciosMasSolicitados: [
@@ -111,16 +114,16 @@ export const mockDashboardService: DashboardService = {
         {
           id: 'a1',
           tipo: 'orden',
-          titulo: 'OS-0142 marcada como',
+          titulo: 'OS-0146 marcada como',
           destacado: 'COMPLETADA',
-          detalle: 'Carlos Ruiz · Clínica San Rafael',
+          detalle: 'Carlos Ruiz · Juan Pérez',
           fecha: haceMinutos(12),
         },
         {
           id: 'a2',
           tipo: 'cotizacion',
-          titulo: 'COT-0088 aprobada por el cliente',
-          detalle: 'Distribuidora Andina',
+          titulo: 'CT-2088 aprobada por el cliente',
+          detalle: 'Alcaldía de Envigado',
           fecha: haceMinutos(45),
         },
         {
@@ -134,7 +137,7 @@ export const mockDashboardService: DashboardService = {
           id: 'a4',
           tipo: 'pago',
           titulo: `Pago parcial registrado · ${formatearMoneda(1_200_000)}`,
-          detalle: 'Ferretería El Roble',
+          detalle: 'Hotel Poblado Plaza',
           fecha: haceMinutos(120),
         },
       ],

@@ -35,7 +35,7 @@ export const NAV_GROUPS: NavGroup[] = [
         label: 'Órdenes',
         to: ROUTES.ordenes,
         icon: IconOrdenes,
-        badge: { valor: 12, tono: 'primary' },
+        badge: { valor: 6, tono: 'primary' },
       },
       {
         label: 'Cotizaciones',
@@ -54,7 +54,7 @@ export const NAV_GROUPS: NavGroup[] = [
         label: 'Pagos',
         to: ROUTES.pagos,
         icon: IconPagos,
-        badge: { valor: 5, tono: 'warning' },
+        badge: { valor: 24, tono: 'warning' },
       },
     ],
   },
