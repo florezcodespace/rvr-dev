@@ -17,6 +17,7 @@ import {
 import { useCambioEstado } from '@shared/hooks/useCambioEstado'
 import { useListaParams } from '@shared/hooks/useListaParams'
 import { useRecurso } from '@shared/hooks/useRecurso'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { formatearDecimal, formatearMoneda } from '@shared/lib/format'
 import { serviciosService } from '../api'
 import { CATEGORIA_LABEL, TABS_SERVICIO, type TabServicio } from '../types'
@@ -62,10 +63,17 @@ export default function ServiciosPage() {
         descripcion="Catálogo de servicios que se pueden cotizar y asignar a una orden"
         acciones={
           <>
-            <Button variant="secondary" leadingIcon={<IconDescargar />}>
+            <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconDescargar />}
+            >
               Exportar catálogo
             </Button>
-            <Button leadingIcon={<IconMas />}>Nuevo servicio</Button>
+            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
+              Nuevo servicio
+            </Button>
           </>
         }
       />

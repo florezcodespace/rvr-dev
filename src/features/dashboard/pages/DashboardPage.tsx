@@ -4,6 +4,7 @@ import { ROUTES } from '@app/routes/paths'
 import { IconDescargar, IconMas } from '@shared/components/icons'
 import { Alert, Button, Spinner } from '@shared/components/ui'
 import { formatearFechaLarga, nombreLegible, saludo } from '@shared/lib/format'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { ActividadOperativa } from '../components/ActividadOperativa'
 import { KpiCard } from '../components/KpiCard'
 import { ServiciosMasSolicitados } from '../components/ServiciosMasSolicitados'
@@ -57,7 +58,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex gap-2.5">
-          <Button variant="secondary" leadingIcon={<IconDescargar />}>
+          <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconDescargar />}
+            >
             Exportar reporte
           </Button>
           <Button leadingIcon={<IconMas />} onClick={() => navigate(ROUTES.ordenNueva)}>

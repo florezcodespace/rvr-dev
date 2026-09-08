@@ -2,9 +2,7 @@ import { useAuth } from '@features/auth'
 import { IconBuscar, IconCampana, IconSalir } from '@shared/components/icons'
 import { ThemeToggle } from '@shared/components/theme/ThemeToggle'
 import { nombreLegible } from '@shared/lib/format'
-
-/** Texto único para los controles que esperan al backend. */
-const PENDIENTE = 'Disponible cuando se conecte el backend'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 
 function iniciales(nombre: string): string {
   return nombre
@@ -27,7 +25,7 @@ export function Topbar() {
         clics y no pasaba nada, que es la peor de las tres opciones.
       */}
       <div
-        title={PENDIENTE}
+        title={PENDIENTE_BACKEND}
         className="flex h-[38px] max-w-[400px] flex-1 items-center gap-[9px] rounded-[9px] border border-border-base bg-bg px-3 opacity-60"
       >
         <IconBuscar width="14" height="14" className="flex-none text-fg-faint" />
@@ -35,7 +33,7 @@ export function Topbar() {
           type="search"
           disabled
           placeholder="Buscar orden, cliente o técnico…"
-          aria-label={`Buscar en el portal. ${PENDIENTE}`}
+          aria-label={`Buscar en el portal. ${PENDIENTE_BACKEND}`}
           className="min-w-0 flex-1 cursor-not-allowed bg-transparent text-[12.5px] text-fg outline-none placeholder:text-fg-faint"
         />
       </div>
@@ -43,11 +41,11 @@ export function Topbar() {
       <div className="ml-auto flex items-center gap-3.5">
         <ThemeToggle />
 
-        <span title={PENDIENTE}>
+        <span title={PENDIENTE_BACKEND}>
           <button
             type="button"
             disabled
-            aria-label={`Notificaciones. ${PENDIENTE}`}
+            aria-label={`Notificaciones. ${PENDIENTE_BACKEND}`}
             className="flex size-[34px] items-center justify-center rounded-[9px] border border-border-base text-fg-muted opacity-60"
           >
             <IconCampana />

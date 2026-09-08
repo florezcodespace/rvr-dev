@@ -16,6 +16,7 @@ import {
   Tabs,
 } from '@shared/components/ui'
 import { useRecurso } from '@shared/hooks/useRecurso'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { formatearDecimal, formatearMoneda, formatearNumero } from '@shared/lib/format'
 import { reportesService } from '../api'
 import { RANGOS_REPORTE, type RangoReporte } from '../types'
@@ -72,10 +73,17 @@ export default function ReportesPage() {
         descripcion={`Resultados operativos del ${datos.desde} al ${datos.hasta}`}
         acciones={
           <>
-            <Button variant="secondary" leadingIcon={<IconDescargar />}>
+            <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconDescargar />}
+            >
               Exportar PDF
             </Button>
-            <Button leadingIcon={<IconReportes />}>Programar envío</Button>
+            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconReportes />}>
+              Programar envío
+            </Button>
           </>
         }
       />

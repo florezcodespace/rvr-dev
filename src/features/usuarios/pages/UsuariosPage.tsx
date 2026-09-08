@@ -23,6 +23,7 @@ import {
 import { useCambioEstado } from '@shared/hooks/useCambioEstado'
 import { useListaParams } from '@shared/hooks/useListaParams'
 import { useRecurso } from '@shared/hooks/useRecurso'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { textoPagina } from '@shared/lib/paginar'
 import { usuariosService } from '../api'
 import { TABS_USUARIO, type TabUsuario, type UsuarioPortal } from '../types'
@@ -158,10 +159,17 @@ export default function UsuariosPage() {
         }
         acciones={
           <>
-            <Button variant="secondary" leadingIcon={<IconUsuarios />}>
+            <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconUsuarios />}
+            >
               Ver roles
             </Button>
-            <Button leadingIcon={<IconMas />}>Invitar usuario</Button>
+            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
+              Invitar usuario
+            </Button>
           </>
         }
       />

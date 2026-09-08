@@ -15,11 +15,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'bg-primary text-on-primary shadow-sm hover:bg-primary-hover active:bg-primary-hover',
+    'bg-primary text-on-primary shadow-sm enabled:hover:bg-primary-hover enabled:active:bg-primary-hover',
   secondary:
-    'border border-border-strong bg-surface text-fg hover:bg-surface-muted',
-  ghost: 'text-fg-muted hover:bg-surface-muted hover:text-fg',
-  danger: 'bg-danger text-white hover:brightness-110',
+    'border border-border-strong bg-surface text-fg enabled:hover:bg-surface-muted',
+  ghost: 'text-fg-muted enabled:hover:bg-surface-muted enabled:hover:text-fg',
+  danger: 'bg-danger text-white enabled:hover:brightness-110',
 }
 
 const SIZES: Record<Size, string> = {
@@ -47,7 +47,7 @@ export function Button({
       aria-busy={loading || undefined}
       className={cn(
         'inline-flex cursor-pointer items-center justify-center gap-[7px] font-semibold tracking-[-0.1px] transition-colors',
-        'disabled:pointer-events-none disabled:opacity-60',
+        'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
         VARIANTS[variant],
         SIZES[size],
         fullWidth && 'w-full',

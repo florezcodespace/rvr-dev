@@ -20,6 +20,7 @@ import { useCambioEstado } from '@shared/hooks/useCambioEstado'
 import { useListaParams } from '@shared/hooks/useListaParams'
 import { useRecurso } from '@shared/hooks/useRecurso'
 import { formatearMoneda } from '@shared/lib/format'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { textoPagina } from '@shared/lib/paginar'
 import { cotizacionesService } from '../api'
 import { TABS_COTIZACION, type Cotizacion, type TabCotizacion } from '../types'
@@ -126,10 +127,17 @@ export default function CotizacionesPage() {
         }
         acciones={
           <>
-            <Button variant="secondary" leadingIcon={<IconDescargar />}>
+            <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconDescargar />}
+            >
               Exportar
             </Button>
-            <Button leadingIcon={<IconMas />}>Nueva cotización</Button>
+            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
+              Nueva cotización
+            </Button>
           </>
         }
       />

@@ -15,6 +15,7 @@ import {
 import { useCambioEstado } from '@shared/hooks/useCambioEstado'
 import { useListaParams } from '@shared/hooks/useListaParams'
 import { useRecurso } from '@shared/hooks/useRecurso'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { formatearDecimal } from '@shared/lib/format'
 import { tecnicosService } from '../api'
 import { TarjetaTecnico } from '../components/TarjetaTecnico'
@@ -61,10 +62,17 @@ export default function TecnicosPage() {
         }
         acciones={
           <>
-            <Button variant="secondary" leadingIcon={<IconDescargar />}>
+            <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconDescargar />}
+            >
               Ver agenda
             </Button>
-            <Button leadingIcon={<IconMas />}>Agregar técnico</Button>
+            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
+              Agregar técnico
+            </Button>
           </>
         }
       />

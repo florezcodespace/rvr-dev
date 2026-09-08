@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Button, Checkbox, Input } from '@shared/components/ui'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { STORAGE_KEYS, storage } from '@shared/lib/storage'
 import { useLogin } from '../hooks/useLogin'
 import { loginSchema, type LoginFormValues } from '../schemas/loginSchema'
@@ -49,12 +50,12 @@ export function LoginForm() {
         placeholder="••••••••••••"
         error={errors.contrasena?.message}
         labelAction={
-          <a
-            href="#recuperar"
-            className="text-[12px] font-semibold text-link hover:underline"
+          <span
+            title={PENDIENTE_BACKEND}
+            className="text-[12px] font-semibold text-fg-faint"
           >
             ¿Olvidaste tu contraseña?
-          </a>
+          </span>
         }
         trailing={
           <button

@@ -7,6 +7,7 @@ import { Alert, Button, Card, Spinner } from '@shared/components/ui'
 import { useCambioEstado } from '@shared/hooks/useCambioEstado'
 import { useToast } from '@shared/hooks/useToast'
 import { formatearNumero } from '@shared/lib/format'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { FiltrosOrdenes } from '../components/FiltrosOrdenes'
 import { PieTabla } from '../components/PieTabla'
 import { TablaOrdenes } from '../components/TablaOrdenes'
@@ -73,7 +74,12 @@ export default function OrdenesPage() {
         </div>
 
         <div className="flex gap-2.5">
-          <Button variant="secondary" leadingIcon={<IconDescargar />}>
+          <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconDescargar />}
+            >
             Exportar
           </Button>
           <Button leadingIcon={<IconMas />} onClick={() => navigate(ROUTES.ordenNueva)}>

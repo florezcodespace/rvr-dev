@@ -18,6 +18,7 @@ import { useCambioEstado } from '@shared/hooks/useCambioEstado'
 import { useListaParams } from '@shared/hooks/useListaParams'
 import { useRecurso } from '@shared/hooks/useRecurso'
 import { formatearMoneda, formatearNumero, tiempoRelativo } from '@shared/lib/format'
+import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 import { textoPagina } from '@shared/lib/paginar'
 import { clientesService } from '../api'
 import { TABS_CLIENTE, type Cliente, type TabCliente } from '../types'
@@ -127,10 +128,17 @@ export default function ClientesPage() {
         }
         acciones={
           <>
-            <Button variant="secondary" leadingIcon={<IconDescargar />}>
+            <Button
+              variant="secondary"
+              disabled
+              title={PENDIENTE_BACKEND}
+              leadingIcon={<IconDescargar />}
+            >
               Importar
             </Button>
-            <Button leadingIcon={<IconMas />}>Nuevo cliente</Button>
+            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
+              Nuevo cliente
+            </Button>
           </>
         }
       />
