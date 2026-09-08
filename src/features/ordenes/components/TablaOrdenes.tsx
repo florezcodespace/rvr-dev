@@ -6,8 +6,24 @@ import { cn } from '@shared/lib/cn'
 import { SelectorTecnico } from './SelectorTecnico'
 import type { OpcionFiltro, OrdenResumen } from '../types'
 
-const COLUMNAS =
-  'grid grid-cols-[38px_86px_1.25fr_1.05fr_96px_104px_1.5fr_148px_100px] items-center gap-3 px-4'
+/**
+ * Las columnas de texto llevan un minimo real: con `1.25fr` a secas el navegador
+ * las reducia a 0 px cuando la tabla no cabia (<=1024 px), y el nombre del
+ * cliente y el diagnostico desaparecian dejando solo el encabezado. Con el piso
+ * la tabla desborda y el contenedor la deja desplazar en horizontal.
+ *
+ * La columna de tecnico va en ancho fijo: su contenido es un boton con nombre
+ * variable, y como `fr` la rejilla se resolvia distinto en cada fila y el
+ * encabezado dejaba de cuadrar con los datos.
+ */
+/** 922 px de columnas + 96 px de gaps + 32 px de padding lateral. */
+const ANCHO_MINIMO = 'min-w-[1050px]'
+
+const COLUMNAS = cn(
+  'grid grid-cols-[38px_86px_minmax(104px,1.25fr)_118px_96px_104px_minmax(128px,1.5fr)_148px_100px]',
+  'items-center gap-3 px-4',
+  ANCHO_MINIMO,
+)
 
 const FECHA = new Intl.DateTimeFormat('es-CO', {
   day: '2-digit',
@@ -73,11 +89,11 @@ export function TablaOrdenes({
   onAsignarTecnico,
 }: Props) {
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="min-h-0 flex-1 overflow-auto">
       <div
         className={cn(
           COLUMNAS,
-          'border-b border-border-base bg-bg py-[11px] text-[10.5px] font-bold tracking-[0.07em] text-fg-subtle uppercase',
+          'sticky top-0 z-10 border-b border-border-base bg-bg py-[11px] text-[10.5px] font-bold tracking-[0.07em] text-fg-subtle uppercase',
         )}
       >
         <Casilla
@@ -97,7 +113,8 @@ export function TablaOrdenes({
 
       <div
         className={cn(
-          'min-h-0 flex-1 overflow-y-auto transition-opacity',
+          ANCHO_MINIMO,
+          'transition-opacity',
           cargando && 'pointer-events-none opacity-50',
         )}
       >
