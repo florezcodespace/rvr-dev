@@ -67,6 +67,8 @@
   --rvr-chart-1: #4f46e5; /* órdenes creadas */
   --rvr-chart-2: #10b981; /* órdenes completadas */
   --rvr-chart-grid: #e2e8f0;
+  /* Canal vacío de barras, bloques y medidores. */
+  --rvr-track: #e9edf3;
 
   /* --- Estados de orden (enum estado_orden) --- */
   --rvr-estado-nueva: #4f46e5;
@@ -115,11 +117,34 @@
   --rvr-cat-3: #d97706;
   --rvr-cat-4: #7c3aed;
 
+
+  /* --- Acabado: degradados y sombras del pase de pulido --- */
+  --rvr-grad-primary: linear-gradient(180deg, #5850ec, #4f46e5);
+  --rvr-grad-primary-hover: linear-gradient(180deg, #4f46e5, #4338ca);
+  --rvr-grad-danger: linear-gradient(180deg, #dc2626, #b91c1c);
+  --rvr-grad-marca: linear-gradient(135deg, #6366f1 0%, #4f46e5 55%, #7c3aed 100%);
+  /* Filo de un píxel de las tarjetas y halo de los titulares. Viven aquí, con
+     sus alfas escritas a mano, porque `color-mix(… var(--x) …)` no sobrevive al
+     minificador de CSS: lo reduce al color opaco. */
+  --rvr-filo-tinte: rgb(79 70 229 / 0.18);
+  --rvr-filo-luz: linear-gradient(to right, transparent, rgb(79 70 229 / 0.5) 35%, rgb(124 58 237 / 0.55) 65%, transparent);
+  --rvr-halo-titular: rgb(79 70 229 / 0.2);
+  /* Luz interior de 1 px: le da volumen al botón sin subir la saturación. */
+  --rvr-brillo: inset 0 1px 0 rgb(255 255 255 / 0.2);
+  --rvr-halo-primary: rgb(79 70 229 / 0.55);
+  --rvr-halo-danger: rgb(220 38 38 / 0.5);
+  /* Planos del shell: el lateral y la barra superior dejan de ser fondos planos. */
+  --rvr-lateral: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  --rvr-superior: linear-gradient(180deg, #ffffff 0%, #fcfdfe 100%);
+
   /* --- Sombras --- */
   --rvr-shadow-xs: 0 1px 2px rgb(15 23 42 / 0.08);
   --rvr-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.1);
   --rvr-shadow-md: 0 2px 10px rgb(15 23 42 / 0.09);
   --rvr-shadow-lg: 0 8px 30px rgb(15 23 42 / 0.12);
+  /* Dos capas: 1 px de contacto y un halo largo y suave. */
+  --rvr-shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 10px 28px -18px rgb(15 23 42 / 0.35);
+  --rvr-shadow-card-up: 0 1px 2px rgb(15 23 42 / 0.06), 0 16px 34px -16px rgb(15 23 42 / 0.4);
 }
 
 .dark {
@@ -136,6 +161,9 @@
   --rvr-fg-subtle: #a1adbe;
   --rvr-fg-faint: #8f8f99;
 
+  --rvr-filo-tinte: rgb(129 140 248 / 0.24);
+  --rvr-filo-luz: linear-gradient(to right, transparent, rgb(129 140 248 / 0.75) 35%, rgb(167 139 250 / 0.8) 65%, transparent);
+  --rvr-halo-titular: rgb(99 102 241 / 0.3);
   --rvr-primary: #4f46e5;
   --rvr-primary-hover: #6366f1;
   --rvr-primary-strong: #818cf8;
@@ -178,6 +206,7 @@
   --rvr-chart-1: #6366f1;
   --rvr-chart-2: #0ea57a;
   --rvr-chart-grid: #27272a;
+  --rvr-track: #232327;
 
   --rvr-estado-nueva: #4f46e5;
   --rvr-estado-pendiente: #d97706;
@@ -221,8 +250,21 @@
   --rvr-cat-3: #d97706;
   --rvr-cat-4: #8b5cf6;
 
+
+  --rvr-grad-primary: linear-gradient(180deg, #5850ec, #4f46e5);
+  --rvr-grad-primary-hover: linear-gradient(180deg, #6366f1, #4f46e5);
+  --rvr-grad-danger: linear-gradient(180deg, #dc2626, #991b1b);
+  --rvr-grad-marca: linear-gradient(135deg, #6366f1 0%, #4f46e5 55%, #7c3aed 100%);
+  --rvr-brillo: inset 0 1px 0 rgb(255 255 255 / 0.16);
+  --rvr-halo-primary: rgb(99 102 241 / 0.5);
+  --rvr-halo-danger: rgb(220 38 38 / 0.45);
+  --rvr-lateral: linear-gradient(180deg, #141417 0%, #0e0e10 100%);
+  --rvr-superior: linear-gradient(180deg, #151518 0%, #111113 100%);
+
   --rvr-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
   --rvr-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
   --rvr-shadow-md: 0 2px 10px rgb(0 0 0 / 0.5);
   --rvr-shadow-lg: 0 8px 30px rgb(0 0 0 / 0.6);
+  --rvr-shadow-card: 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 30px -20px rgb(0 0 0 / 0.9);
+  --rvr-shadow-card-up: 0 1px 2px rgb(0 0 0 / 0.5), 0 18px 38px -16px rgb(0 0 0 / 1);
 }

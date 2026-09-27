@@ -1,194 +1,86 @@
-import { useCallback } from 'react'
-import { ESTADO_SERVICIO_META, TRANSICIONES_SERVICIO } from '@shared/domain/estados'
-import { IconDescargar, IconMas } from '@shared/components/icons'
-import { SelectorEstado } from '@shared/components/data'
-import {
-  Alert,
-  Button,
-  Card,
-  Chip,
-  PageHeader,
-  SearchInput,
-  Spinner,
-  StatCard,
-  StatGrid,
-  Tabs,
-} from '@shared/components/ui'
-import { useCambioEstado } from '@shared/hooks/useCambioEstado'
-import { useListaParams } from '@shared/hooks/useListaParams'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@features/auth'
+import { DETALLE } from '@app/routes/paths'
+import { AccionesFila, CambioActivo, Listado, type Columna } from '@shared/components/data'
+import { FiltroSelect } from '@shared/components/form/Campos'
+import { CATEGORIAS_SERVICIO } from '@shared/domain/estados'
+import { IconEditar, IconMas, IconVer } from '@shared/components/icons'
+import { Button, SearchInput, Tabs } from '@shared/components/ui'
+import { useFiltros } from '@shared/hooks/useFiltros'
 import { useRecurso } from '@shared/hooks/useRecurso'
-import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
-import { formatearDecimal, formatearMoneda } from '@shared/lib/format'
-import { serviciosService } from '../api'
-import { CATEGORIA_LABEL, TABS_SERVICIO, type TabServicio } from '../types'
-
-const ETIQUETAS: Record<TabServicio, string> = {
-  todos: 'Todos',
-  soporte: 'Soporte',
-  infraestructura: 'Infraestructura',
-  seguridad: 'Seguridad',
-  borradores: 'Borradores',
-}
+import { useToast } from '@shared/hooks/useToast'
+import { formatearMoneda } from '@shared/lib/format'
+import { serviciosService, type Servicio } from '../api'
+import { FormServicio } from '../FormServicio'
 
 const cargar = serviciosService.listar.bind(serviciosService)
 
+/** HU_17 Listar · HU_16 Buscar · HU_19 Cambiar estado · HU_15 / HU_18 */
 export default function ServiciosPage() {
-  const { tab, q, params, setTab, setQ } = useListaParams<TabServicio>(
-    'todos',
-    TABS_SERVICIO,
-  )
-  const { datos, cargando, error } = useRecurso(cargar, params)
+  const { tiene } = useAuth()
+  const { mostrar } = useToast()
+  const navigate = useNavigate()
+  const f = useFiltros(['estado', 'categoria'] as const)
+  const { datos, cargando, error, recargar } = useRecurso(cargar, f.params)
+  const [form, setForm] = useState<{ abierto: boolean; servicio: Servicio | null }>({ abierto: false, servicio: null })
 
-  const guardar = useCallback(
-    (id: number, estado: Parameters<typeof serviciosService.cambiarEstado>[1]) =>
-      serviciosService.cambiarEstado(id, estado),
-    [],
-  )
-  const { estadoDe, cambiar } = useCambioEstado(guardar, ESTADO_SERVICIO_META)
+  const columnas: Columna<Servicio>[] = [
+    {
+      clave: 'nombre', titulo: 'Servicio', recortar: true,
+      render: (s) => (
+        <div className="min-w-0">
+          <div className="truncate font-semibold text-fg">{s.nombre}</div>
+          <div className="truncate text-[11.5px] text-fg-subtle">{s.descripcion || 'Sin descripción'}</div>
+        </div>
+      ),
+    },
+    { clave: 'categoria', titulo: 'Categoría', ancho: '170px', render: (s) => s.categoria },
+    { clave: 'precio', titulo: 'Precio base', ancho: '130px', alinear: 'right', render: (s) => <span className="font-mono whitespace-nowrap text-fg">{formatearMoneda(s.precioBase)}</span> },
+    { clave: 'veces', titulo: 'Cotizado', ancho: '100px', alinear: 'right', render: (s) => <span className="font-mono">{s.vecesCotizado ?? 0}</span> },
+    {
+      clave: 'estado', titulo: 'Estado', ancho: '130px',
+      render: (s) => <CambioActivo estado={s.estado} registro={s.nombre} puede={tiene('servicios.cambiar_estado')} onCambiar={(e) => serviciosService.cambiarEstado(s.id, e)} onHecho={recargar} />,
+    },
+    {
+      clave: 'acciones', titulo: '', ancho: '92px', alinear: 'right',
+      render: (s) => (
+        <AccionesFila acciones={[
+          ...(tiene('servicios.ver_detalle') ? [{ clave: 'ver', etiqueta: `Ver ${s.nombre}`, icono: <IconVer />, a: DETALLE.servicio(s.id) }] : []),
+          ...(tiene('servicios.editar') ? [{ clave: 'editar', etiqueta: `Editar ${s.nombre}`, icono: <IconEditar />, onClick: () => setForm({ abierto: true, servicio: s }) }] : []),
+        ]} />
+      ),
+    },
+  ]
 
-  if (error) {
-    return (
-      <div className="p-7">
-        <Alert tone="danger" title={error} description="Inténtalo de nuevo en un momento." />
-      </div>
-    )
-  }
-
-  const resumen = datos?.resumen
-
+  const c = datos?.conteos
   return (
-    <div className="flex flex-col gap-4 px-7 py-6">
-      <PageHeader
-        titulo="Servicios"
-        descripcion="Catálogo de servicios que se pueden cotizar y asignar a una orden"
-        acciones={
+    <>
+      <Listado
+        eyebrow="Servicios"
+        titulo="Catálogo de servicios"
+        descripcion="La oferta de RvR Tecnologías con su categoría y su precio base. Los activos se ven en el catálogo público."
+        acciones={tiene('servicios.registrar') && <Button leadingIcon={<IconMas />} onClick={() => setForm({ abierto: true, servicio: null })}>Registrar servicio</Button>}
+        barra={
           <>
-            <Button
-              variant="secondary"
-              disabled
-              title={PENDIENTE_BACKEND}
-              leadingIcon={<IconDescargar />}
-            >
-              Exportar catálogo
-            </Button>
-            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
-              Nuevo servicio
-            </Button>
+            {tiene('servicios.buscar') && <SearchInput valor={f.valores.q} onChange={(v) => f.set('q', v)} placeholder="Buscar por nombre, categoría o descripción…" className="w-full max-w-[320px]" />}
+            <Tabs etiqueta="Estado" valor={f.valores.estado || 'todos'} onChange={(v) => f.set('estado', v === 'todos' ? '' : v)}
+              opciones={[{ valor: 'todos', label: 'Todos', conteo: c?.todos }, { valor: 'activo', label: 'Activos', conteo: c?.activo }, { valor: 'inactivo', label: 'Inactivos', conteo: c?.inactivo }]} />
+            <FiltroSelect etiqueta="Categoría" valor={f.valores.categoria} onChange={(v) => f.set('categoria', v)} opciones={CATEGORIAS_SERVICIO.map((x) => ({ valor: x, label: x }))} todos="Todas" />
           </>
         }
+        columnas={columnas}
+        filas={datos?.items ?? []}
+        claveFila={(s) => s.id}
+        cargando={cargando}
+        error={error}
+        onAbrir={tiene('servicios.ver_detalle') ? (s) => navigate(DETALLE.servicio(s.id)) : undefined}
+        vacio={{ titulo: 'No se encontraron servicios', descripcion: 'Prueba con otro término o quita los filtros.' }}
+        pagina={datos ?? undefined}
+        onPagina={f.setPagina}
       />
-
-      {resumen && (
-        <StatGrid>
-          <StatCard
-            etiqueta="Servicios publicados"
-            valor={String(resumen.publicados)}
-            detalle={`${resumen.borradores} en borrador`}
-            glifo="◆"
-            tono="primary"
-          />
-          <StatCard
-            etiqueta="Más solicitado"
-            valor={String(resumen.masSolicitado.ordenes)}
-            detalle={resumen.masSolicitado.nombre}
-            glifo="◈"
-            tono="info"
-          />
-          <StatCard
-            etiqueta="Ingreso del mes"
-            valor={formatearMoneda(resumen.ingresoMes)}
-            detalle="+9 % vs. agosto"
-            glifo="✓"
-            tono="success"
-          />
-          <StatCard
-            etiqueta="Duración promedio"
-            valor={`${formatearDecimal(resumen.duracionPromedio)} h`}
-            detalle="Por visita en sitio"
-            glifo="◷"
-            tono="cyan"
-          />
-        </StatGrid>
-      )}
-
-      <Card className="gap-4 px-4 py-3.5">
-        <div className="flex flex-wrap items-center gap-3">
-          <Tabs
-            etiqueta="Filtrar servicios por categoría"
-            valor={tab}
-            onChange={setTab}
-            opciones={TABS_SERVICIO.map((valor) => ({
-              valor,
-              label: ETIQUETAS[valor],
-              conteo: datos?.conteos[valor],
-            }))}
-          />
-          <SearchInput
-            valor={q}
-            onChange={setQ}
-            placeholder="Buscar servicio"
-            className="ml-auto w-full max-w-[240px]"
-          />
-        </div>
-
-        {cargando && !datos ? (
-          <div className="flex justify-center py-16 text-fg-subtle">
-            <Spinner className="size-5" />
-          </div>
-        ) : datos && datos.items.length === 0 ? (
-          <div className="flex flex-col items-center gap-1.5 py-16 text-center">
-            <p className="m-0 text-[14px] font-semibold text-fg">Ningún servicio coincide</p>
-            <p className="m-0 text-[12.5px] text-fg-muted">
-              Cambia de categoría o ajusta la búsqueda.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {datos?.items.map((servicio) => {
-              const actual = estadoDe(servicio.id, servicio.estado)
-              return (
-                <Card
-                  key={servicio.id}
-                  className="gap-2.5 border-border-base px-[17px] py-4"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <Chip>{CATEGORIA_LABEL[servicio.categoria]}</Chip>
-                    <SelectorEstado
-                      valor={actual}
-                      meta={ESTADO_SERVICIO_META}
-                      transiciones={TRANSICIONES_SERVICIO[actual]}
-                      registro={servicio.nombre}
-                      onCambiar={(destino) =>
-                        cambiar(servicio.id, destino, actual, servicio.nombre)
-                      }
-                    />
-                  </div>
-
-                  <h3 className="m-0 text-[13.5px] font-bold tracking-[-0.2px] text-fg">
-                    {servicio.nombre}
-                  </h3>
-                  <p className="m-0 flex-1 text-[11.5px] leading-[1.5] text-fg-muted">
-                    {servicio.descripcion}
-                  </p>
-
-                  <div className="flex items-end justify-between gap-2 border-t border-border-base pt-2.5">
-                    <div>
-                      <div className="text-[15px] font-bold tracking-[-0.4px] text-fg">
-                        {formatearMoneda(servicio.precio)}
-                      </div>
-                      <div className="text-[11px] text-fg-subtle">{servicio.unidad}</div>
-                    </div>
-                    <div className="text-right text-[11px] text-fg-subtle">
-                      <div>{servicio.ordenes} órdenes</div>
-                      <div>{servicio.diasGarantia} días de garantía</div>
-                    </div>
-                  </div>
-                </Card>
-              )
-            })}
-          </div>
-        )}
-      </Card>
-    </div>
+      <FormServicio abierto={form.abierto} servicio={form.servicio} onCerrar={() => setForm({ abierto: false, servicio: null })}
+        onGuardado={(s) => { mostrar({ tono: 'exito', mensaje: form.servicio ? `${s.nombre} actualizado` : `${s.nombre} registrado` }); recargar() }} />
+    </>
   )
 }

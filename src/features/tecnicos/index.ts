@@ -1,2 +1,2 @@
 export { default as TecnicosPage } from './pages/TecnicosPage'
-export type { Tecnico } from './types'
+export { default as TecnicoDetallePage } from './pages/TecnicoDetallePage'

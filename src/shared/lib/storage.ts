@@ -31,4 +31,7 @@ export const STORAGE_KEYS = {
   theme: 'rvr.theme',
   session: 'rvr.session',
   rememberedEmail: 'rvr.remembered-email',
+  sidebarColapsado: 'rvr.sidebar-colapsado',
+  busquedasRecientes: 'rvr.busquedas-recientes',
+  envioReportes: 'rvr.envio-reportes',
 } as const

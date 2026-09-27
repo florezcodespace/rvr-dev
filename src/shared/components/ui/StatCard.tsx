@@ -35,13 +35,13 @@ export function StatCard({
   tono,
 }: StatCardProps) {
   return (
-    <Card className="gap-[7px] px-[17px] py-[15px]">
+    <Card viva className="anim-entrada gap-[6px] px-[17px] py-[15px]">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11.5px] font-semibold text-fg-muted">{etiqueta}</span>
         <span
           aria-hidden="true"
           className={cn(
-            'flex size-6 flex-none items-center justify-center rounded-[7px] text-[11px] font-bold',
+            'flex size-[26px] flex-none items-center justify-center rounded-[9px] text-[11px] font-bold',
             TONOS[tono],
           )}
         >
@@ -49,10 +49,10 @@ export function StatCard({
         </span>
       </div>
 
-      <div className="text-[29px] leading-none font-bold tracking-[-1px] text-fg">
+      <div className="mt-0.5 text-[27px] leading-none font-bold tracking-[-1.2px] tabular-nums text-fg">
         {valor}
         {valorSecundario && (
-          <span className="text-[15px] font-semibold text-fg-subtle">
+          <span className="text-[14px] font-semibold text-fg-subtle">
             {valorSecundario}
           </span>
         )}
@@ -73,6 +73,8 @@ export function StatCard({
 /** Rejilla estándar de KPIs (3 o 4 por fila según el ancho). */
 export function StatGrid({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4">{children}</div>
+    <div className="escalonado grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+      {children}
+    </div>
   )
 }

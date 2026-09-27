@@ -1,254 +1,111 @@
-import { useCallback } from 'react'
-import {
-  ESTADO_USUARIO_META,
-  ROLES_USUARIO,
-  ROL_USUARIO_META,
-  TRANSICIONES_USUARIO,
-  type RolUsuario,
-} from '@shared/domain/estados'
-import { IconMas, IconUsuarios } from '@shared/components/icons'
-import { DataTable, Pager, SelectorEstado } from '@shared/components/data'
-import type { Columna } from '@shared/components/data'
-import {
-  Alert,
-  Avatar,
-  Button,
-  Card,
-  PageHeader,
-  SearchInput,
-  StatCard,
-  StatGrid,
-  Tabs,
-} from '@shared/components/ui'
-import { useCambioEstado } from '@shared/hooks/useCambioEstado'
-import { useListaParams } from '@shared/hooks/useListaParams'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@features/auth'
+import { DETALLE } from '@app/routes/paths'
+import { CredencialesNuevas, type Credenciales } from '@shared/components/cuentas/CredencialesNuevas'
+import { AccionesFila, CambioActivo, Listado, type Columna } from '@shared/components/data'
+import { FiltroSelect } from '@shared/components/form/Campos'
+import { IconEditar, IconMas, IconVer } from '@shared/components/icons'
+import { Avatar, Button, SearchInput, Tabs } from '@shared/components/ui'
+import { useFiltros } from '@shared/hooks/useFiltros'
 import { useRecurso } from '@shared/hooks/useRecurso'
-import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
-import { textoPagina } from '@shared/lib/paginar'
-import { usuariosService } from '../api'
-import { TABS_USUARIO, type TabUsuario, type UsuarioPortal } from '../types'
-
-const ETIQUETAS: Record<TabUsuario, string> = {
-  todos: 'Todos',
-  administradores: 'Administradores',
-  coordinacion: 'Coordinación',
-  tecnicos: 'Técnicos',
-  inactivos: 'Inactivos',
-}
-
-const ACCESO = new Intl.DateTimeFormat('es-CO', {
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-})
+import { useToast } from '@shared/hooks/useToast'
+import { tiempoRelativo } from '@shared/lib/format'
+import { usuariosService, type Usuario } from '../api'
+import { FormUsuario } from '../FormUsuario'
 
 const cargar = usuariosService.listar.bind(usuariosService)
 
+/** HU_09 Listar · HU_08 Buscar · HU_11 Cambiar estado · HU_07 / HU_10 */
 export default function UsuariosPage() {
-  const { tab, q, params, setTab, setQ, setPagina } = useListaParams<TabUsuario>(
-    'todos',
-    TABS_USUARIO,
-  )
-  const { datos, cargando, error } = useRecurso(cargar, params)
+  const { tiene, usuario: yo } = useAuth()
+  const { mostrar } = useToast()
+  const navigate = useNavigate()
+  const f = useFiltros(['estado', 'rol'] as const)
+  const { datos, cargando, error, recargar } = useRecurso(cargar, f.params)
+  const [roles, setRoles] = useState<{ id: number; nombre: string }[]>([])
+  const [form, setForm] = useState<{ abierto: boolean; usuario: Usuario | null }>({ abierto: false, usuario: null })
+  const [credenciales, setCredenciales] = useState<Credenciales | null>(null)
 
-  const guardarEstado = useCallback(
-    (id: number, estado: Parameters<typeof usuariosService.cambiarEstado>[1]) =>
-      usuariosService.cambiarEstado(id, estado),
-    [],
-  )
-  const guardarRol = useCallback(
-    (id: number, rol: RolUsuario) => usuariosService.cambiarRol(id, rol),
-    [],
-  )
+  useEffect(() => { usuariosService.roles().then(setRoles).catch(() => undefined) }, [])
 
-  const { estadoDe, cambiar } = useCambioEstado(guardarEstado, ESTADO_USUARIO_META)
-  const { estadoDe: rolDe, cambiar: cambiarRol } = useCambioEstado(
-    guardarRol,
-    ROL_USUARIO_META,
-  )
-
-  if (error) {
-    return (
-      <div className="p-7">
-        <Alert tone="danger" title={error} description="Inténtalo de nuevo en un momento." />
-      </div>
-    )
-  }
-
-  const resumen = datos?.resumen
-  const lista = datos?.pagina
-
-  const columnas: Columna<UsuarioPortal>[] = [
+  const columnas: Columna<Usuario>[] = [
     {
-      clave: 'usuario',
-      titulo: 'Usuario',
+      clave: 'usuario', titulo: 'Usuario',
       render: (u) => (
         <div className="flex items-center gap-2.5">
           <Avatar nombre={u.nombre} tamano="sm" />
           <div className="min-w-0">
-            <div className="truncate font-semibold text-fg">{u.nombre}</div>
-            <div className="truncate text-[11px] text-fg-subtle">{u.correo}</div>
+            <div className="truncate font-semibold text-fg">{u.nombres} {u.apellidos}</div>
+            <div className="truncate font-mono text-[11px] text-fg-subtle">@{u.nombreUsuario}</div>
           </div>
         </div>
       ),
     },
+    { clave: 'correo', titulo: 'Correo', recortar: true, render: (u) => u.correo },
     {
-      clave: 'rol',
-      titulo: 'Rol',
-      ancho: '168px',
-      render: (u) => {
-        const actual = rolDe(u.id, u.rol)
-        return (
-          <SelectorEstado
-            valor={actual}
-            meta={ROL_USUARIO_META}
-            transiciones={ROLES_USUARIO.filter((rol) => rol !== actual)}
-            registro={u.nombre}
-            onCambiar={(destino) => cambiarRol(u.id, destino, actual, u.nombre)}
-          />
-        )
-      },
+      clave: 'rol', titulo: 'Rol', ancho: '150px',
+      render: (u) => (
+        <span className="text-fg">{u.rol.nombre}{u.vinculo && <span className="block text-[11px] text-fg-subtle">{u.vinculo.tipo === 'cliente' ? 'Cuenta de cliente' : 'App móvil'}</span>}</span>
+      ),
+    },
+    { clave: 'acceso', titulo: 'Último ingreso', ancho: '130px', render: (u) => (u.ultimoAcceso ? tiempoRelativo(u.ultimoAcceso) : 'Nunca') },
+    {
+      clave: 'estado', titulo: 'Estado', ancho: '130px',
+      render: (u) => (
+        <CambioActivo estado={u.estado} registro={`La cuenta de ${u.nombre}`} puede={tiene('usuarios.cambiar_estado') && u.id !== yo?.id}
+          onCambiar={(e) => usuariosService.cambiarEstado(u.id, e)} onHecho={recargar} />
+      ),
     },
     {
-      clave: 'acceso',
-      titulo: 'Acceso',
-      ancho: '210px',
-      render: (u) => ROL_USUARIO_META[rolDe(u.id, u.rol)].acceso,
-    },
-    {
-      clave: 'estado',
-      titulo: 'Estado',
-      ancho: '206px',
-      render: (u) => {
-        const actual = estadoDe(u.id, u.estado)
-        return (
-          <SelectorEstado
-            valor={actual}
-            meta={ESTADO_USUARIO_META}
-            transiciones={TRANSICIONES_USUARIO[actual]}
-            registro={u.nombre}
-            onCambiar={(destino) => cambiar(u.id, destino, actual, u.nombre)}
-          />
-        )
-      },
-    },
-    {
-      clave: 'ultimo',
-      titulo: 'Último ingreso',
-      ancho: '152px',
-      render: (u) =>
-        u.ultimoAcceso ? (
-          ACCESO.format(new Date(u.ultimoAcceso)).replace(',', ' ·')
-        ) : (
-          <span className="text-fg-faint italic">Sin ingresar</span>
-        ),
+      clave: 'acciones', titulo: '', ancho: '92px', alinear: 'right',
+      render: (u) => (
+        <AccionesFila acciones={[
+          ...(tiene('usuarios.ver_detalle') ? [{ clave: 'ver', etiqueta: `Ver a ${u.nombre}`, icono: <IconVer />, a: DETALLE.usuario(u.id) }] : []),
+          ...(tiene('usuarios.editar') ? [{ clave: 'editar', etiqueta: `Editar a ${u.nombre}`, icono: <IconEditar />, onClick: () => setForm({ abierto: true, usuario: u }) }] : []),
+        ]} />
+      ),
     },
   ]
 
+  const c = datos?.conteos
   return (
-    <div className="flex h-full flex-col gap-4 px-7 py-6">
-      <PageHeader
+    <>
+      <Listado
+        eyebrow="Configuración"
         titulo="Usuarios"
-        descripcion={
-          resumen
-            ? `${resumen.total} cuentas con acceso al portal · ${resumen.invitaciones} invitación sin aceptar`
-            : 'Cargando…'
-        }
-        acciones={
+        descripcion="Cuentas de acceso del personal, de los técnicos (app móvil) y de los clientes del portal."
+        acciones={tiene('usuarios.registrar') && <Button leadingIcon={<IconMas />} onClick={() => setForm({ abierto: true, usuario: null })}>Registrar usuario</Button>}
+        barra={
           <>
-            <Button
-              variant="secondary"
-              disabled
-              title={PENDIENTE_BACKEND}
-              leadingIcon={<IconUsuarios />}
-            >
-              Ver roles
-            </Button>
-            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
-              Invitar usuario
-            </Button>
+            {tiene('usuarios.buscar') && <SearchInput valor={f.valores.q} onChange={(v) => f.set('q', v)} placeholder="Buscar por nombre, correo, usuario o rol…" className="w-full max-w-[320px]" />}
+            <Tabs etiqueta="Estado" valor={f.valores.estado || 'todos'} onChange={(v) => f.set('estado', v === 'todos' ? '' : v)}
+              opciones={[{ valor: 'todos', label: 'Todos', conteo: c?.todos }, { valor: 'activo', label: 'Activos', conteo: c?.activo }, { valor: 'inactivo', label: 'Inactivos', conteo: c?.inactivo }]} />
+            <FiltroSelect etiqueta="Rol" valor={f.valores.rol} onChange={(v) => f.set('rol', v)} opciones={roles.map((r) => ({ valor: String(r.id), label: r.nombre }))} />
           </>
         }
+        columnas={columnas}
+        filas={datos?.items ?? []}
+        claveFila={(u) => u.id}
+        cargando={cargando}
+        error={error}
+        onAbrir={tiene('usuarios.ver_detalle') ? (u) => navigate(DETALLE.usuario(u.id)) : undefined}
+        vacio={{ titulo: 'No se encontraron usuarios', descripcion: 'Prueba con otro término o quita los filtros.' }}
+        pagina={datos ?? undefined}
+        onPagina={f.setPagina}
       />
-
-      {resumen && (
-        <StatGrid>
-          <StatCard
-            etiqueta="Usuarios activos"
-            valor={String(resumen.activos)}
-            valorSecundario={` / ${resumen.total}`}
-            detalle="Cuentas creadas en el portal"
-            glifo="✓"
-            tono="primary"
-          />
-          <StatCard
-            etiqueta="Administradores"
-            valor={String(resumen.administradores)}
-            detalle="Con acceso total al sistema"
-            glifo="★"
-            tono="info"
-          />
-          <StatCard
-            etiqueta="Invitaciones pendientes"
-            valor={String(resumen.invitaciones)}
-            detalle="Enviada hace 3 días"
-            detalleDestacado
-            glifo="✉"
-            tono="warning"
-          />
-          <StatCard
-            etiqueta="Sin ingresar hace 30 días"
-            valor={String(resumen.sinIngresar30)}
-            detalle="Revisar si siguen activos"
-            glifo="!"
-            tono="danger"
-          />
-        </StatGrid>
-      )}
-
-      <Card className="min-h-0 flex-1 overflow-hidden">
-        <div className="flex flex-wrap items-center gap-3 border-b border-border-base px-4 py-3">
-          <Tabs
-            etiqueta="Filtrar usuarios por rol"
-            valor={tab}
-            onChange={setTab}
-            opciones={TABS_USUARIO.map((valor) => ({
-              valor,
-              label: ETIQUETAS[valor],
-              conteo: datos?.conteos[valor],
-            }))}
-          />
-          <SearchInput
-            valor={q}
-            onChange={setQ}
-            placeholder="Buscar por nombre o correo"
-            className="ml-auto w-full max-w-[260px]"
-          />
-        </div>
-
-        <DataTable
-          columnas={columnas}
-          filas={lista?.items ?? []}
-          claveFila={(u) => u.id}
-          cargando={cargando}
-          vacio={{
-            titulo: 'Ningún usuario coincide',
-            descripcion: 'Cambia de pestaña o ajusta la búsqueda.',
-          }}
-        />
-
-        {lista && (
-          <Pager
-            pagina={lista.pagina}
-            totalPaginas={lista.totalPaginas}
-            info={textoPagina(lista, 'usuarios')}
-            onPagina={setPagina}
-          />
-        )}
-      </Card>
-    </div>
+      <FormUsuario
+        abierto={form.abierto}
+        usuario={form.usuario}
+        onCerrar={() => setForm({ abierto: false, usuario: null })}
+        onRegistrado={(r) => {
+          mostrar({ tono: 'exito', mensaje: `Usuario ${r.usuario.nombre} registrado` })
+          setCredenciales({ nombre: r.usuario.nombre, correo: r.usuario.correo, contrasena: r.contrasenaTemporal })
+          recargar()
+        }}
+        onEditado={(u) => { mostrar({ tono: 'exito', mensaje: `Datos de ${u.nombre} actualizados` }); recargar() }}
+      />
+      <CredencialesNuevas credenciales={credenciales} onCerrar={() => setCredenciales(null)} />
+    </>
   )
 }

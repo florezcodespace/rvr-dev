@@ -1,165 +1,98 @@
-import { useCallback } from 'react'
-import { ESTADO_TECNICO_META } from '@shared/domain/estados'
-import { IconDescargar, IconMas } from '@shared/components/icons'
-import {
-  Alert,
-  Button,
-  Card,
-  PageHeader,
-  SearchInput,
-  Spinner,
-  StatCard,
-  StatGrid,
-  Tabs,
-} from '@shared/components/ui'
-import { useCambioEstado } from '@shared/hooks/useCambioEstado'
-import { useListaParams } from '@shared/hooks/useListaParams'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@features/auth'
+import { DETALLE } from '@app/routes/paths'
+import { CredencialesNuevas, type Credenciales } from '@shared/components/cuentas/CredencialesNuevas'
+import { AccionesFila, CambioActivo, Listado, type Columna } from '@shared/components/data'
+import { FiltroSelect } from '@shared/components/form/Campos'
+import { IconEditar, IconMas, IconVer } from '@shared/components/icons'
+import { Avatar, Button, SearchInput, Tabs } from '@shared/components/ui'
+import { useFiltros } from '@shared/hooks/useFiltros'
 import { useRecurso } from '@shared/hooks/useRecurso'
-import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
-import { formatearDecimal } from '@shared/lib/format'
-import { tecnicosService } from '../api'
-import { TarjetaTecnico } from '../components/TarjetaTecnico'
-import { TABS_TECNICO, type TabTecnico } from '../types'
-
-const ETIQUETAS: Record<TabTecnico, string> = {
-  todos: 'Todos',
-  disponibles: 'Disponibles',
-  en_ruta: 'En ruta o en sitio',
-  fuera_turno: 'Fuera de turno',
-}
+import { useToast } from '@shared/hooks/useToast'
+import { tecnicosService, type Tecnico } from '../api'
+import { FormTecnico } from '../FormTecnico'
 
 const cargar = tecnicosService.listar.bind(tecnicosService)
 
+/** HU_24 Listar · HU_23 Buscar · HU_26 Cambiar estado · HU_22 / HU_25 */
 export default function TecnicosPage() {
-  const { tab, q, params, setTab, setQ } = useListaParams<TabTecnico>('todos', TABS_TECNICO)
-  const { datos, cargando, error } = useRecurso(cargar, params)
+  const { tiene } = useAuth()
+  const { mostrar } = useToast()
+  const navigate = useNavigate()
+  const f = useFiltros(['estado', 'especialidad'] as const)
+  const { datos, cargando, error, recargar } = useRecurso(cargar, f.params)
+  const [especialidades, setEspecialidades] = useState<string[]>([])
+  const [form, setForm] = useState<{ abierto: boolean; tecnico: Tecnico | null }>({ abierto: false, tecnico: null })
+  const [credenciales, setCredenciales] = useState<Credenciales | null>(null)
 
-  const guardar = useCallback(
-    (id: number, estado: Parameters<typeof tecnicosService.cambiarEstado>[1]) =>
-      tecnicosService.cambiarEstado(id, estado),
-    [],
-  )
-  const { estadoDe, cambiar } = useCambioEstado(guardar, ESTADO_TECNICO_META)
+  useEffect(() => { tecnicosService.especialidades().then(setEspecialidades).catch(() => undefined) }, [datos])
 
-  if (error) {
-    return (
-      <div className="p-7">
-        <Alert tone="danger" title={error} description="Inténtalo de nuevo en un momento." />
-      </div>
-    )
-  }
+  const columnas: Columna<Tecnico>[] = [
+    {
+      clave: 'tecnico', titulo: 'Técnico',
+      render: (t) => (
+        <div className="flex items-center gap-2.5">
+          <Avatar nombre={t.nombre} tamano="sm" />
+          <div className="min-w-0">
+            <div className="truncate font-semibold text-fg">{t.nombres} {t.apellidos}</div>
+            <div className="truncate font-mono text-[11px] text-fg-subtle">{t.documento}</div>
+          </div>
+        </div>
+      ),
+    },
+    { clave: 'especialidad', titulo: 'Especialidad', recortar: true, render: (t) => t.especialidad || '—' },
+    { clave: 'telefono', titulo: 'Teléfono', ancho: '130px', render: (t) => t.telefono || '—' },
+    { clave: 'visitas', titulo: 'Visitas pend.', ancho: '110px', alinear: 'right', render: (t) => <span className="font-mono whitespace-nowrap text-fg">{t.visitasPendientes}</span> },
+    { clave: 'app', titulo: 'App móvil', ancho: '100px', render: (t) => (t.cuentaMovil ? <span className="text-success-fg">● Con cuenta</span> : <span className="text-fg-faint">Sin cuenta</span>) },
+    {
+      clave: 'estado', titulo: 'Estado', ancho: '130px',
+      render: (t) => <CambioActivo estado={t.estado} registro={t.nombre} puede={tiene('tecnicos.cambiar_estado')} onCambiar={(e, c) => tecnicosService.cambiarEstado(t.id, e, c)} onHecho={recargar} />,
+    },
+    {
+      clave: 'acciones', titulo: '', ancho: '92px', alinear: 'right',
+      render: (t) => (
+        <AccionesFila acciones={[
+          ...(tiene('tecnicos.ver_detalle') ? [{ clave: 'ver', etiqueta: `Ver a ${t.nombre}`, icono: <IconVer />, a: DETALLE.tecnico(t.id) }] : []),
+          ...(tiene('tecnicos.editar') ? [{ clave: 'editar', etiqueta: `Editar a ${t.nombre}`, icono: <IconEditar />, onClick: () => setForm({ abierto: true, tecnico: t }) }] : []),
+        ]} />
+      ),
+    },
+  ]
 
-  const resumen = datos?.resumen
-
+  const c = datos?.conteos
   return (
-    <div className="flex flex-col gap-4 px-7 py-6">
-      <PageHeader
+    <>
+      <Listado
+        eyebrow="Servicios"
         titulo="Técnicos"
-        descripcion={
-          resumen
-            ? `${resumen.disponibles} de ${resumen.activos} técnicos disponibles para las órdenes de hoy`
-            : 'Cargando…'
-        }
-        acciones={
+        descripcion="Personal que presta los servicios. Trabajan desde la aplicación móvil; aquí se administran."
+        acciones={tiene('tecnicos.registrar') && <Button leadingIcon={<IconMas />} onClick={() => setForm({ abierto: true, tecnico: null })}>Registrar técnico</Button>}
+        barra={
           <>
-            <Button
-              variant="secondary"
-              disabled
-              title={PENDIENTE_BACKEND}
-              leadingIcon={<IconDescargar />}
-            >
-              Ver agenda
-            </Button>
-            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
-              Agregar técnico
-            </Button>
+            {tiene('tecnicos.buscar') && <SearchInput valor={f.valores.q} onChange={(v) => f.set('q', v)} placeholder="Nombre, documento o especialidad…" className="w-full max-w-[300px]" />}
+            <Tabs etiqueta="Estado" valor={f.valores.estado || 'todos'} onChange={(v) => f.set('estado', v === 'todos' ? '' : v)}
+              opciones={[{ valor: 'todos', label: 'Todos', conteo: c?.todos }, { valor: 'activo', label: 'Activos', conteo: c?.activo }, { valor: 'inactivo', label: 'Inactivos', conteo: c?.inactivo }]} />
+            <FiltroSelect etiqueta="Especialidad" valor={f.valores.especialidad} onChange={(v) => f.set('especialidad', v)} opciones={especialidades.map((e) => ({ valor: e, label: e }))} todos="Todas" />
           </>
         }
+        columnas={columnas}
+        filas={datos?.items ?? []}
+        claveFila={(t) => t.id}
+        cargando={cargando}
+        error={error}
+        onAbrir={tiene('tecnicos.ver_detalle') ? (t) => navigate(DETALLE.tecnico(t.id)) : undefined}
+        vacio={{ titulo: 'No se encontraron técnicos', descripcion: 'Prueba con otro término o quita los filtros.' }}
+        pagina={datos ?? undefined}
+        onPagina={f.setPagina}
       />
-
-      {resumen && (
-        <StatGrid>
-          <StatCard
-            etiqueta="Disponibles ahora"
-            valor={String(resumen.disponibles)}
-            valorSecundario={` / ${resumen.activos}`}
-            detalle="Según horarios_tecnicos de hoy"
-            glifo="✓"
-            tono="success"
-          />
-          <StatCard
-            etiqueta="En ruta o en sitio"
-            valor={String(resumen.enRuta)}
-            detalle="Con orden asignada"
-            glifo="→"
-            tono="primary"
-          />
-          <StatCard
-            etiqueta="Órdenes asignadas hoy"
-            valor={String(resumen.ordenesHoy)}
-            detalle={`Promedio de ${formatearDecimal(resumen.promedioPorTecnico)} por técnico`}
-            glifo="◆"
-            tono="info"
-          />
-          <StatCard
-            etiqueta="Cumplimiento SLA"
-            valor={`${resumen.cumplimientoSla} %`}
-            detalle="Meta del mes: 95 %"
-            glifo="◈"
-            tono="warning"
-          />
-        </StatGrid>
-      )}
-
-      <Card className="gap-4 px-4 py-3.5">
-        <div className="flex flex-wrap items-center gap-3">
-          <Tabs
-            etiqueta="Filtrar técnicos por disponibilidad"
-            valor={tab}
-            onChange={setTab}
-            opciones={TABS_TECNICO.map((valor) => ({
-              valor,
-              label: ETIQUETAS[valor],
-              conteo: datos?.conteos[valor],
-            }))}
-          />
-          <SearchInput
-            valor={q}
-            onChange={setQ}
-            placeholder="Buscar por nombre, zona o habilidad"
-            className="ml-auto w-full max-w-[280px]"
-          />
-        </div>
-
-        {cargando && !datos ? (
-          <div className="flex justify-center py-16 text-fg-subtle">
-            <Spinner className="size-5" />
-          </div>
-        ) : datos && datos.items.length === 0 ? (
-          <div className="flex flex-col items-center gap-1.5 py-16 text-center">
-            <p className="m-0 text-[14px] font-semibold text-fg">Ningún técnico coincide</p>
-            <p className="m-0 text-[12.5px] text-fg-muted">
-              Cambia de pestaña o ajusta la búsqueda.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {datos?.items.map((tecnico) => {
-              const actual = estadoDe(tecnico.id, tecnico.estado)
-              return (
-                <TarjetaTecnico
-                  key={tecnico.id}
-                  tecnico={tecnico}
-                  estado={actual}
-                  onCambiarEstado={(destino) =>
-                    cambiar(tecnico.id, destino, actual, tecnico.nombre)
-                  }
-                />
-              )
-            })}
-          </div>
-        )}
-      </Card>
-    </div>
+      <FormTecnico abierto={form.abierto} tecnico={form.tecnico} onCerrar={() => setForm({ abierto: false, tecnico: null })}
+        onGuardado={(t, cuenta) => {
+          mostrar({ tono: 'exito', mensaje: form.tecnico ? `Datos de ${t.nombre} actualizados` : `${t.nombre} registrado` })
+          if (cuenta) setCredenciales({ nombre: t.nombre, correo: cuenta.correo, contrasena: cuenta.contrasenaTemporal })
+          recargar()
+        }} />
+      <CredencialesNuevas titulo="Cuenta de la app móvil creada" credenciales={credenciales} onCerrar={() => setCredenciales(null)} />
+    </>
   )
 }

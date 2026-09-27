@@ -1,0 +1,82 @@
+// ============================================================================
+// Cambios propuestos al diagrama de RvR Tecnologías
+// Salidos de la revisión BD vs. portal del 9 de septiembre de 2026.
+// Pegar en dbdiagram.io sobre el modelo vigente.
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// 1. Estados propios donde hoy se usa estado_general
+//    El portal permite cambiar estos estados desde el listado; con
+//    estado_general (activo/inactivo) no tendrían dónde guardarse.
+// ---------------------------------------------------------------------------
+
+Enum estado_tecnico {
+  disponible
+  en_ruta
+  en_sitio
+  fuera_turno
+}
+
+Enum estado_servicio {
+  activo
+  borrador
+  archivado
+}
+
+Enum estado_usuario {
+  activo
+  invitacion_enviada
+  inactivo
+  bloqueado
+}
+
+// tecnicos.estado   : estado_general -> estado_tecnico
+// servicios.estado  : estado_general -> estado_servicio
+// usuarios.estado   : estado_general -> estado_usuario
+
+// NOTA sobre clientes: el portal muestra "Activo / Con saldo / Inactivo", pero
+// "con saldo" se deduce de `pagos` (hay saldo pendiente). Lo recomendable es
+// dejar clientes.estado como estado_general y calcular "con saldo"; si se
+// prefiere guardarlo, crear estado_cliente { activo, con_saldo, inactivo }.
+
+// ---------------------------------------------------------------------------
+// 2. Columnas que el portal muestra y hoy no existen
+// ---------------------------------------------------------------------------
+
+// tecnicos
+//   zona varchar(80)              // filtro y tarjeta de técnico
+
+Table tecnico_habilidades {
+  tecnico_id int [ref: > tecnicos.id, not null]
+  nombre varchar(60) [not null]
+
+  indexes {
+    (tecnico_id, nombre) [pk]
+  }
+  Note: 'Etiquetas del tecnico (Redes, CCTV, VMware). especialidad sigue siendo el cargo.'
+}
+
+// clientes
+//   sector varchar(60)            // filtro y columna del listado
+//   ciudad varchar(60)            // hoy solo existe direccion
+
+// servicios
+//   unidad varchar(30)            // "por equipo", "por camara", "mensual"
+
+// ordenes_servicio
+//   observaciones varchar(1000)   // nota interna para el tecnico que hoy captura
+//                                 // el formulario de creacion. Si no se agrega,
+//                                 // el backend debe guardarla en el primer
+//                                 // reportes_tecnicos.
+
+// cotizaciones
+//   fecha_vigencia date           // OPCIONAL: solo si se quiere el KPI
+//                                 // "por vencer". El portal hoy usa
+//                                 // fecha_emision + dias de respuesta.
+
+// ---------------------------------------------------------------------------
+// 3. Auditoria de accesos
+//    Se decidio sacarla del alcance: el portal ya no la menciona y
+//    usuarios.ultimo_acceso queda como unico rastro. Si mas adelante se pide
+//    trazabilidad, vuelve la tabla log_accesos.
+// ---------------------------------------------------------------------------

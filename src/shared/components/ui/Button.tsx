@@ -14,12 +14,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS: Record<Variant, string> = {
-  primary:
-    'bg-primary text-on-primary shadow-sm enabled:hover:bg-primary-hover enabled:active:bg-primary-hover',
+  primary: 'pintura-primaria text-on-primary',
   secondary:
-    'border border-border-strong bg-surface text-fg enabled:hover:bg-surface-muted',
+    'pintura-secundaria border border-border-strong bg-surface text-fg enabled:hover:bg-surface-muted',
   ghost: 'text-fg-muted enabled:hover:bg-surface-muted enabled:hover:text-fg',
-  danger: 'bg-danger text-white enabled:hover:brightness-110',
+  danger: 'pintura-peligro text-white',
 }
 
 const SIZES: Record<Size, string> = {
@@ -46,8 +45,8 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        'inline-flex cursor-pointer items-center justify-center gap-[7px] font-semibold tracking-[-0.1px] transition-colors',
-        'disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none',
+        'pintura-boton inline-flex cursor-pointer items-center justify-center gap-[7px] font-semibold tracking-[-0.1px]',
+        'disabled:cursor-not-allowed disabled:opacity-60',
         VARIANTS[variant],
         SIZES[size],
         fullWidth && 'w-full',

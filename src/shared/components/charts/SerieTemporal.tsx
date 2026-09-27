@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { cn } from '@shared/lib/cn'
 
 const ANCHO = 420
@@ -28,22 +28,29 @@ const aPath = (ps: { x: number; y: number }[]) =>
   ps.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
 
 /**
- * Dos series en el tiempo, con área bajo la primera, crosshair y tooltip.
- * La segunda serie va punteada: nunca se distinguen solo por color.
+ * Dos series en el tiempo: la primera con área en degradado, la segunda
+ * punteada —nunca se distinguen solo por color—. Al entrar, un barrido revela
+ * el trazado de izquierda a derecha; el área se funde después.
  */
 export function SerieTemporal({
   datos,
   series,
   descripcion,
   etiquetasEje,
+  alto = 'h-32',
 }: {
   datos: PuntoSerie[]
   series: ConfigSeries
   descripcion: string
   /** Índices del eje a rotular; por defecto 5 repartidos. */
   etiquetasEje?: number[]
+  /** Clase de altura del lienzo, para tarjetas más altas. */
+  alto?: string
 }) {
   const [activo, setActivo] = useState<number | null>(null)
+  const id = useId()
+  const idDegradado = `degradado-${id}`
+  const idRevelado = `revelado-${id}`
 
   const { maximo, lineas, marcas } = useMemo(() => {
     const max = Math.max(...datos.flatMap((d) => [d.a, d.b]), 1)
@@ -75,12 +82,12 @@ export function SerieTemporal({
   const punto = activo !== null ? datos[activo] : undefined
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex min-h-0 flex-col gap-2">
       <div
         role="img"
         tabIndex={0}
         aria-label={descripcion}
-        className="relative cursor-crosshair rounded-[6px] outline-offset-4"
+        className="relative min-h-0 flex-1 cursor-crosshair rounded-[6px] outline-offset-4"
         onPointerMove={moverPuntero}
         onPointerLeave={() => setActivo(null)}
         onBlur={() => setActivo(null)}
@@ -97,9 +104,20 @@ export function SerieTemporal({
         <svg
           viewBox={`0 0 ${ANCHO} ${ALTO}`}
           preserveAspectRatio="none"
-          className="block h-32 w-full"
+          className={cn('block w-full', alto)}
           aria-hidden="true"
         >
+          <defs>
+            <linearGradient id={idDegradado} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={series.a.color} stopOpacity="0.24" />
+              <stop offset="100%" stopColor={series.a.color} stopOpacity="0" />
+            </linearGradient>
+            {/* Barrido de entrada: un rectángulo que crece revela el trazado. */}
+            <clipPath id={idRevelado}>
+              <rect className="anim-revelado" x="0" y="0" width={ANCHO} height={ALTO} />
+            </clipPath>
+          </defs>
+
           {[30, 60, 90].map((y) => (
             <line
               key={y}
@@ -113,31 +131,33 @@ export function SerieTemporal({
             />
           ))}
 
-          <polygon
-            points={`${lineas.a.map((p) => `${p.x},${p.y}`).join(' ')} ${ANCHO},${ALTO} 0,${ALTO}`}
-            fill={series.a.color}
-            opacity="0.08"
-          />
+          <g clipPath={`url(#${idRevelado})`}>
+            <polygon
+              className="anim-velo"
+              points={`${lineas.a.map((p) => `${p.x},${p.y}`).join(' ')} ${ANCHO},${ALTO} 0,${ALTO}`}
+              fill={`url(#${idDegradado})`}
+            />
 
-          <path
-            d={aPath(lineas.a)}
-            fill="none"
-            stroke={series.a.color}
-            strokeWidth="2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <path
-            d={aPath(lineas.b)}
-            fill="none"
-            stroke={series.b.color}
-            strokeWidth="2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            strokeDasharray={series.b.discontinua === false ? undefined : '5 4'}
-            vectorEffect="non-scaling-stroke"
-          />
+            <path
+              d={aPath(lineas.a)}
+              fill="none"
+              stroke={series.a.color}
+              strokeWidth="2.4"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={aPath(lineas.b)}
+              fill="none"
+              stroke={series.b.color}
+              strokeWidth="2.2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              strokeDasharray={series.b.discontinua === false ? undefined : '5 4'}
+              vectorEffect="non-scaling-stroke"
+            />
+          </g>
         </svg>
 
         {activo !== null && punto && (
@@ -198,7 +218,9 @@ export function SerieTemporal({
 
       <div className="sr-only">
         <table>
-          <caption>{descripcion} (máximo {maximo})</caption>
+          <caption>
+            {descripcion} (máximo {maximo})
+          </caption>
           <thead>
             <tr>
               <th scope="col">Periodo</th>
@@ -223,11 +245,11 @@ export function SerieTemporal({
 
 export function LeyendaSeries({ series }: { series: ConfigSeries }) {
   return (
-    <div className="flex gap-3 text-[11px] font-medium text-fg-muted">
+    <div className="flex gap-3.5 text-[11px] font-medium text-fg-muted">
       {(['a', 'b'] as const).map((clave) => (
-        <span key={clave} className="flex items-center gap-[5px]">
+        <span key={clave} className="flex items-center gap-[6px]">
           <span
-            className="h-[3px] w-[9px] rounded-[2px]"
+            className="h-[3px] w-[14px] rounded-[2px]"
             style={{ background: series[clave].color }}
           />
           {series[clave].label}

@@ -1,222 +1,98 @@
-import { useCallback } from 'react'
-import { ESTADO_CLIENTE_META, TRANSICIONES_CLIENTE } from '@shared/domain/estados'
-import { IconDescargar, IconMas } from '@shared/components/icons'
-import { DataTable, Pager, SelectorEstado } from '@shared/components/data'
-import type { Columna } from '@shared/components/data'
-import {
-  Alert,
-  Avatar,
-  Button,
-  Card,
-  PageHeader,
-  SearchInput,
-  StatCard,
-  StatGrid,
-  Tabs,
-} from '@shared/components/ui'
-import { useCambioEstado } from '@shared/hooks/useCambioEstado'
-import { useListaParams } from '@shared/hooks/useListaParams'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@features/auth'
+import { DETALLE } from '@app/routes/paths'
+import { AccionesFila, CambioActivo, Listado, type Columna } from '@shared/components/data'
+import { FiltroSelect } from '@shared/components/form/Campos'
+import { IconEditar, IconMas, IconVer } from '@shared/components/icons'
+import { Avatar, Button, SearchInput, StatCard, StatGrid, Tabs } from '@shared/components/ui'
+import { useFiltros } from '@shared/hooks/useFiltros'
 import { useRecurso } from '@shared/hooks/useRecurso'
-import { formatearMoneda, formatearNumero, tiempoRelativo } from '@shared/lib/format'
-import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
-import { textoPagina } from '@shared/lib/paginar'
-import { clientesService } from '../api'
-import { TABS_CLIENTE, type Cliente, type TabCliente } from '../types'
-
-const ETIQUETAS: Record<TabCliente, string> = {
-  todos: 'Todos',
-  activos: 'Activos',
-  con_saldo: 'Con saldo',
-  inactivos: 'Inactivos',
-}
+import { useToast } from '@shared/hooks/useToast'
+import { formatearFecha } from '@shared/lib/format'
+import { clientesService, type Cliente } from '../api'
+import { FormCliente } from '../FormCliente'
 
 const cargar = clientesService.listar.bind(clientesService)
 
+/** HU_33 Listar · HU_32 Buscar · HU_83 Cambiar estado · HU_31 / HU_34 */
 export default function ClientesPage() {
-  const { tab, q, params, setTab, setQ, setPagina } = useListaParams<TabCliente>(
-    'todos',
-    TABS_CLIENTE,
-  )
-  const { datos, cargando, error } = useRecurso(cargar, params)
-
-  const guardar = useCallback(
-    (id: number, estado: Parameters<typeof clientesService.cambiarEstado>[1]) =>
-      clientesService.cambiarEstado(id, estado),
-    [],
-  )
-  const { estadoDe, cambiar } = useCambioEstado(guardar, ESTADO_CLIENTE_META)
-
-  if (error) {
-    return (
-      <div className="p-7">
-        <Alert tone="danger" title={error} description="Inténtalo de nuevo en un momento." />
-      </div>
-    )
-  }
-
-  const resumen = datos?.resumen
-  const lista = datos?.pagina
+  const { tiene } = useAuth()
+  const { mostrar } = useToast()
+  const navigate = useNavigate()
+  const f = useFiltros(['estado', 'orden'] as const, { orden: 'fecha' })
+  const { datos, cargando, error, recargar } = useRecurso(cargar, f.params)
+  const [form, setForm] = useState<{ abierto: boolean; cliente: Cliente | null }>({ abierto: false, cliente: null })
 
   const columnas: Columna<Cliente>[] = [
     {
-      clave: 'cliente',
-      titulo: 'Cliente',
+      clave: 'cliente', titulo: 'Cliente',
       render: (c) => (
         <div className="flex items-center gap-2.5">
           <Avatar nombre={c.nombre} tamano="sm" />
           <div className="min-w-0">
-            <div className="truncate font-semibold text-fg">{c.nombre}</div>
-            <div className="truncate font-mono text-[11px] text-fg-subtle">
-              {c.documento}
-            </div>
+            <div className="truncate font-semibold text-fg">{c.nombres} {c.apellidos}</div>
+            <div className="truncate font-mono text-[11px] text-fg-subtle">{c.documento}</div>
           </div>
         </div>
       ),
     },
-    { clave: 'sector', titulo: 'Sector', ancho: '128px', render: (c) => c.sector },
+    { clave: 'telefono', titulo: 'Teléfono', ancho: '120px', render: (c) => c.telefono || '—' },
+    { clave: 'direccion', titulo: 'Dirección', recortar: true, render: (c) => c.direccion || '—' },
+    { clave: 'registro', titulo: 'Registro', ancho: '104px', render: (c) => formatearFecha(c.fechaRegistro) },
+    { clave: 'portal', titulo: 'Portal', ancho: '90px', render: (c) => (c.tieneCuenta ? <span className="text-success-fg">● Cuenta</span> : <span className="text-fg-faint">—</span>) },
     {
-      clave: 'ordenes',
-      titulo: 'Órdenes',
-      ancho: '86px',
-      alinear: 'right',
-      render: (c) => <span className="font-mono text-[12px] text-fg">{c.ordenes}</span>,
+      clave: 'estado', titulo: 'Estado', ancho: '130px',
+      render: (c) => <CambioActivo estado={c.estado} registro={c.nombre} puede={tiene('clientes.cambiar_estado')} onCambiar={(e, conf) => clientesService.cambiarEstado(c.id, e, conf)} onHecho={recargar} />,
     },
     {
-      clave: 'facturacion',
-      titulo: 'Facturación',
-      ancho: '132px',
-      alinear: 'right',
+      clave: 'acciones', titulo: '', ancho: '92px', alinear: 'right',
       render: (c) => (
-        <span className="font-mono text-[12px] text-fg">
-          {formatearMoneda(c.facturacion)}
-        </span>
+        <AccionesFila acciones={[
+          ...(tiene('clientes.ver_detalle') ? [{ clave: 'ver', etiqueta: `Ver a ${c.nombre}`, icono: <IconVer />, a: DETALLE.cliente(c.id) }] : []),
+          ...(tiene('clientes.editar') ? [{ clave: 'editar', etiqueta: `Editar a ${c.nombre}`, icono: <IconEditar />, onClick: () => setForm({ abierto: true, cliente: c }) }] : []),
+        ]} />
       ),
-    },
-    {
-      clave: 'estado',
-      titulo: 'Estado',
-      ancho: '140px',
-      render: (c) => {
-        const actual = estadoDe(c.id, c.estado)
-        return (
-          <SelectorEstado
-            valor={actual}
-            meta={ESTADO_CLIENTE_META}
-            transiciones={TRANSICIONES_CLIENTE[actual]}
-            registro={c.nombre}
-            onCambiar={(destino) => cambiar(c.id, destino, actual, c.nombre)}
-          />
-        )
-      },
-    },
-    {
-      clave: 'ultima',
-      titulo: 'Última orden',
-      ancho: '124px',
-      render: (c) => tiempoRelativo(`${c.ultimaOrden}T12:00:00`),
     },
   ]
 
+  const c = datos?.conteos
   return (
-    <div className="flex h-full flex-col gap-4 px-7 py-6">
-      <PageHeader
+    <>
+      <Listado
+        eyebrow="Venta – Órdenes"
         titulo="Clientes"
-        descripcion={
-          resumen
-            ? `${formatearNumero(resumen.total)} clientes registrados · ${resumen.nuevosMes} nuevos este mes`
-            : 'Cargando…'
-        }
-        acciones={
+        descripcion="Historial centralizado: ya no se vuelven a pedir los datos ni se pierden en el cuaderno."
+        acciones={tiene('clientes.registrar') && <Button leadingIcon={<IconMas />} onClick={() => setForm({ abierto: true, cliente: null })}>Registrar cliente</Button>}
+        indicadores={c && (
+          <StatGrid>
+            <StatCard etiqueta="Clientes activos" valor={String(c.activo)} detalle={`${c.todos} registrados en total`} glifo="●" tono="success" />
+            <StatCard etiqueta="Con cuenta en el portal" valor={String(c.con_cuenta)} detalle="Solicitan y aprueban en línea" glifo="◆" tono="primary" />
+            <StatCard etiqueta="Nuevos este mes" valor={String(c.nuevos_mes)} detalle="Registrados desde el día 1" glifo="✦" tono="info" />
+            <StatCard etiqueta="Inactivos" valor={String(c.inactivo)} detalle="Conservan su historial" glifo="○" tono="warning" />
+          </StatGrid>
+        )}
+        barra={
           <>
-            <Button
-              variant="secondary"
-              disabled
-              title={PENDIENTE_BACKEND}
-              leadingIcon={<IconDescargar />}
-            >
-              Importar
-            </Button>
-            <Button disabled title={PENDIENTE_BACKEND} leadingIcon={<IconMas />}>
-              Nuevo cliente
-            </Button>
+            {tiene('clientes.buscar') && <SearchInput valor={f.valores.q} onChange={(v) => f.set('q', v)} placeholder="Nombre, documento o teléfono…" className="w-full max-w-[300px]" />}
+            <Tabs etiqueta="Estado" valor={f.valores.estado || 'todos'} onChange={(v) => f.set('estado', v === 'todos' ? '' : v)}
+              opciones={[{ valor: 'todos', label: 'Todos', conteo: c?.todos }, { valor: 'activo', label: 'Activos', conteo: c?.activo }, { valor: 'inactivo', label: 'Inactivos', conteo: c?.inactivo }]} />
+            <FiltroSelect etiqueta="Ordenar por" valor={f.valores.orden === 'fecha' ? '' : f.valores.orden} onChange={(v) => f.set('orden', v || 'fecha')}
+              opciones={[{ valor: 'nombre', label: 'Nombre' }]} todos="Fecha de registro" />
           </>
         }
+        columnas={columnas}
+        filas={datos?.items ?? []}
+        claveFila={(x) => x.id}
+        cargando={cargando}
+        error={error}
+        onAbrir={tiene('clientes.ver_detalle') ? (x) => navigate(DETALLE.cliente(x.id)) : undefined}
+        vacio={{ titulo: 'No se encontraron clientes', descripcion: 'Prueba con otro término o quita los filtros.' }}
+        pagina={datos ?? undefined}
+        onPagina={f.setPagina}
       />
-
-      {resumen && (
-        <StatGrid>
-          <StatCard
-            etiqueta="Clientes activos"
-            valor={formatearNumero(resumen.activos)}
-            detalle={`${Math.round((resumen.activos / resumen.total) * 100)} % de la base total`}
-            glifo="◆"
-            tono="primary"
-          />
-          <StatCard
-            etiqueta="Nuevos este mes"
-            valor={String(resumen.nuevosMes)}
-            detalle="+2 frente a agosto"
-            glifo="✦"
-            tono="success"
-          />
-          <StatCard
-            etiqueta="Con saldo pendiente"
-            valor={String(resumen.conSaldo)}
-            detalle={`${formatearMoneda(resumen.valorSaldo)} por conciliar`}
-            detalleDestacado
-            glifo="⏱"
-            tono="warning"
-          />
-          <StatCard
-            etiqueta="Facturación acumulada"
-            valor={formatearMoneda(resumen.facturacionAnual)}
-            detalle="Año corrido 2026"
-            glifo="◈"
-            tono="info"
-          />
-        </StatGrid>
-      )}
-
-      <Card className="min-h-0 flex-1 overflow-hidden">
-        <div className="flex flex-wrap items-center gap-3 border-b border-border-base px-4 py-3">
-          <Tabs
-            etiqueta="Filtrar clientes"
-            valor={tab}
-            onChange={setTab}
-            opciones={TABS_CLIENTE.map((valor) => ({
-              valor,
-              label: ETIQUETAS[valor],
-              conteo: datos?.conteos[valor],
-            }))}
-          />
-          <SearchInput
-            valor={q}
-            onChange={setQ}
-            placeholder="Buscar por nombre o NIT"
-            className="ml-auto w-full max-w-[260px]"
-          />
-        </div>
-
-        <DataTable
-          columnas={columnas}
-          filas={lista?.items ?? []}
-          claveFila={(c) => c.id}
-          cargando={cargando}
-          vacio={{
-            titulo: 'Ningún cliente coincide',
-            descripcion: 'Cambia de pestaña o ajusta la búsqueda.',
-          }}
-        />
-
-        {lista && (
-          <Pager
-            pagina={lista.pagina}
-            totalPaginas={lista.totalPaginas}
-            info={textoPagina(lista, 'clientes')}
-            onPagina={setPagina}
-          />
-        )}
-      </Card>
-    </div>
+      <FormCliente abierto={form.abierto} cliente={form.cliente} onCerrar={() => setForm({ abierto: false, cliente: null })}
+        onGuardado={(x) => { mostrar({ tono: 'exito', mensaje: form.cliente ? `Datos de ${x.nombre} actualizados` : `${x.nombre} registrado` }); recargar() }} />
+    </>
   )
 }

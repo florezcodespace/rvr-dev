@@ -1,0 +1,141 @@
+// ============================================================================
+//  Portal RvR Tecnologías · Modelo de datos OFICIAL
+//
+//  Este archivo es la fuente de verdad del modelo. Se puede pegar completo en
+//  https://dbdiagram.io para volver a ver el diagrama, y se mantiene en paralelo
+//  con `01-esquema.sql`, que es su traducción a PostgreSQL.
+//
+//  Reemplaza al modelo anterior de 22 tablas, que queda obsoleto.
+//
+//  REGLA DE TRABAJO: ningún cambio a la base entra sin acordarlo. Cuando se
+//  acuerde uno, se actualiza este archivo Y se agrega un script nuevo y
+//  numerado en db/ (10-..., 11-...). `01-esquema.sql` nunca se vuelve a correr
+//  sobre una base con datos: empieza con DROP TABLE.
+// ============================================================================
+
+Project rvr_tecnologias {
+  database_type: 'PostgreSQL'
+  Note: 'Portal de gestión de servicios técnicos · 11 tablas'
+}
+
+// ------------------------------------------------------------ 1. Seguridad
+
+Table roles {
+  id          int         [pk, increment]
+  nombre      varchar(50) [not null]
+  descripcion varchar(255)
+  estado      varchar(20)
+}
+
+Table permisos {
+  id          int         [pk, increment]
+  nombre      varchar(50) [not null]
+  modulo      varchar(20)
+  descripcion varchar(255)
+  estado      varchar(20)
+
+  Note: 'Precargados en la base, sin CRUD en la aplicación.'
+}
+
+Table roles_permisos {
+  rol_id     int [ref: > roles.id]
+  permiso_id int [ref: > permisos.id]
+
+  indexes {
+    (rol_id, permiso_id) [pk]
+  }
+}
+
+Table usuarios {
+  id              int          [pk, increment]
+  rol_id          int          [ref: > roles.id]
+  nombre_usuario  varchar(50)  [not null]
+  correo          varchar(100) [not null]
+  contrasena_hash varchar(255) [not null]
+  nombres         varchar(100) [not null]
+  apellidos       varchar(100) [not null]
+  telefono        varchar(20)
+  estado          varchar(20)
+  fecha_creacion  timestamp
+
+  Note: 'Clientes y técnicos son filas de esta tabla, distinguidos por su rol.'
+}
+
+// ------------------------------------------------------------- 2. Catálogo
+
+Table categorias {
+  id          int         [pk, increment]
+  nombre      varchar(80) [not null]
+  descripcion varchar(255)
+  estado      varchar(20)
+}
+
+Table servicios {
+  id           int           [pk, increment]
+  categoria_id int           [ref: > categorias.id]
+  nombre       varchar(100)  [not null]
+  descripcion  text
+  precio       decimal(10,2) [not null]
+  estado       varchar(20)
+}
+
+// ------------------------------------------------------------ 3. Operación
+
+Table agendamientos {
+  id               int         [pk, increment]
+  cliente_id       int         [ref: > usuarios.id]
+  tecnico_id       int         [ref: > usuarios.id]
+  servicio_id      int         [ref: > servicios.id]
+  fecha_programada timestamp   [not null]
+  estado           varchar(20)
+  notas            text
+  fecha_creacion   timestamp
+}
+
+Table ordenes_servicio {
+  id                   int         [pk, increment]
+  agendamiento_id      int         [ref: > agendamientos.id]
+  cliente_id           int         [ref: > usuarios.id]
+  tecnico_id           int         [ref: > usuarios.id]
+  servicio_id          int         [ref: > servicios.id]
+  estado               varchar(30)
+  descripcion_problema text
+  fecha_ingreso        timestamp
+  fecha_entrega        timestamp
+
+  Note: 'El código visible (OS-0147) se arma con el id; no hay columna propia.'
+}
+
+Table diagnosticos {
+  id                 int  [pk, increment]
+  orden_id           int  [ref: > ordenes_servicio.id]
+  tecnico_id         int  [ref: > usuarios.id]
+  hallazgos          text [not null]
+  solucion_propuesta text
+  fecha_diagnostico  timestamp
+
+  Note: 'Una orden puede tener varios: uno por visita.'
+}
+
+// --------------------------------------------------------------- 4. Venta
+
+Table ventas {
+  id              int           [pk, increment]
+  orden_id        int           [ref: > ordenes_servicio.id]
+  cliente_id      int           [ref: > usuarios.id]
+  monto_total     decimal(10,2) [not null]
+  saldo_pendiente decimal(10,2) [not null]
+  estado_pago     varchar(30)
+  fecha_venta     timestamp
+}
+
+Table abonos {
+  id          int           [pk, increment]
+  venta_id    int           [ref: > ventas.id]
+  monto       decimal(10,2) [not null]
+  metodo_pago varchar(30)   [not null]
+  referencia  varchar(100)
+  fecha_abono timestamp
+
+  Note: 'tipo_pago (anticipo/saldo) se distingue por el orden de los abonos.'
+}

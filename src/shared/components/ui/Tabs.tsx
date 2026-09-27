@@ -41,6 +41,7 @@ export function Tabs<T extends string>({
             onClick={() => onChange(opcion.valor)}
             className={cn(
               'flex cursor-pointer items-center gap-1.5 rounded-[8px] px-[11px] py-[7px] text-[12.5px] font-semibold transition-colors',
+              'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--rvr-ring-border)]',
               activo
                 ? 'bg-primary-soft text-primary-on-soft'
                 : 'text-fg-muted hover:bg-surface-muted hover:text-fg',
@@ -51,7 +52,7 @@ export function Tabs<T extends string>({
               <span
                 className={cn(
                   'rounded-full px-1.5 text-[10.5px] font-bold',
-                  activo ? 'bg-surface/70 text-primary-on-soft' : 'text-fg-faint',
+                  activo ? 'bg-primary text-on-primary' : 'text-fg-subtle',
                 )}
               >
                 {opcion.conteo}

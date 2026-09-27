@@ -1,4 +1,4 @@
-import { colorAvatar, iniciales } from '@shared/lib/avatar'
+import { gradienteAvatar, iniciales } from '@shared/lib/avatar'
 import { cn } from '@shared/lib/cn'
 
 type Tamano = 'sm' | 'md' | 'lg'
@@ -21,9 +21,9 @@ export function Avatar({
   return (
     <span
       aria-hidden="true"
-      style={{ background: colorAvatar(nombre) }}
+      style={{ backgroundImage: gradienteAvatar(nombre) }}
       className={cn(
-        'flex flex-none items-center justify-center font-bold text-white',
+        'flex flex-none items-center justify-center font-bold text-white shadow-[var(--rvr-brillo)]',
         TAMANOS[tamano],
         className,
       )}

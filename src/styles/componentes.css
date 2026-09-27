@@ -1,0 +1,310 @@
+/* ============================================================
+   Acabado de los componentes · Portal RvR Tecnologías
+
+   Aquí vive solo la "pintura": degradados, sombras y estados de
+   interacción. La geometría (altos, radios, espaciados) sigue en
+   las utilidades de Tailwind dentro de cada componente, que es
+   donde se lee mejor.
+   ============================================================ */
+
+@layer components {
+  /* --- Botones -------------------------------------------------- */
+
+  .pintura-boton {
+    transition:
+      transform 0.12s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.18s ease,
+      background 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease;
+  }
+
+  /* Al presionar baja 1 px: el clic se siente aunque no haya sonido. */
+  .pintura-boton:enabled:active {
+    transform: translateY(1px);
+  }
+
+  .pintura-primaria {
+    background-image: var(--rvr-grad-primary);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.12), var(--rvr-brillo);
+  }
+  .pintura-primaria:enabled:hover {
+    background-image: var(--rvr-grad-primary-hover);
+    box-shadow: 0 4px 14px -4px var(--rvr-halo-primary), var(--rvr-brillo);
+  }
+
+  .pintura-peligro {
+    background-image: var(--rvr-grad-danger);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.12), var(--rvr-brillo);
+  }
+  .pintura-peligro:enabled:hover {
+    box-shadow: 0 4px 14px -4px var(--rvr-halo-danger), var(--rvr-brillo);
+  }
+
+  /* El secundario y el fantasma se quedan planos para no competir. */
+  .pintura-secundaria {
+    box-shadow: var(--rvr-shadow-xs);
+  }
+  .pintura-secundaria:enabled:hover {
+    border-color: var(--rvr-fg-faint);
+  }
+
+  .pintura-boton:disabled {
+    box-shadow: none;
+    transform: none;
+    filter: saturate(0.7);
+  }
+
+  /* --- Superficies ---------------------------------------------- */
+
+  .tarjeta {
+    box-shadow: var(--rvr-shadow-card);
+  }
+
+  .tarjeta-viva {
+    transition:
+      transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.22s ease;
+  }
+  .tarjeta-viva:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--rvr-shadow-card-up);
+  }
+
+  /* El lateral y la barra superior se leen como planos propios sin
+     necesidad de un borde duro. */
+  .superficie-lateral {
+    background-image: var(--rvr-lateral);
+  }
+  .superficie-superior {
+    background-image: var(--rvr-superior);
+    box-shadow: 0 1px 3px -1px rgb(15 23 42 / 0.06);
+  }
+  .dark .superficie-superior {
+    box-shadow: 0 1px 3px -1px rgb(0 0 0 / 0.6);
+  }
+
+  .marca-degradada {
+    background-image: var(--rvr-grad-marca);
+    box-shadow: 0 2px 8px -2px var(--rvr-halo-primary), var(--rvr-brillo);
+  }
+
+  /* Subrayado que crece bajo los enlaces de la landing. */
+  .enlace-landing {
+    position: relative;
+  }
+  .enlace-landing::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--rvr-primary);
+    transition: width 0.25s ease;
+  }
+  .enlace-landing:hover::after {
+    width: 100%;
+  }
+
+  /* Velo bajo la barra flotante de la landing: sin él, el contenido se ve
+     pasar por los huecos que quedan alrededor de la isla. */
+  .velo-superior {
+    background: linear-gradient(
+      to bottom,
+      var(--rvr-surface) 0%,
+      color-mix(in srgb, var(--rvr-surface) 78%, transparent) 58%,
+      transparent 100%
+    );
+  }
+
+  /* Filo de realce de las tarjetas.
+
+     Un aro teñido dibujado con `box-shadow` más una línea de luz de un píxel en
+     el borde superior. Se descartaron las dos técnicas habituales de borde
+     degradado: las máscaras restadas no sobreviven al minificador —sube
+     `mask-composite` por delante de la forma corta que lo reinicia— y la capa
+     por detrás con `z-index: -1` tapa el fondo de la propia tarjeta en cuanto
+     algo crea un contexto de apilamiento, cosa que hace cualquier `transform`,
+     incluido el desplazamiento al apuntar. */
+  .filo-fijo {
+    position: relative;
+    box-shadow:
+      var(--rvr-shadow-card),
+      0 0 0 1px var(--rvr-filo-tinte);
+  }
+  .filo-fijo::before,
+  .filo-hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 14%;
+    left: 14%;
+    height: 1px;
+    background-image: var(--rvr-filo-luz);
+    pointer-events: none;
+  }
+
+  /* En una rejilla de seis, el filo encendido en todas deja de ser un acento y
+     pasa a ser ruido: aquí solo aparece en la tarjeta que se está mirando. */
+  .filo-hover {
+    position: relative;
+    transition: box-shadow 0.28s ease;
+  }
+  .filo-hover::before {
+    opacity: 0;
+    transition: opacity 0.28s ease;
+  }
+  .filo-hover:hover,
+  .filo-hover:focus-within {
+    box-shadow:
+      var(--rvr-shadow-card-up),
+      0 0 0 1px var(--rvr-filo-tinte);
+  }
+  .filo-hover:hover::before,
+  .filo-hover:focus-within::before {
+    opacity: 1;
+  }
+
+  /* Halo bajo un titular: da profundidad sin teñir el texto. */
+  .resplandor {
+    position: relative;
+  }
+  .resplandor::before {
+    content: '';
+    position: absolute;
+    top: -12%;
+    left: -8%;
+    width: 62%;
+    height: 118%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, var(--rvr-halo-titular), transparent);
+    filter: blur(46px);
+    pointer-events: none;
+  }
+
+  /* Los extremos de la cinta se desvanecen: cortada en seco parece un error. */
+  .cinta-velada {
+    mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+  }
+
+  /* La landing navega por anclas dentro de la misma página; el portal interno
+     no, así que la clase se activa solo mientras la landing está montada. */
+  .scroll-suave {
+    scroll-behavior: smooth;
+    scroll-padding-top: 92px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-suave {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Retícula del hero, difuminada hacia los bordes. */
+  .reticula-hero {
+    background-image:
+      linear-gradient(to right, var(--rvr-border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--rvr-border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 85% 65% at 50% 38%, #000 5%, transparent 72%);
+  }
+
+  /* --- Navegación ----------------------------------------------- */
+
+  .nav-lateral {
+    position: relative;
+    transition:
+      background-color 0.16s ease,
+      color 0.16s ease,
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-lateral:hover {
+    transform: translateX(2px);
+  }
+
+  /* Barra de desplazamiento discreta: el menú lateral y las listas largas se
+     recorren con la rueda sin que la barra le robe protagonismo al contenido. */
+  .desplazable-fino {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rvr-border-strong) transparent;
+  }
+  .desplazable-fino::-webkit-scrollbar {
+    width: 6px;
+  }
+  .desplazable-fino::-webkit-scrollbar-thumb {
+    border-radius: 99px;
+    background: var(--rvr-border-strong);
+  }
+  .desplazable-fino::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Riel de 3 px: el estado activo se reconoce antes de leer el texto. */
+  .nav-activa::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 18px;
+    border-radius: 0 2px 2px 0;
+    background: var(--rvr-primary);
+  }
+
+  .nav-riel.nav-activa::before {
+    left: -9px;
+    height: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pintura-boton,
+  .tarjeta-viva,
+  .nav-lateral {
+    transition: none !important;
+  }
+  .pintura-boton:enabled:active,
+  .tarjeta-viva:hover,
+  .nav-lateral:hover {
+    transform: none !important;
+  }
+}
+
+/* ============================================================
+   Impresión · «Exportar PDF» de Reportes
+
+   No hace falta backend: el navegador ya sabe imprimir a PDF. Lo que hace
+   falta es que la página impresa no arrastre el shell de la aplicación.
+   ============================================================ */
+@media print {
+  .no-imprimir {
+    display: none !important;
+  }
+
+  /* El shell usa alturas fijas y scroll interno: en papel estorban. */
+  html,
+  body,
+  #root {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  main {
+    overflow: visible !important;
+  }
+
+  /* Las tarjetas se imprimen con su borde, sin sombras que ensucian el tóner. */
+  .tarjeta {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 14mm;
+  }
+}

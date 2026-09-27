@@ -1,79 +1,66 @@
+import { Link } from 'react-router-dom'
+import { InsigniaDemo } from '@app/demo/InsigniaDemo'
+import { ROUTES } from '@app/routes/paths'
 import { useAuth } from '@features/auth'
-import { IconBuscar, IconCampana, IconSalir } from '@shared/components/icons'
-import { ThemeToggle } from '@shared/components/theme/ThemeToggle'
+import { PanelNotificaciones } from '@features/notificaciones'
+import { IconBuscar, IconSalir } from '@shared/components/icons'
+import { Avatar } from '@shared/components/ui'
 import { nombreLegible } from '@shared/lib/format'
-import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
 
-function iniciales(nombre: string): string {
-  return nombre
-    .split(/[.\s]/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((parte) => parte[0]?.toUpperCase() ?? '')
-    .join('')
-}
-
-export function Topbar() {
+export function Topbar({ onBuscar }: { onBuscar: () => void }) {
   const { usuario, logout } = useAuth()
 
   return (
-    <header className="flex h-16 flex-none items-center gap-[18px] border-b border-border-base bg-surface px-7">
-      {/*
-        El buscador global y la campana todavía no tienen a qué consultar: no
-        hay endpoint de búsqueda ni de notificaciones. Mientras tanto van
-        deshabilitados, con el motivo en el tooltip. Antes aceptaban texto y
-        clics y no pasaba nada, que es la peor de las tres opciones.
-      */}
-      <div
-        title={PENDIENTE_BACKEND}
-        className="flex h-[38px] max-w-[400px] flex-1 items-center gap-[9px] rounded-[9px] border border-border-base bg-bg px-3 opacity-60"
+    <header className="no-imprimir superficie-superior flex h-16 flex-none items-center gap-3 border-b border-border-base px-4 sm:gap-4 sm:px-7">
+      {/* El buscador abre la paleta global (⌘K); no es un campo, es un disparador. */}
+      <button
+        type="button"
+        onClick={onBuscar}
+        aria-label="Buscar en el portal"
+        aria-keyshortcuts="Meta+K Control+K"
+        className="group flex h-[38px] max-w-[420px] min-w-0 flex-1 cursor-pointer items-center gap-[9px] rounded-[9px] border border-border-base bg-bg px-3 text-left transition-[border-color,background-color,box-shadow] duration-150 hover:border-border-strong hover:bg-surface focus-visible:ring-focus"
       >
-        <IconBuscar width="14" height="14" className="flex-none text-fg-faint" />
-        <input
-          type="search"
-          disabled
-          placeholder="Buscar orden, cliente o técnico…"
-          aria-label={`Buscar en el portal. ${PENDIENTE_BACKEND}`}
-          className="min-w-0 flex-1 cursor-not-allowed bg-transparent text-[12.5px] text-fg outline-none placeholder:text-fg-faint"
+        <IconBuscar
+          width="14"
+          height="14"
+          className="flex-none text-fg-faint transition-colors group-hover:text-fg-muted"
         />
-      </div>
-
-      <div className="ml-auto flex items-center gap-3.5">
-        <ThemeToggle />
-
-        <span title={PENDIENTE_BACKEND}>
-          <button
-            type="button"
-            disabled
-            aria-label={`Notificaciones. ${PENDIENTE_BACKEND}`}
-            className="flex size-[34px] items-center justify-center rounded-[9px] border border-border-base text-fg-muted opacity-60"
-          >
-            <IconCampana />
-          </button>
+        <span className="min-w-0 flex-1 truncate text-[12.5px] text-fg-faint">
+          Buscar orden, cotización, cliente o módulo…
         </span>
+        <kbd className="hidden flex-none rounded-[6px] border border-border-base bg-surface px-1.5 py-px font-mono text-[10px] font-medium text-fg-subtle sm:block">
+          ⌘K
+        </kbd>
+      </button>
 
-        <div className="h-[26px] w-px bg-border-base" />
+      <div className="ml-auto flex items-center gap-2.5 sm:gap-3.5">
+        <InsigniaDemo className="hidden sm:inline-flex" />
+        <PanelNotificaciones />
 
-        <div className="flex items-center gap-[9px]">
-          <div className="flex size-8 items-center justify-center rounded-[9px] bg-primary text-[12px] font-bold text-on-primary">
-            {iniciales(usuario?.nombreUsuario ?? 'RvR')}
-          </div>
-          <div className="hidden sm:block">
+        <div className="hidden h-[26px] w-px bg-border-base sm:block" />
+
+        <Link
+          to={ROUTES.perfil}
+          title="Mi perfil"
+          className="flex items-center gap-[9px] rounded-[10px] px-1 py-0.5 transition-colors hover:bg-surface-muted"
+        >
+          <Avatar nombre={usuario?.nombre ?? 'RvR'} />
+          <div className="hidden lg:block">
             <div className="text-[12.5px] leading-tight font-semibold text-fg">
-              {nombreLegible(usuario?.nombreUsuario)}
+              {usuario?.nombre ?? nombreLegible(usuario?.nombreUsuario)}
             </div>
             <div className="text-[10.5px] text-fg-subtle">
               Rol: {usuario?.rol.nombre ?? '—'}
             </div>
           </div>
-        </div>
+        </Link>
 
         <button
           type="button"
           onClick={() => void logout()}
           aria-label="Cerrar sesión"
           title="Cerrar sesión"
-          className="flex size-[34px] cursor-pointer items-center justify-center rounded-[9px] border border-border-base text-fg-muted transition-colors hover:bg-surface-muted hover:text-danger-fg"
+          className="flex size-[34px] flex-none cursor-pointer items-center justify-center rounded-[9px] border border-border-base text-fg-muted transition-[background-color,color,transform] duration-150 hover:-translate-y-px hover:bg-surface-muted hover:text-danger-fg"
         >
           <IconSalir />
         </button>

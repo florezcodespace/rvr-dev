@@ -24,3 +24,13 @@ export function colorAvatar(nombre: string): string {
   }
   return `var(--rvr-av-${(hash % ACENTOS) + 1})`
 }
+
+/**
+ * Degradado del avatar. Arranca en el acento ya validado y baja hacia su
+ * versión oscura: si empezara por el lado claro, las iniciales blancas no
+ * llegarían a 4.5:1 sobre el verde ni sobre el ámbar.
+ */
+export function gradienteAvatar(nombre: string): string {
+  const color = colorAvatar(nombre)
+  return `linear-gradient(135deg, ${color}, color-mix(in srgb, ${color} 78%, #000))`
+}

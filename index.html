@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -29,8 +29,115 @@
         } catch (e) {}
       })();
     </script>
+
+    <!--
+      Splash de arranque. Va en el HTML, con estilos en línea, para que se pinte
+      antes de que descargue el bundle: si viviera en React, el usuario vería
+      primero una pantalla en blanco, que es justo lo que se quiere evitar.
+      main.tsx lo retira cuando la aplicación ya pintó.
+    -->
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 26px;
+        background: #f8fafc;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        transition: opacity 0.35s ease;
+      }
+      html.dark #splash {
+        background: #09090b;
+      }
+      #splash.saliendo {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #splash .icono {
+        width: 92px;
+        height: 92px;
+        display: block;
+        animation: splash-entra 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      html.dark #splash .claro,
+      #splash .oscuro {
+        display: none;
+      }
+      html.dark #splash .oscuro {
+        display: block;
+      }
+      #splash .halo {
+        position: absolute;
+        width: 132px;
+        height: 132px;
+        border-radius: 30%;
+        background: rgba(79, 70, 229, 0.25);
+        filter: blur(32px);
+        animation: splash-halo 2.4s ease-in-out infinite;
+      }
+      #splash .pista {
+        width: 148px;
+        height: 3px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        overflow: hidden;
+      }
+      html.dark #splash .pista {
+        background: #18181b;
+      }
+      #splash .pista span {
+        display: block;
+        width: 33%;
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #5850ec, #4f46e5);
+        animation: splash-barrido 1.25s cubic-bezier(0.55, 0, 0.35, 1) infinite;
+      }
+      #splash .marca {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+        color: #64748b;
+      }
+      html.dark #splash .marca {
+        color: #8f8f99;
+      }
+      @keyframes splash-entra {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: none; }
+      }
+      @keyframes splash-halo {
+        0%, 100% { opacity: 0.55; transform: scale(0.94); }
+        50% { opacity: 1; transform: scale(1.06); }
+      }
+      @keyframes splash-barrido {
+        from { transform: translateX(-110%); }
+        to { transform: translateX(340%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash .icono,
+        #splash .halo,
+        #splash .pista span { animation: none; }
+        #splash .pista span { width: 100%; }
+      }
+    </style>
   </head>
   <body>
+    <div id="splash" role="status" aria-label="Cargando el portal">
+      <div style="position: relative; display: flex; align-items: center; justify-content: center">
+        <span class="halo" aria-hidden="true"></span>
+        <img class="icono claro" src="/marca/rvr-icono-light-512.png" alt="" />
+        <img class="icono oscuro" src="/marca/rvr-icono-dark-512.png" alt="" />
+      </div>
+      <div class="pista" aria-hidden="true"><span></span></div>
+      <p class="marca">Portal RvR Tecnologías</p>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

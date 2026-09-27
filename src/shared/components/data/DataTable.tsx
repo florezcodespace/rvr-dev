@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@shared/lib/cn'
-import { Spinner } from '@shared/components/ui/Spinner'
+import { SkeletonFilas } from '@shared/components/ui/Skeleton'
 
 export interface Columna<T> {
   clave: string
@@ -8,6 +8,8 @@ export interface Columna<T> {
   /** Ancho CSS de la columna (`<col>`); el resto se reparte. */
   ancho?: string
   alinear?: 'left' | 'right'
+  /** Recorta con puntos suspensivos en vez de partir la celda en dos líneas. */
+  recortar?: boolean
   render: (fila: T) => ReactNode
 }
 
@@ -67,7 +69,18 @@ export function DataTable<T>({
             <tr
               key={claveFila(fila)}
               tabIndex={onAbrir ? 0 : undefined}
-              onClick={onAbrir ? () => onAbrir(fila) : undefined}
+              onClick={
+                onAbrir
+                  ? (evento) => {
+                      // Un clic sobre un control de la fila (badge de estado,
+                      // menú, enlace) es para ese control, no para abrir el
+                      // registro.
+                      const destino = evento.target as HTMLElement
+                      if (destino.closest('button, a, input, select, [role="menuitem"]')) return
+                      onAbrir(fila)
+                    }
+                  : undefined
+              }
               onKeyDown={
                 onAbrir
                   ? (evento) => {
@@ -87,7 +100,8 @@ export function DataTable<T>({
                   key={columna.clave}
                   className={cn(
                     'px-4 py-[13px] text-[12.5px] text-fg-muted',
-                    columna.alinear === 'right' && 'text-right',
+                    columna.alinear === 'right' && 'text-right whitespace-nowrap',
+                    columna.recortar && 'max-w-0 truncate',
                   )}
                 >
                   {columna.render(fila)}
@@ -105,11 +119,8 @@ export function DataTable<T>({
         </div>
       )}
 
-      {filas.length === 0 && cargando && (
-        <div className="flex items-center justify-center py-16 text-fg-subtle">
-          <Spinner className="size-5" />
-        </div>
-      )}
+      {/* Primera carga: filas con la forma de la tabla, no un spinner suelto. */}
+      {filas.length === 0 && cargando && <SkeletonFilas />}
     </div>
   )
 }

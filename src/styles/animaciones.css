@@ -1,0 +1,422 @@
+/* ============================================================
+   Sistema de animación · Portal RvR Tecnologías
+   Un solo juego de gestos para todas las gráficas del portal:
+   las tarjetas entran, las barras crecen desde su origen y las
+   series se revelan de izquierda a derecha.
+
+   El escalonado se controla con --retraso desde el componente,
+   así las clases no se multiplican por cada delay.
+
+   Cada utilidad apaga su propia animación bajo
+   prefers-reduced-motion —anidada dentro de la regla, no en un
+   bloque aparte— para que el dato quede en su posición final
+   sin movimiento y sin depender del orden del CSS.
+   ============================================================ */
+
+@keyframes rvr-aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rvr-crecer-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes rvr-crecer-y {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes rvr-velar {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rvr-latir {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+/* Titulares: cada palabra sube desde debajo de su máscara. */
+@keyframes rvr-subir {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Halo del splash: late despacio, sin llamar la atención. */
+@keyframes rvr-halo {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+/* Barrido de la barra de progreso indeterminada. */
+@keyframes rvr-barrido {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(340%);
+  }
+}
+
+@keyframes rvr-pulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Sin `to`: el arco termina en el stroke-dashoffset que trae el elemento,
+   así cada segmento del donut se dibuja girando hasta su posición. */
+@keyframes rvr-girar {
+  from {
+    stroke-dashoffset: var(--arco, 327);
+  }
+}
+
+
+/* --- Fondo decorativo ------------------------------------------------
+   Orbes que derivan despacio y partículas que suben. Tres recorridos
+   distintos para que dos orbes vecinos nunca vayan sincronizados: con una
+   sola curva el fondo entero late a la vez y se nota artificial. */
+@keyframes rvr-derivar-1 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(7%, -9%, 0) scale(1.09);
+  }
+  66% {
+    transform: translate3d(-6%, 7%, 0) scale(0.94);
+  }
+}
+
+@keyframes rvr-derivar-2 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  30% {
+    transform: translate3d(-9%, 6%, 0) scale(1.12);
+  }
+  70% {
+    transform: translate3d(8%, 10%, 0) scale(0.9);
+  }
+}
+
+@keyframes rvr-derivar-3 {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.97);
+  }
+  50% {
+    transform: translate3d(5%, 11%, 0) scale(1.14);
+  }
+}
+
+/* La partícula nace abajo, sube todo su recorrido y se apaga en los
+   extremos: así no aparece ni desaparece de golpe a media pantalla. */
+@keyframes rvr-flotar {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  14% {
+    opacity: var(--opacidad, 0.5);
+  }
+  86% {
+    opacity: var(--opacidad, 0.5);
+  }
+  100% {
+    transform: translate3d(var(--deriva, 12px), calc(var(--recorrido, 320px) * -1), 0);
+    opacity: 0;
+  }
+}
+
+/* Mecido lento: la tarjeta del hero flota sin llamar la atención. */
+@keyframes rvr-mecer {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Cinta continua. Recorre exactamente la mitad del contenido, que va
+   duplicado, así el salto al reiniciar cae en un punto idéntico. */
+@keyframes rvr-marquesina {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@layer utilities {
+
+  /* --- Fondo decorativo ---------------------------------------------- */
+
+  /* Cada recorrido es una utilidad completa, no una variante que sobrescribe
+     `animation-name`: si no, el bloque de movimiento reducido apaga la base y
+     la variante la vuelve a encender. */
+  .anim-orbe-1 {
+    animation: rvr-derivar-1 var(--duracion, 26s) ease-in-out infinite;
+    animation-delay: var(--retraso, 0ms);
+    will-change: transform;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-orbe-2 {
+    animation: rvr-derivar-2 var(--duracion, 32s) ease-in-out infinite;
+    animation-delay: var(--retraso, 0ms);
+    will-change: transform;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-orbe-3 {
+    animation: rvr-derivar-3 var(--duracion, 38s) ease-in-out infinite;
+    animation-delay: var(--retraso, 0ms);
+    will-change: transform;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-particula {
+    animation: rvr-flotar var(--duracion, 15s) linear infinite;
+    animation-delay: var(--retraso, 0ms);
+    will-change: transform, opacity;
+
+    /* Sin movimiento no se apaga: se queda quieta y visible en su sitio,
+       para que el fondo no pierda la textura. */
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      opacity: var(--opacidad, 0.5);
+    }
+  }
+
+  .anim-mecer {
+    animation: rvr-mecer 7s ease-in-out infinite;
+    animation-delay: var(--retraso, 0ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-marquesina {
+    animation: rvr-marquesina var(--duracion, 38s) linear infinite;
+    will-change: transform;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Entrada de una tarjeta o de una fila de leyenda. */
+  .anim-entrada {
+    animation: rvr-aparecer 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--retraso, 0ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Barra horizontal: crece desde el borde izquierdo. */
+  .anim-barra {
+    transform-origin: left center;
+    animation: rvr-crecer-x 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--retraso, 0ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Columna vertical: crece desde la base, nunca desde el centro. */
+  .anim-columna {
+    transform-origin: bottom center;
+    animation: rvr-crecer-y 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--retraso, 0ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Barrido que revela una serie completa de izquierda a derecha. */
+  .anim-revelado {
+    transform-origin: left center;
+    animation: rvr-crecer-x 1.1s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation-delay: var(--retraso, 0ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-velo {
+    animation: rvr-velar 0.8s both;
+    animation-delay: var(--retraso, 350ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Latido continuo: marca que hay trabajo en curso ahora mismo. */
+  .anim-latido {
+    animation: rvr-latir 1.8s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-subir {
+    animation: rvr-subir 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--retraso, 0ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Entrada al desplazar (landing). El estado inicial solo se aplica cuando el
+     elemento aún no es visible, para que sin JS nada quede oculto. */
+  .revelar {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--retraso, 0ms);
+  }
+  .revelar.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .revelar {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  .anim-halo {
+    animation: rvr-halo 2.4s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-barrido {
+    animation: rvr-barrido 1.25s cubic-bezier(0.55, 0, 0.35, 1) infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+      width: 100%;
+    }
+  }
+
+  /* Bloques de carga: respiran mientras llega el dato. */
+  .anim-pulso {
+    animation: rvr-pulso 1.6s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  .anim-arco {
+    animation: rvr-girar 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--retraso, 0ms);
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  /* Escalona los hijos directos de una rejilla sin tocar el JSX de la página. */
+  .escalonado > *:nth-child(1) {
+    --retraso: 0ms;
+  }
+  .escalonado > *:nth-child(2) {
+    --retraso: 60ms;
+  }
+  .escalonado > *:nth-child(3) {
+    --retraso: 120ms;
+  }
+  .escalonado > *:nth-child(4) {
+    --retraso: 180ms;
+  }
+  .escalonado > *:nth-child(5) {
+    --retraso: 240ms;
+  }
+  .escalonado > *:nth-child(6) {
+    --retraso: 300ms;
+  }
+  .escalonado > *:nth-child(7) {
+    --retraso: 360ms;
+  }
+  .escalonado > *:nth-child(8) {
+    --retraso: 420ms;
+  }
+}

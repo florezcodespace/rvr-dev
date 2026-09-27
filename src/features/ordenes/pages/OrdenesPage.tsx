@@ -1,147 +1,97 @@
-import { useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '@app/routes/paths'
-import { ESTADO_ORDEN_META } from '@shared/domain/estadoOrden'
-import { IconDescargar, IconMas } from '@shared/components/icons'
-import { Alert, Button, Card, Spinner } from '@shared/components/ui'
-import { useCambioEstado } from '@shared/hooks/useCambioEstado'
-import { useToast } from '@shared/hooks/useToast'
-import { formatearNumero } from '@shared/lib/format'
-import { PENDIENTE_BACKEND } from '@shared/lib/pendiente'
-import { FiltrosOrdenes } from '../components/FiltrosOrdenes'
-import { PieTabla } from '../components/PieTabla'
-import { TablaOrdenes } from '../components/TablaOrdenes'
-import { useFiltrosOrdenes } from '../hooks/useFiltrosOrdenes'
-import { useListadoOrdenes } from '../hooks/useListadoOrdenes'
-import { useSeleccion } from '../hooks/useSeleccion'
-import { ordenesService } from '../api'
+import { useAuth } from '@features/auth'
+import { DETALLE, ROUTES } from '@app/routes/paths'
+import { AccionesFila, EstadoBadge, Listado, type Columna } from '@shared/components/data'
+import { FiltroFecha, FiltroSelect } from '@shared/components/form/Campos'
+import { IconMas, IconVer } from '@shared/components/icons'
+import { Button, SearchInput, Tabs } from '@shared/components/ui'
+import { ESTADO_ORDEN_META, ESTADO_PAGO_META } from '@shared/domain/estados'
+import { useFiltros } from '@shared/hooks/useFiltros'
+import { useRecurso } from '@shared/hooks/useRecurso'
+import { formatearFecha, formatearFechaHora, formatearMoneda } from '@shared/lib/format'
+import { ordenesService, type OrdenResumen } from '../api'
 
+const cargar = ordenesService.listar.bind(ordenesService)
+
+/** HU_46 Listar (CA_46_01: código, cliente, fecha, monto y estado) · HU_45 Buscar */
 export default function OrdenesPage() {
+  const { tiene } = useAuth()
   const navigate = useNavigate()
-  const { filtros, actualizar, limpiar, activos } = useFiltrosOrdenes()
-  const { datos, cargando, error } = useListadoOrdenes(filtros)
+  const f = useFiltros(['estado', 'tecnico', 'desde', 'hasta', 'orden'] as const, { orden: 'fecha' })
+  const { datos, cargando, error } = useRecurso(cargar, f.params)
+  const [tecnicos, setTecnicos] = useState<{ id: number; nombre: string }[]>([])
+  useEffect(() => { ordenesService.tecnicos().then(setTecnicos).catch(() => undefined) }, [])
 
-  const { mostrar } = useToast()
-  const guardarEstado = useCallback(
-    (id: number, estado: Parameters<typeof ordenesService.cambiarEstado>[1]) =>
-      ordenesService.cambiarEstado(id, estado),
-    [],
-  )
-  const { estadoDe, cambiar } = useCambioEstado(guardarEstado, ESTADO_ORDEN_META)
-
-  const items = datos?.items ?? []
-  const { seleccion, cantidad, alternar, alternarTodas, todasVisiblesSeleccionadas } =
-    useSeleccion(items.map((o) => o.id))
-
-  if (error) {
-    return (
-      <div className="p-7">
-        <Alert
-          tone="danger"
-          title={error}
-          description="Actualiza la página o inténtalo en unos minutos."
-        />
-      </div>
-    )
-  }
-
-  if (!datos) {
-    return (
-      <div className="flex h-full items-center justify-center text-fg-subtle">
-        <Spinner className="size-6" />
-      </div>
-    )
-  }
-
-  const totalPaginas = Math.max(Math.ceil(datos.total / datos.porPagina), 1)
-  const desde = datos.total === 0 ? 0 : (datos.pagina - 1) * datos.porPagina + 1
-  const hasta = Math.min(datos.pagina * datos.porPagina, datos.total)
-
-  return (
-    <div className="flex h-full flex-col gap-4 px-7 py-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+  const columnas: Columna<OrdenResumen>[] = [
+    {
+      clave: 'codigo', titulo: 'Orden',
+      render: (o) => (
+        <div className="min-w-0">
+          <div className="font-mono whitespace-nowrap font-semibold text-fg">{o.codigo}</div>
+          <div className="truncate text-[11.5px] text-fg-subtle">{o.servicios || '—'}</div>
+        </div>
+      ),
+    },
+    { clave: 'cliente', titulo: 'Cliente', recortar: true, render: (o) => o.cliente?.nombre ?? '—' },
+    { clave: 'fecha', titulo: 'Creada', ancho: '100px', render: (o) => formatearFecha(o.fechaCreacion) },
+    {
+      clave: 'tecnico', titulo: 'Técnico / visita', ancho: '170px',
+      render: (o) => (
+        <div className="min-w-0">
+          <div className="truncate text-fg">{o.tecnico?.nombre ?? <span className="text-fg-faint">Sin agendar</span>}</div>
+          {o.proximaVisita && <div className="text-[11px] text-fg-subtle">{formatearFechaHora(o.proximaVisita)}</div>}
+        </div>
+      ),
+    },
+    {
+      clave: 'venta', titulo: 'Venta', ancho: '150px', alinear: 'right',
+      render: (o) => (o.montoVenta === null ? <span className="text-fg-faint">Sin venta</span> : (
         <div>
-          <h1 className="m-0 mb-[5px] text-[23px] font-bold tracking-[-0.6px] text-fg">
-            Órdenes de servicio
-          </h1>
-          <p className="m-0 text-[13px] text-fg-muted">
-            {formatearNumero(datos.totalGeneral)} órdenes registradas ·{' '}
-            {datos.activas} activas · datos de{' '}
-            <span className="font-mono text-[12px] font-medium text-primary-on-soft">
-              ordenes_servicio
-            </span>
-          </p>
+          <div className="font-mono whitespace-nowrap text-fg">{formatearMoneda(o.montoVenta)}</div>
+          {o.estadoPago && <div className="text-[10.5px] font-semibold text-fg-subtle">{ESTADO_PAGO_META[o.estadoPago].labelCorto}</div>}
         </div>
+      )),
+    },
+    { clave: 'estado', titulo: 'Estado', ancho: '180px', render: (o) => <EstadoBadge meta={ESTADO_ORDEN_META[o.estado]} /> },
+    { clave: 'acciones', titulo: '', ancho: '56px', alinear: 'right', render: (o) => tiene('ordenes.ver_detalle') && <AccionesFila acciones={[{ clave: 'ver', etiqueta: `Ver ${o.codigo}`, icono: <IconVer />, a: DETALLE.orden(o.id) }]} /> },
+  ]
 
-        <div className="flex gap-2.5">
-          <Button
-              variant="secondary"
-              disabled
-              title={PENDIENTE_BACKEND}
-              leadingIcon={<IconDescargar />}
-            >
-            Exportar
-          </Button>
-          <Button leadingIcon={<IconMas />} onClick={() => navigate(ROUTES.ordenNueva)}>
-            Nueva orden
-          </Button>
-        </div>
-      </div>
-
-      <FiltrosOrdenes
-        filtros={filtros}
-        clientes={datos.clientes}
-        tecnicos={datos.tecnicos}
-        activos={activos}
-        onCambiar={actualizar}
-        onLimpiar={limpiar}
-      />
-
-      <Card className="min-h-0 flex-1 overflow-hidden">
-        <TablaOrdenes
-          ordenes={items}
-          seleccion={seleccion}
-          todasSeleccionadas={todasVisiblesSeleccionadas}
-          onAlternar={alternar}
-          onAlternarTodas={alternarTodas}
-          cargando={cargando}
-          tecnicos={datos.tecnicos}
-          estadoDe={estadoDe}
-          onCambiarEstado={(orden, destino, actual) =>
-            cambiar(orden.id, destino, actual, orden.codigo)
-          }
-          onAsignarTecnico={(orden, tecnicoId) => {
-            const anterior = orden.tecnicoId
-            const nombre =
-              datos.tecnicos.find((t) => t.id === tecnicoId)?.nombre ?? 'Sin asignar'
-            orden.tecnicoId = tecnicoId
-            orden.tecnicoNombre = tecnicoId === null ? null : nombre
-            void ordenesService.asignarTecnico(orden.id, tecnicoId).then(() =>
-              mostrar({
-                tono: 'exito',
-                mensaje: `${orden.codigo} → ${nombre}`,
-                deshacer: () => {
-                  orden.tecnicoId = anterior
-                  orden.tecnicoNombre =
-                    datos.tecnicos.find((t) => t.id === anterior)?.nombre ?? null
-                  void ordenesService.asignarTecnico(orden.id, anterior)
-                },
-              }),
-            )
-          }}
-        />
-
-        <PieTabla
-          seleccionadas={cantidad}
-          desde={desde}
-          hasta={hasta}
-          total={datos.total}
-          pagina={datos.pagina}
-          totalPaginas={totalPaginas}
-          onPagina={(pagina) => actualizar({ pagina })}
-          onAccionMasiva={() => undefined}
-        />
-      </Card>
-    </div>
+  const c = datos?.conteos
+  return (
+    <Listado
+      eyebrow="Venta – Órdenes"
+      titulo="Órdenes de servicio"
+      descripcion="Trabajos generados desde las cotizaciones aprobadas, con su ejecución, visitas y estado de pago."
+      acciones={tiene('ordenes.registrar') && <Button leadingIcon={<IconMas />} onClick={() => navigate(ROUTES.ordenNueva)}>Registrar orden</Button>}
+      barra={
+        <>
+          {tiene('ordenes.buscar') && <SearchInput valor={f.valores.q} onChange={(v) => f.set('q', v)} placeholder="Código, cliente o técnico…" className="w-full max-w-[240px]" />}
+          <Tabs etiqueta="Estado" valor={f.valores.estado || 'todos'} onChange={(v) => f.set('estado', v === 'todos' ? '' : v)}
+            opciones={[
+              { valor: 'todos', label: 'Todas', conteo: c?.todos },
+              { valor: 'esperando_anticipo', label: 'Esperando anticipo', conteo: c?.esperando_anticipo },
+              { valor: 'en_proceso', label: 'En proceso', conteo: c?.en_proceso },
+              { valor: 'en_espera_repuesto', label: 'Espera repuesto', conteo: c?.en_espera_repuesto },
+              { valor: 'finalizada', label: 'Finalizadas', conteo: c?.finalizada },
+              { valor: 'cancelada', label: 'Canceladas', conteo: c?.cancelada },
+            ]} />
+          <FiltroSelect etiqueta="Técnico" valor={f.valores.tecnico} onChange={(v) => f.set('tecnico', v)} opciones={tecnicos.map((t) => ({ valor: String(t.id), label: t.nombre }))} />
+          <FiltroFecha etiqueta="Desde" valor={f.valores.desde} onChange={(v) => f.set('desde', v)} max={f.valores.hasta || undefined} />
+          <FiltroFecha etiqueta="Hasta" valor={f.valores.hasta} onChange={(v) => f.set('hasta', v)} min={f.valores.desde || undefined} />
+          <FiltroSelect etiqueta="Ordenar" valor={f.valores.orden === 'fecha' ? '' : f.valores.orden} onChange={(v) => f.set('orden', v || 'fecha')} opciones={[{ valor: 'estado', label: 'Por estado' }]} todos="Por fecha" />
+          {f.hayFiltros && <Button variant="ghost" size="sm" onClick={f.limpiar}>Limpiar</Button>}
+        </>
+      }
+      columnas={columnas}
+      filas={datos?.items ?? []}
+      claveFila={(o) => o.id}
+      cargando={cargando}
+      error={error}
+      onAbrir={tiene('ordenes.ver_detalle') ? (o) => navigate(DETALLE.orden(o.id)) : undefined}
+      vacio={{ titulo: 'No se encontraron órdenes', descripcion: 'Prueba con otro término o cambia los filtros.' }}
+      pagina={datos ?? undefined}
+      onPagina={f.setPagina}
+    />
   )
 }

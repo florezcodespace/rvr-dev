@@ -41,6 +41,51 @@ export function formatearFechaEje(fecha: Date | string): string {
   return `${dia} ${MESES_CORTOS[d.getMonth()]}`
 }
 
+const FECHA_CORTA = new Intl.DateTimeFormat('es-CO', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+})
+
+const HORA = new Intl.DateTimeFormat('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false })
+
+/** 21/09/2026 */
+export const formatearFecha = (fecha: Date | string): string =>
+  FECHA_CORTA.format(typeof fecha === 'string' ? new Date(fecha) : fecha)
+
+/** 21/09/2026 · 14:30 */
+export function formatearFechaHora(fecha: Date | string): string {
+  const d = typeof fecha === 'string' ? new Date(fecha) : fecha
+  return `${FECHA_CORTA.format(d)} · ${HORA.format(d)}`
+}
+
+const DIAS_CORTOS = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'] as const
+
+/**
+ * 'YYYY-MM-DD' como fecha local. `new Date(iso)` la interpreta en UTC y en
+ * Colombia (UTC-5) eso adelanta un día a cualquier fecha sin hora.
+ */
+export function fechaLocal(iso: string): Date {
+  const [anio, mes, dia] = iso.split('-').map(Number)
+  return new Date(anio ?? 1970, (mes ?? 1) - 1, dia ?? 1)
+}
+
+/** HOY para la fecha de hoy; si no, la abreviatura del día (MIÉ, JUE…). */
+export function etiquetaDiaCorto(iso: string): string {
+  const d = fechaLocal(iso)
+  const hoy = new Date()
+  const esHoy =
+    d.getFullYear() === hoy.getFullYear() &&
+    d.getMonth() === hoy.getMonth() &&
+    d.getDate() === hoy.getDate()
+  return esHoy ? 'HOY' : (DIAS_CORTOS[d.getDay()] ?? '')
+}
+
+/** $ 41,3M — cifras de eje y notas donde el importe exacto estorba. */
+export function formatearMillones(valor: number): string {
+  return `$ ${DECIMAL.format(valor / 1_000_000)}M`
+}
+
 /** 'ricardo.vargas' → 'Ricardo Vargas' */
 export function nombreLegible(nombreUsuario: string | undefined): string {
   if (!nombreUsuario) return '—'

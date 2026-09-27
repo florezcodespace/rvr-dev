@@ -3,6 +3,8 @@ import type { InputHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@shared/lib/cn'
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  /** Clases del campo en sí. */
+  claseCampo?: string
   label?: string
   /** Slot a la derecha de la etiqueta (p. ej. "¿Olvidaste tu contraseña?"). */
   labelAction?: ReactNode
@@ -13,7 +15,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, labelAction, error, hint, trailing, className, id, ...props },
+  { label, labelAction, error, hint, trailing, className, claseCampo, id, style, ...props },
   ref,
 ) {
   const generatedId = useId()
@@ -25,7 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       : undefined
 
   return (
-    <div className="flex flex-col">
+    <div className={cn('flex flex-col', className)} style={style}>
       {(label || labelAction) && (
         <div className="mb-1.5 flex items-baseline justify-between gap-3">
           {label && (
@@ -55,7 +57,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             error &&
               'border-danger focus:border-danger focus:shadow-[0_0_0_3px_rgb(239_68_68/0.16)]',
             trailing && 'pr-[78px]',
-            className,
+            claseCampo,
           )}
           {...props}
         />

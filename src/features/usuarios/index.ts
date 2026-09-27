@@ -1,2 +1,3 @@
 export { default as UsuariosPage } from './pages/UsuariosPage'
-export type { UsuarioPortal } from './types'
+export { default as UsuarioDetallePage } from './pages/UsuarioDetallePage'
+export { default as AccesosPage } from './pages/AccesosPage'

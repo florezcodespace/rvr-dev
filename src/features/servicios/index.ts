@@ -1,2 +1,2 @@
 export { default as ServiciosPage } from './pages/ServiciosPage'
-export type { Servicio } from './types'
+export { default as ServicioDetallePage } from './pages/ServicioDetallePage'

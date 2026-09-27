@@ -3,14 +3,17 @@ import { cn } from '@shared/lib/cn'
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode
+  /** Sube 2 px al pasar el cursor: solo para tarjetas que llevan a algún sitio. */
+  viva?: boolean
 }
 
 /** Contenedor base de los paneles del portal. */
-export function Card({ className, children, ...props }: CardProps) {
+export function Card({ className, children, viva = false, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        'flex flex-col rounded-[13px] border border-border-base bg-surface',
+        'tarjeta flex flex-col rounded-[13px] border border-border-base bg-surface',
+        viva && 'tarjeta-viva',
         className,
       )}
       {...props}

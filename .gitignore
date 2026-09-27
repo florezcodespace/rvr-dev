@@ -22,3 +22,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variables de entorno. Nunca al repositorio: traen la cadena de conexión de
+# PostgreSQL y la clave con la que se firman las sesiones. Solo viajan los
+# .env.example, sin valores reales.
+.env
+.env.*
+!.env.example
+
+# Volcados de la base
+*.sql.gz
+*.dump
+
+# Copias locales que no van al repositorio
+_respaldos/
+_to_delete/

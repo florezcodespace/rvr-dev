@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { mensajeDe } from '@shared/lib/api'
 
 interface Respuesta<T, P> {
   params: P
@@ -20,6 +21,10 @@ export function useRecurso<T, P>(
   mensajeError = 'No pudimos cargar la información.',
 ) {
   const [respuesta, setRespuesta] = useState<Respuesta<T, P> | null>(null)
+  /** Se incrementa al crear o modificar un registro para volver a pedir la lista. */
+  const [version, setVersion] = useState(0)
+
+  const recargar = useCallback(() => setVersion((v) => v + 1), [])
 
   useEffect(() => {
     let activo = true
@@ -28,19 +33,20 @@ export function useRecurso<T, P>(
       .then((datos) => {
         if (activo) setRespuesta({ params, datos, error: null })
       })
-      .catch(() => {
-        if (activo) setRespuesta({ params, datos: null, error: mensajeError })
+      .catch((fallo: unknown) => {
+        if (activo) setRespuesta({ params, datos: null, error: mensajeDe(fallo, mensajeError) })
       })
 
     return () => {
       activo = false
     }
     // `cargar` es estable (viene del módulo de servicio); `params` se memoiza en el hook de URL.
-  }, [cargar, params, mensajeError])
+  }, [cargar, params, mensajeError, version])
 
   return {
     datos: respuesta?.datos ?? null,
     error: respuesta?.error ?? null,
     cargando: respuesta === null || respuesta.params !== params,
+    recargar,
   }
 }

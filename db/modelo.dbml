@@ -1,0 +1,264 @@
+// ============================================================================
+//  Portal RvR Tecnologías · Modelo de datos v6 (PostgreSQL)
+//  Pégalo en https://dbdiagram.io para ver el diagrama.
+//  Generado desde la base montada con 01-esquema.sql: si cambias el esquema,
+//  vuelve a generarlo. Cada tabla dice de dónde sale (imagen «BASE DE DATOS
+//  FINAL», control de cambios v6 o un criterio de aceptación de la matriz).
+// ============================================================================
+
+Table abonos {
+  id integer [pk, increment]
+  venta_id integer [not null]
+  monto numeric(10,2) [not null]
+  tipo_abono varchar(20) [not null, note: 'valores: anticipo, saldo']
+  metodo_pago varchar(50) [not null, note: 'valores: Efectivo, Transferencia, Nequi, Daviplata, Tarjeta']
+  referencia varchar(100)
+  fecha_abono timestamp [not null, default: `now()`]
+  Note: 'imagen · +metodo_pago, referencia'
+}
+
+Table agendamiento {
+  id integer [pk, increment]
+  orden_id integer [not null]
+  tecnico_id integer [not null]
+  fecha_programada timestamp [not null]
+  estado varchar(20) [not null, default: 'pendiente', note: 'valores: pendiente, cumplida, reprogramada, cancelada']
+  notas text
+  disponibilidad_id integer
+  fecha_inicio timestamp
+  fecha_fin timestamp
+  Note: 'imagen · +disponibilidad_id, fecha_inicio, fecha_fin (HU_51, móvil HU_04/05)'
+}
+
+Table cliente {
+  id integer [pk, increment]
+  documento_identidad varchar(20) [not null, unique]
+  nombres varchar(100) [not null]
+  apellidos varchar(100) [not null]
+  telefono varchar(20)
+  direccion varchar(150)
+  correo varchar(100)
+  fecha_registro timestamp [not null, default: `now()`]
+  usuario_id integer [unique]
+  estado varchar(20) [not null, default: 'activo', note: 'valores: activo, inactivo']
+  Note: 'imagen · +usuario_id, estado (v6: portal del cliente, HU_83)'
+}
+
+Table cotizacion {
+  id integer [pk, increment]
+  cliente_id integer [not null]
+  fecha_cotizacion timestamp [not null, default: `now()`]
+  monto_total numeric(10,2) [not null, default: `0`]
+  estado varchar(20) [not null, default: 'solicitada', note: 'valores: solicitada, pendiente, aprobada, rechazada']
+  fecha_envio timestamp
+  fecha_respuesta timestamp
+  motivo_rechazo varchar(255)
+  origen varchar(20) [not null, default: 'administrador', note: 'valores: cliente, administrador, tecnico']
+  descripcion text
+  direccion varchar(150)
+  orden_id integer
+  respondida_por integer
+  Note: 'imagen · +fecha_envio, fecha_respuesta, motivo_rechazo, origen, descripcion, direccion, orden_id, respondida_por (v6)'
+}
+
+Table detalle_cotizacion {
+  id integer [pk, increment]
+  cotizacion_id integer [not null]
+  servicio_id integer
+  cantidad integer [not null]
+  precio_unitario numeric(10,2) [not null]
+  subtotal numeric(10,2) [note: 'calculado: cantidad * precio_unitario']
+  tipo_item varchar(20) [not null, default: 'servicio', note: 'valores: servicio, repuesto']
+  descripcion varchar(255)
+  Note: 'imagen (maestro-detalle) · subtotal calculado · +tipo_item, descripcion (repuestos, v6)'
+}
+
+Table detalle_orden {
+  id integer [pk, increment]
+  orden_id integer [not null]
+  detalle_cotizacion_id integer [not null, unique]
+  fecha_asignacion timestamp [not null, default: `now()`]
+  estado_item varchar(20) [not null, default: 'pendiente', note: 'valores: pendiente, en_proceso, completado']
+  notas_tecnico text
+  Note: 'imagen · +detalle_cotizacion_id, estado_item, notas_tecnico (v6)'
+}
+
+Table diagnostico {
+  id integer [pk, increment]
+  orden_id integer [not null, unique]
+  tecnico_id integer
+  hallazgos text [not null]
+  solucion_aplicada text
+  fecha_diagnostico timestamp [not null, default: `now()`]
+  fecha_solucion timestamp
+  Note: 'imagen · +tecnico_id, hallazgos, solucion_aplicada, fecha_solucion (móvil HU_06, HU_08)'
+}
+
+Table disponibilidad {
+  id integer [pk, increment]
+  tecnico_id integer [not null]
+  fecha date [not null]
+  hora_inicio time [not null]
+  hora_fin time [not null]
+  estado varchar(20) [not null, default: 'disponible', note: 'valores: disponible, ocupada, bloqueada']
+  motivo varchar(255)
+  Note: 'imagen · +motivo (HU_30)'
+}
+
+Table historial_orden {
+  id integer [pk, increment]
+  orden_id integer [not null]
+  estado_anterior varchar(20)
+  estado_nuevo varchar(20)
+  descripcion varchar(255) [not null]
+  usuario_id integer
+  fecha timestamp [not null, default: `now()`]
+  Note: 'requerida por CA_48_04 / móvil HU_10 (seguimiento de la orden)'
+}
+
+Table material_orden {
+  id integer [pk, increment]
+  orden_id integer [not null]
+  tecnico_id integer
+  descripcion varchar(150) [not null]
+  cantidad integer [not null]
+  fecha_registro timestamp [not null, default: `now()`]
+  Note: 'requerida por móvil HU_07 (materiales utilizados)'
+}
+
+Table notificacion {
+  id integer [pk, increment]
+  usuario_id integer [not null]
+  titulo varchar(120) [not null]
+  mensaje varchar(255) [not null]
+  enlace varchar(200)
+  leida boolean [not null, default: `false`]
+  fecha timestamp [not null, default: `now()`]
+  Note: 'requerida por CA_78_04, CA_80_03, móvil CA_09_04 (avisos)'
+}
+
+Table orden {
+  id integer [pk, increment]
+  codigo_orden varchar(50) [not null, unique]
+  fecha_creacion timestamp [not null, default: `now()`]
+  estado varchar(20) [not null, default: 'esperando_anticipo', note: 'valores: esperando_anticipo, en_proceso, en_espera_repuesto, finalizada, cancelada']
+  observaciones text
+  Note: 'imagen · estados v6'
+}
+
+Table permiso {
+  id integer [pk, increment]
+  nombre varchar(50) [not null]
+  modulo varchar(50) [not null]
+  descripcion varchar(255)
+  estado varchar(20) [not null, default: 'activo', note: 'valores: activo, inactivo']
+  indexes {
+    (nombre, modulo) [unique]
+  }
+  Note: 'imagen'
+}
+
+Table registro_acceso {
+  id integer [pk, increment]
+  usuario_id integer
+  identificador varchar(100) [not null]
+  resultado varchar(20) [not null, note: 'valores: exitoso, fallido, bloqueado, cierre_sesion, recuperacion, restablecimiento']
+  canal varchar(10) [not null, default: 'web', note: 'valores: web, movil']
+  ip varchar(45)
+  fecha timestamp [not null, default: `now()`]
+  Note: 'requerida por CA_13_05 / HU_74 (registro y bloqueo de accesos)'
+}
+
+Table rol {
+  id integer [pk, increment]
+  nombre varchar(50) [not null, unique]
+  descripcion varchar(255)
+  estado varchar(20) [not null, default: 'activo', note: 'valores: activo, inactivo']
+  Note: 'imagen'
+}
+
+Table rol_x_permiso {
+  rol_id integer [pk]
+  permiso_id integer [pk]
+  indexes {
+    (rol_id, permiso_id) [pk]
+  }
+  Note: 'imagen'
+}
+
+Table servicio {
+  id integer [pk, increment]
+  nombre varchar(100) [not null, unique]
+  descripcion text
+  precio_base numeric(10,2) [not null]
+  estado varchar(20) [not null, default: 'activo', note: 'valores: activo, inactivo']
+  categoria varchar(50) [not null, note: 'valores: Mantenimiento, Servidores, Redes, Cámaras de seguridad, Alarmas']
+  Note: 'imagen · +categoria (v6, HU_21)'
+}
+
+Table tecnico {
+  id integer [pk, increment]
+  documento_identidad varchar(20) [not null, unique]
+  nombres varchar(100) [not null]
+  apellidos varchar(100) [not null]
+  especialidad varchar(100)
+  telefono varchar(20)
+  correo varchar(100)
+  estado varchar(20) [not null, default: 'activo', note: 'valores: activo, inactivo']
+  usuario_id integer [unique]
+  Note: 'imagen (antes «terceros», renombrada en v6) · +usuario_id (app móvil)'
+}
+
+Table usuario {
+  id integer [pk, increment]
+  rol_id integer [not null]
+  nombre_usuario varchar(50) [not null, unique]
+  correo varchar(100) [not null, unique]
+  contrasena_hash varchar(255) [not null]
+  nombres varchar(100) [not null]
+  apellidos varchar(100) [not null]
+  telefono varchar(20)
+  estado varchar(20) [not null, default: 'activo', note: 'valores: activo, inactivo']
+  token_recuperacion varchar(255)
+  token_vence timestamp
+  version_sesion integer [not null, default: `0`]
+  Note: 'imagen · +token_recuperacion, token_vence, version_sesion (CA_72, RNF sesiones)'
+}
+
+Table ventas {
+  id integer [pk, increment]
+  orden_id integer [not null, unique]
+  monto_total numeric(10,2) [not null]
+  monto_anticipo numeric(10,2) [not null]
+  saldo_pendiente numeric(10,2) [not null]
+  estado_pago varchar(20) [not null, default: 'pendiente_anticipo', note: 'valores: pendiente_anticipo, abonada, pagada, anulada']
+  fecha_venta timestamp [not null, default: `now()`]
+  Note: 'imagen'
+}
+
+Ref: abonos.venta_id > ventas.id
+Ref: agendamiento.disponibilidad_id > disponibilidad.id
+Ref: agendamiento.orden_id > orden.id
+Ref: agendamiento.tecnico_id > tecnico.id
+Ref: cliente.usuario_id > usuario.id
+Ref: cotizacion.cliente_id > cliente.id
+Ref: cotizacion.orden_id > orden.id
+Ref: cotizacion.respondida_por > usuario.id
+Ref: detalle_cotizacion.cotizacion_id > cotizacion.id
+Ref: detalle_cotizacion.servicio_id > servicio.id
+Ref: detalle_orden.detalle_cotizacion_id > detalle_cotizacion.id
+Ref: detalle_orden.orden_id > orden.id
+Ref: diagnostico.orden_id > orden.id
+Ref: diagnostico.tecnico_id > tecnico.id
+Ref: disponibilidad.tecnico_id > tecnico.id
+Ref: historial_orden.orden_id > orden.id
+Ref: historial_orden.usuario_id > usuario.id
+Ref: material_orden.orden_id > orden.id
+Ref: material_orden.tecnico_id > tecnico.id
+Ref: notificacion.usuario_id > usuario.id
+Ref: registro_acceso.usuario_id > usuario.id
+Ref: rol_x_permiso.permiso_id > permiso.id
+Ref: rol_x_permiso.rol_id > rol.id
+Ref: tecnico.usuario_id > usuario.id
+Ref: usuario.rol_id > rol.id
+Ref: ventas.orden_id > orden.id

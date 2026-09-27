@@ -1,0 +1,273 @@
+// ============================================================================
+//  Portal RvR Tecnologías · Modelo de datos OFICIAL · corregido (15 tablas)
+//
+//  Fuente de verdad del modelo. Se pega completo en https://dbdiagram.io para
+//  ver el diagrama, y se mantiene en paralelo con `01-esquema.sql`, que es su
+//  traducción a PostgreSQL (con los triggers y la vista, que dbdiagram no
+//  dibuja).
+//
+//  Parte del diagrama de 11 tablas (guardado en db/anterior-11-tablas/) y le
+//  aplica las correcciones de la revisión del 18 de septiembre de 2026.
+//
+//  REGLA DE TRABAJO: ningún cambio a la base entra sin acordarlo. Cuando se
+//  acuerde uno, se actualiza este archivo Y 01-esquema.sql.
+// ============================================================================
+
+Project rvr_tecnologias {
+  database_type: 'PostgreSQL'
+  Note: 'Portal de gestión de servicios técnicos · 15 tablas · modelo corregido'
+}
+
+// ------------------------------------------------------------ listas cerradas
+
+Enum estado_registro {
+  activo
+  inactivo
+}
+Enum estado_usuario {
+  activo
+  invitacion_enviada
+  inactivo
+  bloqueado
+}
+Enum estado_servicio {
+  activo
+  borrador
+  archivado
+}
+Enum estado_tecnico {
+  disponible
+  en_ruta
+  en_sitio
+  fuera_turno
+}
+Enum tipo_documento {
+  CC
+  NIT
+  CE
+  PAS
+}
+Enum estado_orden {
+  nueva
+  pendiente
+  aprobada
+  programada
+  reprogramada
+  en_proceso
+  completada
+  cancelada
+}
+Enum estado_agenda {
+  programado
+  reprogramado
+  en_curso
+  completado
+  cancelado
+}
+Enum estado_venta {
+  vigente
+  anulada
+}
+Enum tipo_pago {
+  anticipo
+  saldo
+}
+Enum estado_abono {
+  por_conciliar
+  conciliado
+  reembolsado
+}
+
+// ------------------------------------------------------------ 1. Seguridad
+
+Table roles {
+  id          int             [pk, increment]
+  nombre      varchar(50)     [not null, unique]
+  descripcion varchar(255)
+  estado      estado_registro [not null, default: 'activo']
+}
+
+Table permisos {
+  id          int             [pk, increment]
+  nombre      varchar(50)     [not null, unique]
+  modulo      varchar(20)     [not null]
+  descripcion varchar(255)
+  estado      estado_registro [not null, default: 'activo']
+
+  Note: 'Precargados en la base, sin CRUD en la aplicación.'
+}
+
+Table roles_permisos {
+  rol_id     int [not null, ref: > roles.id]
+  permiso_id int [not null, ref: > permisos.id]
+
+  indexes {
+    (rol_id, permiso_id) [pk]
+  }
+}
+
+Table usuarios {
+  id              int            [pk, increment]
+  rol_id          int            [not null, ref: > roles.id]
+  nombre_usuario  varchar(50)    [not null, unique]
+  correo          varchar(100)   [not null, unique, note: 'Único sin distinguir mayúsculas']
+  contrasena_hash varchar(255)   [not null]
+  nombres         varchar(100)   [not null]
+  apellidos       varchar(100)   [not null]
+  telefono        varchar(20)
+  estado          estado_usuario [not null, default: 'activo']
+  ultimo_acceso   timestamptz
+  fecha_creacion  timestamptz    [not null, default: `now()`]
+
+  Note: '''
+  Las cuentas del portal. El administrador no tiene tabla propia: es un
+  usuario con rol administrador.
+  '''
+}
+
+// ------------------------------------------------------------- 2. Personas
+
+Table clientes {
+  id               int             [pk, increment]
+  usuario_id       int             [unique, ref: - usuarios.id, note: 'Solo si el cliente entra al portal (rol cliente)']
+  tipo_documento   tipo_documento  [not null]
+  numero_documento varchar(20)     [not null]
+  nombre           varchar(150)    [not null]
+  correo           varchar(100)
+  telefono         varchar(20)
+  direccion        varchar(200)
+  ciudad           varchar(80)
+  sector           varchar(80)
+  estado           estado_registro [not null, default: 'activo']
+  fecha_creacion   timestamptz     [not null, default: `now()`]
+
+  indexes {
+    (tipo_documento, numero_documento) [unique]
+  }
+
+  Note: 'NUEVA · el cliente puede existir sin cuenta (llega por WhatsApp o teléfono).'
+}
+
+Table tecnicos {
+  id           int            [pk, increment]
+  usuario_id   int            [not null, unique, ref: - usuarios.id, note: 'Cuenta con rol técnico']
+  especialidad varchar(100)   [not null]
+  zona         varchar(80)
+  estado       estado_tecnico [not null, default: 'disponible']
+
+  Note: 'NUEVA · nombre, correo y teléfono salen de usuarios.'
+}
+
+// ------------------------------------------------------------- 3. Catálogo
+
+Table categorias {
+  id          int             [pk, increment]
+  nombre      varchar(80)     [not null, unique]
+  descripcion varchar(255)
+  estado      estado_registro [not null, default: 'activo']
+}
+
+Table servicios {
+  id            int             [pk, increment]
+  categoria_id  int             [not null, ref: > categorias.id]
+  nombre        varchar(100)    [not null, unique]
+  descripcion   text
+  precio        decimal(10,2)   [not null]
+  dias_garantia int             [not null, default: 0]
+  estado        estado_servicio [not null, default: 'activo']
+}
+
+Table metodos_pago {
+  id          int             [pk, increment]
+  nombre      varchar(40)     [not null, unique]
+  descripcion varchar(255)
+  estado      estado_registro [not null, default: 'activo']
+
+  Note: 'NUEVA · antes era texto libre en abonos.'
+}
+
+// ------------------------------------------------------------ 4. Operación
+
+Table ordenes_servicio {
+  id                   int          [pk, increment]
+  cliente_id           int          [not null, ref: > clientes.id]
+  tecnico_id           int          [ref: > tecnicos.id, note: 'Nulo mientras no se asigna']
+  estado               estado_orden [not null, default: 'nueva']
+  descripcion_problema text         [not null]
+  direccion_servicio   varchar(200) [not null]
+  fecha_ingreso        timestamptz  [not null, default: `now()`]
+  fecha_entrega        timestamptz  [note: 'Obligatoria si la orden está completada']
+
+  Note: '''
+  Ya no guarda servicio_id ni agendamiento_id: los servicios van en
+  orden_servicio_detalle y las visitas en agendamientos.
+  El código visible (OS-0147) se arma con el id.
+  '''
+}
+
+Table orden_servicio_detalle {
+  id              int           [pk, increment]
+  orden_id        int           [not null, ref: > ordenes_servicio.id]
+  servicio_id     int           [not null, ref: > servicios.id]
+  cantidad        int           [not null, default: 1]
+  precio_unitario decimal(10,2) [not null, note: 'Copiado del catálogo al crear la línea']
+  dias_garantia   int           [not null, default: 0, note: 'Copiado del catálogo']
+  subtotal        decimal(12,2) [note: 'Calculado: cantidad × precio_unitario']
+
+  indexes {
+    (orden_id, servicio_id) [unique]
+  }
+
+  Note: 'NUEVA · una orden agrupa varios servicios.'
+}
+
+Table agendamientos {
+  id               int           [pk, increment]
+  orden_id         int           [not null, ref: > ordenes_servicio.id]
+  tecnico_id       int           [not null, ref: > tecnicos.id]
+  fecha_programada timestamptz   [not null]
+  estado           estado_agenda [not null, default: 'programado']
+  notas            text
+  fecha_creacion   timestamptz   [not null, default: `now()`]
+
+  Note: 'Cuelga de la orden: una orden, varias visitas. Ya no repite cliente ni servicio.'
+}
+
+Table diagnosticos {
+  id                 int         [pk, increment]
+  orden_id           int         [not null, ref: > ordenes_servicio.id]
+  tecnico_id         int         [not null, ref: > tecnicos.id]
+  hallazgos          text        [not null]
+  solucion_propuesta text
+  fecha_diagnostico  timestamptz [not null, default: `now()`]
+
+  Note: 'Una orden puede tener varios: uno por visita.'
+}
+
+// --------------------------------------------------------------- 5. Venta
+
+Table ventas {
+  id          int           [pk, increment]
+  orden_id    int           [not null, unique, ref: - ordenes_servicio.id]
+  monto_total decimal(12,2) [not null]
+  estado      estado_venta  [not null, default: 'vigente']
+  fecha_venta timestamptz   [not null, default: `now()`]
+
+  Note: '''
+  Una venta por orden. Sin cliente_id (sale de la orden) y sin
+  saldo_pendiente ni estado_pago: los calcula la vista v_ventas.
+  '''
+}
+
+Table abonos {
+  id             int           [pk, increment]
+  venta_id       int           [not null, ref: > ventas.id]
+  metodo_pago_id int           [not null, ref: > metodos_pago.id]
+  tipo_pago      tipo_pago     [not null]
+  monto          decimal(12,2) [not null]
+  estado         estado_abono  [not null, default: 'por_conciliar']
+  referencia     varchar(100)
+  fecha_abono    timestamptz   [not null, default: `now()`]
+
+  Note: 'La suma de abonos no puede superar el monto de la venta (trigger).'
+}

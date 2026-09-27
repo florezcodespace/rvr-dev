@@ -14,10 +14,10 @@ export function NotFoundPage() {
         Verifica la dirección o vuelve al inicio del portal.
       </p>
       <Link
-        to={ROUTES.dashboard}
+        to={ROUTES.inicio}
         className="mt-2 text-[13px] font-semibold text-link hover:underline"
       >
-        Ir al dashboard
+        Ir al inicio
       </Link>
     </div>
   )
