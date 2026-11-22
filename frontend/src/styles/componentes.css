@@ -1,0 +1,780 @@
+/* ============================================================
+   Acabado de los componentes · Portal RvR Tecnologías · «Cristal»
+
+   Vidrio translúcido tipo iOS: superficies blancas al 70-90 % con
+   desenfoque y saturación del fondo, un filo de luz de 1 px arriba
+   y sombras largas y suaves. Colores planos (sin degradados).
+   La geometría sigue en las utilidades de Tailwind de cada componente.
+   ============================================================ */
+
+@layer components {
+  /* --- Vidrio ---------------------------------------------------- */
+
+  .vidrio {
+    background-color: var(--rvr-surface);
+    -webkit-backdrop-filter: blur(var(--rvr-glass-blur)) saturate(var(--rvr-glass-sat));
+    backdrop-filter: blur(var(--rvr-glass-blur)) saturate(var(--rvr-glass-sat));
+    box-shadow:
+      inset 0 1px 0 var(--rvr-glass-luz),
+      var(--rvr-shadow-card);
+  }
+
+  /* Vidrio más denso: menús, diálogos y la barra flotante. */
+  .vidrio-denso {
+    background-color: var(--rvr-surface-raised);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    backdrop-filter: blur(28px) saturate(190%);
+    box-shadow:
+      inset 0 1px 0 var(--rvr-glass-luz),
+      var(--rvr-shadow-lg);
+  }
+
+  /* Un vidrio dentro de otro vidrio no puede desenfocar lo que hay detrás
+     (limitación del navegador): menús y paneles anidados van sólidos. */
+  .vidrio .vidrio-denso,
+  .vidrio-denso .vidrio-denso {
+    background-color: var(--rvr-surface-solid);
+  }
+
+  /* Vidrio oscuro sobre fondos de marca (login, cierre de la landing). */
+  .vidrio-oscuro {
+    background-color: rgb(255 255 255 / 0.07);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
+    border: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  /* --- Botones -------------------------------------------------- */
+
+  .pintura-boton {
+    transition:
+      transform 0.14s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.2s ease,
+      background-color 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease;
+  }
+
+  /* Al presionar se hunde un poco, como un botón de iOS. */
+  .pintura-boton:enabled:active,
+  a.pintura-boton:active {
+    transform: scale(0.97);
+  }
+
+  .pintura-primaria {
+    background-color: var(--rvr-primary);
+    box-shadow:
+      0 1px 2px rgb(10 60 140 / 0.18),
+      0 6px 16px -6px var(--rvr-halo-primary),
+      var(--rvr-brillo);
+  }
+  .pintura-primaria:enabled:hover,
+  a.pintura-primaria:hover {
+    background-color: var(--rvr-primary-hover);
+    box-shadow:
+      0 1px 2px rgb(10 60 140 / 0.2),
+      0 10px 22px -8px var(--rvr-halo-primary),
+      var(--rvr-brillo);
+  }
+
+  .pintura-peligro {
+    background-color: #e03a3a;
+    box-shadow: 0 6px 16px -8px var(--rvr-halo-danger), var(--rvr-brillo);
+  }
+  .pintura-peligro:enabled:hover {
+    background-color: #c42525;
+  }
+
+  .pintura-secundaria {
+    background-color: var(--rvr-surface);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--rvr-shadow-xs), inset 0 1px 0 var(--rvr-glass-luz);
+  }
+  .pintura-secundaria:enabled:hover,
+  a.pintura-secundaria:hover {
+    background-color: var(--rvr-surface-raised);
+    border-color: var(--rvr-border-strong);
+  }
+
+  .pintura-boton:disabled {
+    box-shadow: none;
+    transform: none;
+    filter: saturate(0.7);
+  }
+
+  /* --- Superficies ---------------------------------------------- */
+
+  /* Toda tarjeta es vidrio. */
+  .tarjeta {
+    -webkit-backdrop-filter: blur(var(--rvr-glass-blur)) saturate(var(--rvr-glass-sat));
+    backdrop-filter: blur(var(--rvr-glass-blur)) saturate(var(--rvr-glass-sat));
+    box-shadow:
+      inset 0 1px 0 var(--rvr-glass-luz),
+      var(--rvr-shadow-card);
+  }
+
+  .tarjeta-viva {
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
+  }
+  .tarjeta-viva:hover {
+    transform: translateY(-3px);
+    border-color: var(--rvr-filo-tinte);
+    box-shadow:
+      inset 0 1px 0 var(--rvr-glass-luz),
+      var(--rvr-shadow-card-up);
+  }
+
+  .superficie-lateral {
+    background-image: none;
+  }
+  .superficie-superior {
+    background-image: none;
+  }
+
+  .marca-degradada {
+    background-color: var(--rvr-ink);
+  }
+
+  /* Subrayado que crece bajo los enlaces de la landing. */
+  .enlace-landing {
+    position: relative;
+  }
+  .enlace-landing::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--rvr-primary);
+    transition: width 0.25s ease;
+  }
+  .enlace-landing:hover::after {
+    width: 100%;
+  }
+
+  .velo-superior {
+    background: transparent;
+  }
+
+  /* Filo: aro teñido muy tenue (sin línea degradada). */
+  .filo-fijo {
+    position: relative;
+  }
+  .filo-fijo::before,
+  .filo-hover::before {
+    content: none;
+  }
+  .filo-hover {
+    position: relative;
+    transition:
+      box-shadow 0.28s ease,
+      border-color 0.28s ease;
+  }
+  .filo-hover:hover,
+  .filo-hover:focus-within {
+    border-color: var(--rvr-filo-tinte);
+  }
+
+  .resplandor {
+    position: relative;
+  }
+
+  /* Los extremos de la cinta se desvanecen: cortada en seco parece un error. */
+  .cinta-velada {
+    mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+  }
+
+  /* La landing navega por anclas dentro de la misma página. */
+  .scroll-suave {
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-suave {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* --- Navegación ----------------------------------------------- */
+
+  .nav-lateral {
+    position: relative;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease,
+      transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-lateral:hover {
+    transform: translateX(2px);
+  }
+
+  .desplazable-fino {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rvr-border-strong) transparent;
+  }
+  .desplazable-fino::-webkit-scrollbar {
+    width: 6px;
+  }
+  .desplazable-fino::-webkit-scrollbar-thumb {
+    border-radius: 99px;
+    background: var(--rvr-border-strong);
+  }
+  .desplazable-fino::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* El activo: píldora azul llena con texto blanco, como en iOS. */
+  /* El activo lo marca la píldora deslizante (.nav-resalte). */
+  .nav-activa {
+    box-shadow: none;
+  }
+}
+
+/* Cambio de formulario en el teléfono: entra desde el lado del modo. */
+@keyframes rvr-desde-izq {
+  from { opacity: 0; transform: translateX(-28px); }
+}
+@keyframes rvr-desde-der {
+  from { opacity: 0; transform: translateX(28px); }
+}
+.anim-desde-izq {
+  animation: rvr-desde-izq 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.anim-desde-der {
+  animation: rvr-desde-der 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-desde-izq,
+  .anim-desde-der {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Luces de fondo: tres manchas de color plano del logo, muy
+   desenfocadas, fijas detrás de todo. Son las que el vidrio deja
+   ver (sin ellas el vidrio sobre blanco no se nota).
+   ============================================================ */
+.luces-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.luces-fondo span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.55;
+  animation: luz-deriva 28s ease-in-out infinite alternate;
+}
+.luces-fondo span:nth-child(1) {
+  top: -14%;
+  left: -8%;
+  width: 46vw;
+  height: 46vw;
+  background: #b9d8ff;
+}
+.luces-fondo span:nth-child(2) {
+  top: 30%;
+  right: -12%;
+  width: 40vw;
+  height: 40vw;
+  background: #cfe3ff;
+  animation-duration: 34s;
+  animation-delay: -6s;
+}
+.luces-fondo span:nth-child(3) {
+  bottom: -20%;
+  left: 28%;
+  width: 38vw;
+  height: 38vw;
+  background: #dce6f3;
+  animation-duration: 40s;
+  animation-delay: -12s;
+}
+.dark .luces-fondo span {
+  opacity: 0.32;
+}
+.dark .luces-fondo span:nth-child(1) {
+  background: #0a3d8a;
+}
+.dark .luces-fondo span:nth-child(2) {
+  background: #0b2c66;
+}
+.dark .luces-fondo span:nth-child(3) {
+  background: #15233d;
+}
+@keyframes luz-deriva {
+  to {
+    transform: translate3d(4vw, 3vw, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pintura-boton,
+  .tarjeta-viva,
+  .nav-lateral {
+    transition: none !important;
+  }
+  .pintura-boton:enabled:active,
+  .tarjeta-viva:hover,
+  .nav-lateral:hover {
+    transform: none !important;
+  }
+  .luces-fondo span {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Impresión · «Exportar PDF» de Reportes
+   ============================================================ */
+@media print {
+  .no-imprimir,
+  .luces-fondo {
+    display: none !important;
+  }
+
+  html,
+  body,
+  #root {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  main {
+    overflow: visible !important;
+  }
+
+  .tarjeta {
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: #ffffff !important;
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 14mm;
+  }
+}
+
+/* ============================================================
+   Landing · portal de marca «RVR» (GlyphPortal)
+   ============================================================ */
+.portal-marca-antetitulo {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - var(--gp-word-top, 30%) + 26px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.portal-marca-palabra {
+  position: absolute;
+  inset: calc(var(--gp-word-bottom, 60%) + 18px) 16px auto;
+  text-align: center;
+  font-size: clamp(18px, 4.2vw, 46px);
+  line-height: 1;
+  letter-spacing: 0.42em;
+  padding-left: 0.42em; /* compensa el espaciado de la última letra */
+}
+.portal-marca-pista {
+  position: absolute;
+  inset: auto 16px 6%;
+  text-align: center;
+}
+.portal-marca [data-gp-caption] {
+  inset: calc(var(--gp-word-bottom, 60%) + clamp(70px, 9vw, 112px)) 16px auto;
+  justify-content: center;
+}
+.portal-marca [data-gp-hint] {
+  display: none;
+}
+.portal-marca [data-gp-enter] {
+  height: 50px;
+  gap: 10px;
+  padding: 0 22px;
+  border-radius: 16px;
+  background: var(--rvr-primary);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow:
+    0 1px 2px rgb(10 60 140 / 0.18),
+    0 10px 24px -8px var(--rvr-halo-primary);
+  transition:
+    background-color 0.18s ease,
+    transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.portal-marca [data-gp-enter]:hover {
+  background: var(--rvr-primary-hover);
+}
+.portal-marca [data-gp-enter]:active {
+  transform: scale(0.97);
+}
+.portal-marca [data-gp-touch-picker] {
+  top: auto;
+  bottom: calc(6% + 34px);
+}
+.portal-marca [data-gp-select] {
+  border-color: var(--rvr-border-base);
+  background: var(--rvr-surface-raised);
+}
+@container (max-height: 560px) {
+  .portal-marca-pista {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Landing · reflejo de luz que sigue el cursor sobre el vidrio
+   (como el brillo de un cristal al moverlo bajo una lámpara)
+   ============================================================ */
+.reflejo {
+  position: relative;
+  isolation: isolate;
+}
+.reflejo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 50%),
+    rgb(255 255 255 / 0.55),
+    transparent 60%
+  );
+  transition: opacity 0.35s ease;
+}
+.vidrio-oscuro.reflejo::after,
+.dark .reflejo::after {
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    rgb(142 197 255 / 0.16),
+    transparent 60%
+  );
+}
+.reflejo:hover::after {
+  opacity: 1;
+}
+
+/* Inclinación 3D de la tarjeta de muestra del hero */
+.inclinable {
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Progreso de lectura bajo la barra flotante */
+.progreso-lectura {
+  transform-origin: left;
+  transform: scaleX(var(--progreso, 0));
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .reflejo::after {
+    display: none;
+  }
+  .inclinable {
+    transform: none !important;
+  }
+}
+/* Al salir de la escena azul, sus esquinas inferiores se redondean como una tarjeta. */
+.portal-marca [data-gp-pin] {
+  border-radius: 0 0 clamp(28px, 4vw, 48px) clamp(28px, 4vw, 48px);
+}
+
+/* --- Entrada de «RVR» ------------------------------------------------ */
+/* La palabra llega desde un poco más grande y desenfocada, y se asienta. */
+.portal-marca[data-gp-ready] [data-gp-field] {
+  animation: rvr-palabra-llega 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes rvr-palabra-llega {
+  from {
+    opacity: 0;
+    transform: scale(1.12) translateY(24px);
+    filter: blur(14px);
+  }
+}
+/* «TECNOLOGÍA» entra con las letras juntándose hasta su espaciado. */
+.portal-marca-palabra {
+  animation: rvr-tecnologia-llega 1.6s 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes rvr-tecnologia-llega {
+  from {
+    opacity: 0;
+    letter-spacing: 1.1em;
+    padding-left: 1.1em;
+    filter: blur(6px);
+  }
+}
+.portal-marca-antetitulo {
+  animation: rvr-sube 0.9s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.portal-marca [data-gp-caption],
+.portal-marca-pista {
+  animation: rvr-aparece 0.9s 0.9s ease both;
+}
+@keyframes rvr-sube {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+@keyframes rvr-aparece {
+  from {
+    opacity: 0;
+  }
+}
+/* Destello: una barra de luz desenfocada que cruza las letras. */
+.portal-marca-destello {
+  position: absolute;
+  top: -50%;
+  left: 0;
+  width: 14vw;
+  height: 200%;
+  background: rgb(255 255 255 / 0.5);
+  filter: blur(36px);
+  opacity: var(--gp-caption, 1);
+  transform: translateX(-30vw) rotate(18deg);
+  animation: rvr-destello 6s 1.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+@keyframes rvr-destello {
+  0% {
+    transform: translateX(-30vw) rotate(18deg);
+  }
+  45%,
+  100% {
+    transform: translateX(120vw) rotate(18deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portal-marca[data-gp-ready] [data-gp-field],
+  .portal-marca-palabra,
+  .portal-marca-antetitulo,
+  .portal-marca [data-gp-caption],
+  .portal-marca-pista,
+  .portal-marca-destello {
+    animation: none;
+  }
+}
+
+/* --- Relevo desde el splash «RVR» (index.html) ------------------------ */
+/* La palabra ya está en su sitio desde el splash: no se repite su entrada. */
+html.splash-landing .portal-marca[data-gp-ready] [data-gp-field] {
+  animation: none;
+}
+/* La barra de la landing aparece después de la palabra. */
+.landing-nav {
+  animation: rvr-aparece 0.8s 0.35s ease both;
+}
+/* Mientras el splash cubre la página, las entradas esperan su turno. */
+html.splash-activo .portal-marca-palabra,
+html.splash-activo .portal-marca-antetitulo,
+html.splash-activo .portal-marca [data-gp-caption],
+html.splash-activo .portal-marca-pista,
+html.splash-activo .landing-nav {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-nav {
+    animation: none;
+  }
+}
+
+/* El velo de la bienvenida aparece al entrar por la V (el vidrio se ve pleno
+   dentro de las letras y se atenúa detrás del texto). */
+.portal-marca-velo {
+  opacity: calc(var(--gp-reveal, 0) * 0.55);
+}
+
+/* ============================================================
+   Botón de vidrio líquido · para las acciones importantes
+   (basado en Liquid Glass Button). El vidrio está en ::before:
+   deforma y desenfoca lo que hay detrás con el filtro SVG
+   #vidrio-liquido (index.html) y lleva el tinte del botón.
+   ::after dibuja los filos de luz del cristal. Donde el
+   navegador no acepta url() en backdrop-filter, queda el
+   desenfoque normal.
+   ============================================================ */
+.boton-liquido,
+.boton-liquido-claro {
+  position: relative;
+  isolation: isolate;
+  background: transparent !important;
+  color: #fff;
+  box-shadow: 0 10px 26px -10px var(--rvr-halo-primary);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
+}
+.boton-liquido-claro {
+  color: var(--rvr-ink);
+  box-shadow: 0 10px 26px -12px rgb(0 0 0 / 0.35);
+}
+.boton-liquido::before,
+.boton-liquido-claro::before,
+.boton-liquido::after,
+.boton-liquido-claro::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.boton-liquido::before,
+.boton-liquido-claro::before {
+  background-color: rgb(10 108 240 / 0.9);
+  -webkit-backdrop-filter: blur(6px) saturate(170%);
+  backdrop-filter: blur(6px) saturate(170%);
+  backdrop-filter: url(#vidrio-liquido) blur(1.5px) saturate(170%);
+  transition: background-color 0.25s ease;
+}
+.boton-liquido-claro::before {
+  background-color: rgb(255 255 255 / 0.92);
+}
+/* Filos de luz: arriba a la izquierda y abajo a la derecha, más un brillo interior. */
+.boton-liquido::after {
+  box-shadow:
+    inset 3px 3px 0.5px -3.5px rgb(255 255 255 / 0.5),
+    inset -3px -3px 0.5px -3.5px rgb(255 255 255 / 0.85),
+    inset 1px 1px 1px -0.5px rgb(255 255 255 / 0.6),
+    inset -1px -1px 1px -0.5px rgb(255 255 255 / 0.45),
+    inset 0 0 6px 6px rgb(255 255 255 / 0.1),
+    inset 0 0 2px 2px rgb(255 255 255 / 0.06);
+}
+.boton-liquido-claro::after {
+  box-shadow:
+    inset 3px 3px 0.5px -3px rgb(0 0 0 / 0.5),
+    inset -3px -3px 0.5px -3px rgb(0 0 0 / 0.45),
+    inset 1px 1px 1px -0.5px rgb(0 0 0 / 0.3),
+    inset -1px -1px 1px -0.5px rgb(0 0 0 / 0.3),
+    inset 0 0 6px 6px rgb(0 0 0 / 0.06),
+    inset 0 0 2px 2px rgb(0 0 0 / 0.04);
+}
+.boton-liquido:hover:not(:disabled),
+.boton-liquido-claro:hover:not(:disabled) {
+  transform: scale(1.04);
+  box-shadow: 0 14px 32px -10px var(--rvr-halo-primary);
+}
+.boton-liquido:hover:not(:disabled)::before {
+  background-color: rgb(0 89 214 / 0.92);
+}
+.boton-liquido:active:not(:disabled),
+.boton-liquido-claro:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.boton-liquido:focus-visible,
+.boton-liquido-claro:focus-visible {
+  outline: 3px solid rgb(10 108 240 / 0.45);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .boton-liquido,
+  .boton-liquido-claro {
+    transition: none;
+  }
+  .boton-liquido:hover:not(:disabled),
+  .boton-liquido-claro:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Portal del cliente · kit visual
+   ============================================================ */
+/* Etapa actual de la pista: una luz recorre el tramo. */
+.portal-pista-viva {
+  background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  animation: portal-pista 1.8s ease-in-out infinite;
+}
+@keyframes portal-pista {
+  from { background-position: -60% 0; }
+  to { background-position: 160% 0; }
+}
+/* Anillo: se dibuja al aparecer. */
+.portal-anillo {
+  stroke-dashoffset: var(--lleno);
+  animation: portal-anillo 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: stroke-dashoffset 0.6s ease;
+}
+@keyframes portal-anillo {
+  from { stroke-dashoffset: var(--vacio); }
+}
+/* Tarjeta elegida en el catálogo: un «pop» al agregar. */
+@keyframes portal-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.portal-pop {
+  animation: portal-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .portal-pista-viva,
+  .portal-anillo,
+  .portal-pop {
+    animation: none;
+  }
+}
+
+/* Panel del calendario: aparece desde el campo. */
+@keyframes rvr-calendario {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [role='dialog'][aria-label='Elegir fecha'] { animation: none !important; }
+}
+
+/* Menú lateral: píldora de vidrio que se desliza hasta el módulo abierto. */
+.nav-resalte {
+  background-color: var(--rvr-surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--rvr-glass-luz),
+    0 1px 2px rgb(10 40 100 / 0.06),
+    0 8px 20px -10px rgb(10 40 100 / 0.35);
+  border: 1px solid var(--rvr-glass-borde);
+  transition:
+    top 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    left 0.2s ease,
+    width 0.2s ease,
+    height 0.2s ease;
+}
+.dark .nav-resalte {
+  background-color: rgb(255 255 255 / 0.07);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-resalte { transition: none; }
+}
+
+/* Tablero de widgets: barras que crecen al aparecer. */
+.widget-barra {
+  animation: widget-crece-y 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.widget-barra-h {
+  transform-origin: left;
+  animation: widget-crece-x 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes widget-crece-y { from { transform: scaleY(0.05); } }
+@keyframes widget-crece-x { from { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .widget-barra, .widget-barra-h { animation: none; }
+}

@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Portal RvR Tecnologías — gestión de órdenes de servicio, cotizaciones, técnicos y pagos." />
+    <title>Portal RvR Tecnologías</title>
+    <!-- Plus Jakarta Sans (SIL OFL 1.1), servida desde el propio sitio: public/fonts -->
+    <link rel="preload" href="/fonts/plus-jakarta-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/sora-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Anti-flash: aplica el tema guardado antes del primer paint -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('rvr.theme');
+          var mode = stored ? JSON.parse(stored) : 'system';
+          var dark =
+            mode === 'dark' ||
+            (mode === 'system' &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', dark);
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+        // En la landing, el splash es la palabra «RVR» de la portada.
+        if (location.pathname === '/') document.documentElement.classList.add('splash-landing', 'splash-activo');
+      })();
+    </script>
+
+    <!--
+      Splash de arranque. Va en el HTML, con estilos en línea, para que se pinte
+      antes de que descargue el bundle: si viviera en React, el usuario vería
+      primero una pantalla en blanco, que es justo lo que se quiere evitar.
+      main.tsx lo retira cuando la aplicación ya pintó.
+    -->
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 26px;
+        background: #edf2f8;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        transition: opacity 0.35s ease;
+      }
+      html.dark #splash {
+        background: #070d18;
+      }
+      #splash.saliendo {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #splash .icono {
+        width: 92px;
+        height: 92px;
+        display: block;
+        animation: splash-entra 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+      html.dark #splash .claro,
+      #splash .oscuro {
+        display: none;
+      }
+      html.dark #splash .oscuro {
+        display: block;
+      }
+      #splash .halo {
+        position: absolute;
+        width: 132px;
+        height: 132px;
+        border-radius: 30%;
+        background: transparent;
+        filter: none;
+        display: none;
+        animation: splash-halo 2.4s ease-in-out infinite;
+      }
+      #splash .pista {
+        width: 148px;
+        height: 3px;
+        border-radius: 999px;
+        background: rgb(20 45 85 / 0.1);
+        overflow: hidden;
+      }
+      html.dark #splash .pista {
+        background: rgb(255 255 255 / 0.08);
+      }
+      #splash .pista span {
+        display: block;
+        width: 33%;
+        height: 100%;
+        border-radius: 999px;
+        background: #0a6cf0;
+        animation: splash-barrido 1.25s cubic-bezier(0.55, 0, 0.35, 1) infinite;
+      }
+      #splash .marca {
+        font-size: 13px;
+        font-weight: 500;
+        color: #5f6e7d;
+      }
+      html.dark #splash .marca {
+        color: #9fafbf;
+      }
+      @keyframes splash-entra {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: none; }
+      }
+      @keyframes splash-halo {
+        0%, 100% { opacity: 0.55; transform: scale(0.94); }
+        50% { opacity: 1; transform: scale(1.06); }
+      }
+      @keyframes splash-barrido {
+        from { transform: translateX(-110%); }
+        to { transform: translateX(340%); }
+      }
+      /* --- Splash de la landing: «RVR» en el mismo lugar que la portada --- */
+      #splash-rvr,
+      #splash .pista-rvr,
+      #splash .luces-fondo {
+        display: none;
+      }
+      html.splash-landing #splash > :not(#splash-rvr):not(#sr-vidrio):not(.pista-rvr):not(.luces-fondo) {
+        display: none !important;
+      }
+      /* Mismo fondo y mismas luces que la página: al irse el splash no cambia nada. */
+      html.splash-landing #splash {
+        background: var(--rvr-bg, #edf2f8);
+        transition: opacity 0.7s ease;
+      }
+      html.splash-landing #splash .luces-fondo {
+        display: block;
+      }
+      html.splash-landing #splash-rvr {
+        display: block;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        visibility: hidden;
+      }
+      html.splash-landing #splash-rvr.lista {
+        visibility: visible;
+      }
+      #splash-rvr text {
+        font-family: Sora, 'Plus Jakarta Sans', system-ui, sans-serif;
+        font-weight: 800;
+        font-kerning: none;
+        font-variant-ligatures: none;
+      }
+      /* Vidrio doblado (WebGL) recortado a la forma de las letras. */
+      #sr-vidrio {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        clip-path: url(#sr-recorte);
+        opacity: 0;
+      }
+      html.splash-landing #sr-vidrio {
+        display: block;
+      }
+      #sr-vidrio.lista {
+        opacity: 1;
+        animation: sr-aparece 0.4s ease both;
+      }
+      /* Cada letra crece desde su base, una tras otra. */
+      #splash-rvr.lista .letra {
+        transform-box: fill-box;
+        transform-origin: 50% 100%;
+        animation: sr-letra 1.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+      #splash-rvr.lista .letra:nth-of-type(2) { animation-delay: 0.12s; }
+      #splash-rvr.lista .letra:nth-of-type(3) { animation-delay: 0.24s; }
+      @keyframes sr-letra {
+        from { transform: translateY(18%) scaleY(0.02); }
+      }
+      /* Halo azul que respira detrás de la palabra. */
+      #splash-rvr .halo-rvr {
+        fill: #0a6cf0;
+        opacity: 0;
+      }
+      #splash-rvr.lista .halo-rvr {
+        animation: sr-halo-entra 1.2s 0.5s ease both, sr-halo 2.8s 1.7s ease-in-out infinite;
+      }
+      html.dark #splash-rvr .halo-rvr {
+        fill: #1e88ff;
+      }
+      @keyframes sr-halo-entra {
+        to { opacity: 0.32; }
+      }
+      @keyframes sr-halo {
+        0%, 100% { opacity: 0.32; }
+        50% { opacity: 0.16; }
+      }
+      html.splash-landing #splash .pista-rvr {
+        display: block;
+        position: absolute;
+        left: 50%;
+        width: 148px;
+        margin-left: -74px;
+        height: 3px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgb(20 45 85 / 0.1);
+        animation: sr-aparece 0.6s 0.6s ease both;
+      }
+      @keyframes sr-aparece {
+        from { opacity: 0; }
+      }
+      html.dark #splash .pista-rvr {
+        background: rgb(255 255 255 / 0.08);
+      }
+      #splash .pista-rvr span {
+        display: block;
+        width: 33%;
+        height: 100%;
+        border-radius: 999px;
+        background: #0a6cf0;
+        animation: splash-barrido 1.25s cubic-bezier(0.55, 0, 0.35, 1) infinite;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash-rvr .letra,
+        #splash-rvr .halo-rvr,
+        #sr-vidrio,
+        #splash .pista-rvr span { animation: none !important; }
+        #splash-rvr .halo-rvr { opacity: 0.25; }
+        #sr-vidrio.lista { opacity: 1; }
+        #splash .icono,
+        #splash .halo,
+        #splash .pista span { animation: none; }
+        #splash .pista span { width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash" role="status" aria-label="Cargando el portal">
+      <div style="position: relative; display: flex; align-items: center; justify-content: center">
+        <span class="halo" aria-hidden="true"></span>
+        <img class="icono claro" src="/marca/rvr-icono-light-512.png" alt="" />
+        <img class="icono oscuro" src="/marca/rvr-icono-dark-512.png" alt="" />
+      </div>
+      <div class="pista" aria-hidden="true"><span></span></div>
+      <p class="marca">Portal RvR Tecnologías</p>
+      <div class="luces-fondo" aria-hidden="true"><span></span><span></span><span></span></div>
+      <svg id="splash-rvr" aria-hidden="true" focusable="false">
+        <defs>
+          <filter id="sr-halo-difuso" x="-30%" y="-60%" width="160%" height="220%">
+            <feGaussianBlur stdDeviation="46" />
+          </filter>
+          <!-- Forma de las letras: recorta el vidrio (canvas) de abajo -->
+          <clipPath id="sr-recorte" clipPathUnits="userSpaceOnUse">
+            <text class="sr-t letra">R</text>
+            <text class="sr-t letra">V</text>
+            <text class="sr-t letra">R</text>
+          </clipPath>
+        </defs>
+        <text class="halo-rvr sr-palabra" filter="url(#sr-halo-difuso)">RVR</text>
+      </svg>
+      <canvas id="sr-vidrio" aria-hidden="true"></canvas>
+      <div class="pista-rvr" aria-hidden="true"><span></span></div>
+    </div>
+    <script>
+      // Splash de la landing: «RVR» relleno del mismo vidrio doblado (WebGL) que
+      // la portada, colocado con las mismas cuentas que GlyphPortal (centro en
+      // 50 % / 46 %, 84 % del ancho o 38 % del alto, alto = 100svh) y con el
+      // mismo reloj (performance.now). Así el relevo calza letra por letra y
+      // cuadro por cuadro. Shader y colores copiados de
+      // src/shared/components/decor/GlassFold.tsx y PortalMarca.tsx.
+      (function () {
+        var html = document.documentElement;
+        if (!html.classList.contains('splash-landing')) return;
+        var VIDRIO = { color1: '#0a6cf0', color2: '#0f1a2e', color3: '#8ec5ff', speed: 0.35, scale: 1, noise: 0.05 };
+        var DPR = 1.5, QUIETO = 4;
+        var svg = document.getElementById('splash-rvr');
+        var lienzoGl = document.getElementById('sr-vidrio');
+        var letras = svg.querySelectorAll('.sr-t');
+        var palabra = svg.querySelector('.sr-palabra');
+        var pista = document.querySelector('#splash .pista-rvr');
+        var sonda = document.createElement('div');
+        sonda.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none';
+        document.body.appendChild(sonda);
+        var medidor = document.createElement('canvas').getContext('2d');
+        var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // ---------- WebGL ----------
+        var VERT = 'attribute vec2 position;varying vec2 vUv;void main(){vUv=position*0.5+0.5;gl_Position=vec4(position,0.0,1.0);}';
+        var FRAG = [
+          'precision highp float;',
+          'uniform float u_time;uniform vec3 u_color1;uniform vec3 u_color2;uniform vec3 u_color3;',
+          'uniform float u_scale;uniform float u_noise;uniform vec2 u_resolution;varying vec2 vUv;',
+          'float grain(vec2 st){return fract(sin(dot(st,vec2(12.9898,78.233)))*43758.5453);}',
+          'vec2 centered(vec2 uv){vec2 p=uv-0.5;p.x*=u_resolution.x/max(u_resolution.y,1.0);return p;}',
+          'mat2 rot(float a){float s=sin(a);float c=cos(a);return mat2(c,-s,s,c);}',
+          'vec3 shade(vec2 uv,float time){',
+          ' vec2 q=rot(0.6)*centered(uv)*2.0*u_scale;float t=time*0.6;',
+          ' float pixel=2.0*u_scale/max(u_resolution.y,1.0);',
+          ' vec3 color=mix(u_color2,u_color2*0.45,clamp(length(centered(uv))*1.3,0.0,1.0));',
+          ' for(int i=0;i<6;i++){',
+          '  float fi=float(i);float bend=mod(fi,2.0)*2.0-1.0;',
+          '  float crease=(fi-2.5)*0.4+0.26*sin(q.x*(1.05+0.12*fi)+fi*1.9+t*(0.25+0.05*fi))+0.1*bend*q.x*q.x;',
+          '  float s=q.y-crease;float pane=smoothstep(-pixel,pixel,s);float back=max(s,0.0);',
+          '  float body=exp(-back*1.7);float fresnel=exp(-back*8.0);float rim=exp(-back*80.0);',
+          '  float inner=exp(-pow((back-0.045)/0.014,2.0));float bloom=exp(-abs(s)*20.0);',
+          '  vec3 tint=mix(u_color1,u_color3,clamp(fresnel*0.6+0.08+0.14*sin(fi*2.1+q.x*0.8+t*0.2),0.0,1.0));',
+          '  vec3 light=tint*pane*(body*0.42+fresnel*0.4)+u_color3*(pane*(rim*0.6+inner*0.12)+bloom*0.1);',
+          '  color+=light*(1.0-color);',
+          ' }',
+          ' return clamp(color,0.0,1.0);',
+          '}',
+          'void main(){vec3 color=shade(vUv,u_time);',
+          ' if(u_noise>0.001){float g=grain(vUv*200.0+u_time*0.1);color*=1.0-u_noise*0.4+u_noise*g*0.4;}',
+          ' gl_FragColor=vec4(color,1.0);}'
+        ].join('\n');
+        function vec3(hex) {
+          var n = parseInt(hex.slice(1), 16);
+          return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+        }
+        var gl = null, u = {};
+        try { gl = lienzoGl.getContext('webgl', { antialias: false, alpha: false }); } catch (err) {}
+        if (gl) {
+          var prog = gl.createProgram();
+          [[gl.VERTEX_SHADER, VERT], [gl.FRAGMENT_SHADER, FRAG]].forEach(function (par) {
+            var sh = gl.createShader(par[0]); gl.shaderSource(sh, par[1]); gl.compileShader(sh); gl.attachShader(prog, sh);
+          });
+          gl.linkProgram(prog); gl.useProgram(prog);
+          gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+          var pos = gl.getAttribLocation(prog, 'position');
+          gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+          ['time', 'color1', 'color2', 'color3', 'scale', 'noise', 'resolution'].forEach(function (k) { u[k] = gl.getUniformLocation(prog, 'u_' + k); });
+          gl.uniform3fv(u.color1, vec3(VIDRIO.color1));
+          gl.uniform3fv(u.color2, vec3(VIDRIO.color2));
+          gl.uniform3fv(u.color3, vec3(VIDRIO.color3));
+          gl.uniform1f(u.scale, VIDRIO.scale);
+          gl.uniform1f(u.noise, VIDRIO.noise);
+        } else {
+          // Sin WebGL: letras en azul del logo.
+          lienzoGl.style.background = '#0f4fa6';
+        }
+        function pintar(ahora) {
+          if (!gl) return;
+          gl.viewport(0, 0, lienzoGl.width, lienzoGl.height);
+          gl.uniform1f(u.time, quieto ? QUIETO : (ahora / 1000) * VIDRIO.speed);
+          gl.uniform2f(u.resolution, lienzoGl.width, lienzoGl.height);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
+        function ciclo(ahora) {
+          if (!document.getElementById('splash')) return; // el splash ya se fue
+          pintar(ahora);
+          if (!quieto) requestAnimationFrame(ciclo);
+        }
+
+        // ---------- Colocación ----------
+        function colocar() {
+          if (!medidor) return;
+          var W = document.documentElement.clientWidth;
+          var H = Math.min(sonda.offsetHeight || window.innerHeight, window.innerHeight);
+          medidor.font = "800 100px Sora, 'Plus Jakarta Sans', sans-serif";
+          var m = medidor.measureText('RVR');
+          var bx = -m.actualBoundingBoxLeft, by = -m.actualBoundingBoxAscent;
+          var bw = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+          var bh = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+          if (!bw || !bh) return;
+          var e = Math.min((W * 0.84) / bw, (H * 0.38) / bh);
+          var x0 = W / 2 - (bx + bw / 2) * e;
+          var y0 = H * 0.46 - (by + bh / 2) * e;
+          svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+          for (var i = 0; i < letras.length; i++) {
+            letras[i].setAttribute('font-size', 100 * e);
+            letras[i].setAttribute('x', x0 + medidor.measureText('RVR'.slice(0, i)).width * e);
+            letras[i].setAttribute('y', y0);
+          }
+          palabra.setAttribute('font-size', 100 * e);
+          palabra.setAttribute('x', x0);
+          palabra.setAttribute('y', y0);
+          // El lienzo mide lo mismo que la escena de la portada (ancho × 100svh).
+          var dpr = Math.min(window.devicePixelRatio || 1, DPR);
+          lienzoGl.style.width = W + 'px';
+          lienzoGl.style.height = H + 'px';
+          lienzoGl.width = Math.max(1, Math.round(W * dpr));
+          lienzoGl.height = Math.max(1, Math.round(H * dpr));
+          pintar(performance.now());
+          pista.style.top = H * 0.46 + (bh * e) / 2 + 40 + 'px';
+          svg.classList.add('lista');
+          lienzoGl.classList.add('lista');
+        }
+        var listo = false;
+        function una() {
+          if (listo) return;
+          listo = true;
+          colocar();
+          requestAnimationFrame(ciclo);
+        }
+        try { document.fonts.load('800 100px Sora', 'RVR').then(una, una); } catch (err) { una(); }
+        setTimeout(una, 1200);
+        window.addEventListener('resize', function () { if (listo) colocar(); });
+      })();
+    </script>
+
+
+
+    <!-- Luces de fondo: lo que el vidrio deja ver (componentes.css) -->
+    <div class="luces-fondo" aria-hidden="true"><span></span><span></span><span></span></div>
+    <!-- Filtro del botón de vidrio líquido (.boton-liquido en componentes.css) -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+      <filter id="vidrio-liquido" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="ruido" />
+        <feGaussianBlur in="ruido" stdDeviation="2" result="ruidoSuave" />
+        <feDisplacementMap in="SourceGraphic" in2="ruidoSuave" scale="70" xChannelSelector="R" yChannelSelector="B" result="desplazado" />
+        <feGaussianBlur in="desplazado" stdDeviation="4" result="final" />
+        <feComposite in="final" in2="final" operator="over" />
+      </filter>
+    </svg>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

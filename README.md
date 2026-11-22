@@ -6,10 +6,20 @@ la **ficha técnica aprobada** y la **base de datos final** (PostgreSQL).
 
 ```
 RVR DEV/
-├── src/        portal web (React 19 + TypeScript + Vite 8 + Tailwind v4)
-├── api/        API REST (Node + Express 5 + TypeScript) — la usan la web y la app móvil
-├── db/         esquema, catálogos, datos de demostración y consultas de PostgreSQL
-└── docs/       trazabilidad HU → pantalla → API → permiso
+├── frontend/       portal web (React 19 + TypeScript + Vite 8 + Tailwind v4)
+│   ├── src/        código del portal (app, features, shared, styles)
+│   ├── public/     archivos estáticos (íconos, marca)
+│   ├── demo/       la API corriendo en el navegador (versión de Vercel)
+│   └── package.json
+├── backend/        API REST (Node + Express 5 + TypeScript) — la usan la web y la app móvil
+│   ├── src/        servidor: routes/ → controllers/ → models/, más middlewares/ y utils/
+│   ├── db/         esquema, catálogos, datos de demostración y consultas de PostgreSQL
+│   ├── pruebas/    pruebas de punta a punta contra la base
+│   └── package.json
+├── docs/           trazabilidad HU → pantalla → API → permiso
+├── iniciar.bat     levanta backend y frontend
+├── montar-base.bat crea la base y los .env
+└── vercel.json     publica la demo del frontend
 ```
 
 ## Tres portales y una app
@@ -48,10 +58,10 @@ su sesión.
 ## Versión de demostración (Vercel, solo front)
 
 Para revisar el portal sin instalar PostgreSQL ni encender la API, la web se
-publica en **modo demostración**: la misma API de `api/src` corre **dentro del
+publica en **modo demostración**: la misma API de `backend/src` corre **dentro del
 navegador** y la base es PostgreSQL de verdad compilado a WebAssembly
-([PGlite](https://pglite.dev)), cargado con `db/01-esquema.sql`,
-`db/02-catalogos.sql` y `db/99-datos-demo.sql`. Todos los módulos, permisos,
+([PGlite](https://pglite.dev)), cargado con `backend/db/01-esquema.sql`,
+`backend/db/02-catalogos.sql` y `backend/db/99-datos-demo.sql`. Todos los módulos, permisos,
 triggers y reglas funcionan igual que con el servidor.
 
 - La base se crea la primera vez (unos segundos) y queda guardada en ese
@@ -62,12 +72,13 @@ triggers y reglas funcionan igual que con el servidor.
 - La recuperación de contraseña muestra el enlace en pantalla (no hay correo).
 
 ```bash
+cd frontend
 npm run dev:demo      # modo demostración en local
 npm run build:demo    # compila lo mismo que Vercel (vercel-build)
 ```
 
-Vercel usa `vercel.json`: compila con `npm run vercel-build` y sirve `dist/` como
-SPA. Las piezas que reemplazan a Node en el navegador están en `demo/`
+Vercel usa `vercel.json`: compila `frontend/` con `npm run vercel-build` y sirve
+`frontend/dist/` como SPA. Las piezas que reemplazan a Node en el navegador están en `frontend/demo/`
 (`servidor.ts`, `pglite.worker.ts` y `shims/`); la compilación normal
 (`npm run build`) no las incluye.
 
@@ -75,7 +86,7 @@ SPA. Las piezas que reemplazan a Node en el navegador están en `demo/`
 
 1. **`montar-base.bat`** — la primera vez, o cuando quieras reiniciar los datos.
    Pide la contraseña de `postgres`, crea la base `rvr`, pregunta si cargar los
-   datos de demostración, escribe `api/.env` y `.env`, e instala la API.
+   datos de demostración, escribe `backend/.env` y `frontend/.env`, e instala la API.
 2. **`iniciar.bat`** — cada vez que trabajes. Abre la API en otra ventana
    (`http://localhost:4000/api`), espera a que conecte con la base y levanta el
    portal en `http://localhost:5173`.
@@ -83,18 +94,18 @@ SPA. Las piezas que reemplazan a Node en el navegador están en `demo/`
 Manual:
 
 ```bash
-npm install && (cd api && npm install)
-# crea la base y carga db/01, db/02 y, si quieres, db/99 (ver db/README.md)
-cp api/.env.example api/.env        # y completa DATABASE_URL y JWT_SECRET
-(cd api && npm run dev)             # API en :4000
-npm run dev                         # portal en :5173
+(cd frontend && npm install) && (cd backend && npm install)
+# crea la base y carga backend/db/01, 02 y, si quieres, 99 (ver backend/db/README.md)
+cp backend/.env.example backend/.env    # y completa DATABASE_URL y JWT_SECRET
+(cd backend && npm run dev)             # API en :4000
+(cd frontend && npm run dev)            # portal en :5173
 ```
 
 ## Cuentas de prueba
 
 | Portal | Usuario | Contraseña |
 |---|---|---|
-| Administrativo · Administrador | `rvargas` (ricardo.vargas@rvrtec.co) | `RvR2026*admin` |
+| Administrativo · Administrador | `rvargas` (ricardo.vargas@rvrtec.co) | `   ` |
 | Administrativo · Coordinador | `lgomez` (laura.gomez@rvrtec.co) | `RvR2026*coord` |
 | Cliente (con datos demo) | `asuarez` (ana.suarez@gmail.com) · `crestrepo` | `RvR2026*cliente` |
 | App móvil · Técnico | `jmora` (julian.mora@rvrtec.co) · `sherrera` (demo) | `RvR2026*tecnico` |
@@ -104,7 +115,7 @@ Tres intentos fallidos seguidos bloquean la cuenta 5 minutos (CA_13_05).
 ## Estructura del portal (feature-based)
 
 ```
-src/
+frontend/src/
 ├── app/            providers, rutas (paths.ts, router.tsx, paginas.tsx) y layouts
 │                   (DashboardLayout del personal, PortalLayout del cliente)
 ├── features/       una carpeta por módulo, cada una con api/ components/ pages/ index.ts
@@ -136,8 +147,8 @@ baja el código del portal administrativo.
 ## Verificación
 
 ```bash
-npx tsc -b && npm run lint && npm run build     # portal
-(cd api && npx tsc --noEmit)                     # API
-(cd api && node pruebas/flujo-completo.mjs)      # 147 comprobaciones, base recién montada con demo
-(cd api && node pruebas/complementos.mjs)        # 131 comprobaciones, base recién montada con demo
+(cd frontend && npx tsc -b && npm run lint && npm run build)   # portal
+(cd backend && npx tsc --noEmit)                     # API
+(cd backend && node pruebas/flujo-completo.mjs)      # 147 comprobaciones, base recién montada con demo
+(cd backend && node pruebas/complementos.mjs)        # 131 comprobaciones, base recién montada con demo
 ```

@@ -1,0 +1,279 @@
+/* ============================================================
+   Design tokens · Portal RvR Tecnologías · «Cristal»
+   Colores del logo: azul tinta (#1c283c) y el azul eléctrico de la
+   V (#0050c8 → #0088f8). Superficies de vidrio translúcido sobre
+   un fondo claro con luces suaves, como iOS. Sin degradados en
+   botones, textos ni tarjetas. Los nombres no cambian: solo los valores.
+   ============================================================ */
+
+:root {
+  /* --- Marca --- */
+  --rvr-ink: #1c283c;
+  --rvr-ink-muted: #2a3a55;
+  --rvr-azul-vivo: #1e88ff;
+  --rvr-azul-cielo: #8ec5ff;
+
+  /* --- Superficies (vidrio) --- */
+  --rvr-bg: #edf2f8;
+  --rvr-surface: rgb(255 255 255 / 0.74);
+  --rvr-surface-solid: #ffffff;
+  --rvr-surface-muted: rgb(232 240 250 / 0.72);
+  --rvr-surface-raised: rgb(255 255 255 / 0.9);
+
+  /* --- Vidrio --- */
+  --rvr-glass-blur: 22px;
+  --rvr-glass-sat: 180%;
+  --rvr-glass-luz: rgb(255 255 255 / 0.7);
+  --rvr-glass-borde: rgb(255 255 255 / 0.55);
+
+  /* --- Bordes --- */
+  --rvr-border: rgb(20 45 85 / 0.1);
+  --rvr-border-strong: rgb(20 45 85 / 0.2);
+
+  /* --- Texto --- */
+  --rvr-fg: #0f1b2d;
+  --rvr-fg-muted: #3c4a60;
+  --rvr-fg-subtle: #536179;
+  --rvr-fg-faint: #637189;
+
+  /* --- Primario: el azul de la V del logo --- */
+  --rvr-primary: #0a6cf0;
+  --rvr-primary-hover: #0059d6;
+  --rvr-primary-strong: #0047ad;
+  --rvr-primary-soft: rgb(10 108 240 / 0.1);
+  --rvr-primary-on-soft: #0059d6;
+  --rvr-on-primary: #ffffff;
+  --rvr-link: #0059d6;
+
+  /* --- Panel de marca (login) --- */
+  --rvr-brand-bg: #1c283c;
+  --rvr-brand-blob-1: #0a6cf0;
+  --rvr-brand-blob-2: #1e88ff;
+  --rvr-brand-fg: #ffffff;
+  --rvr-brand-fg-muted: #c6d4e8;
+  --rvr-brand-fg-subtle: #8ec5ff;
+  --rvr-brand-check-bg: rgb(255 255 255 / 0.12);
+  --rvr-brand-list-fg: #e3ecf8;
+
+  /* --- Estados semánticos --- */
+  --rvr-success: #16a34a;
+  --rvr-success-fg: #0b7a37;
+  --rvr-success-soft: rgb(22 163 74 / 0.12);
+
+  --rvr-warning: #f59e0b;
+  --rvr-warning-fg: #9a5800;
+  --rvr-warning-soft: rgb(245 158 11 / 0.15);
+
+  --rvr-danger: #ef4444;
+  --rvr-danger-fg: #c42525;
+  --rvr-danger-soft: rgb(239 68 68 / 0.11);
+  --rvr-danger-border: rgb(239 68 68 / 0.35);
+
+  --rvr-info: #0a6cf0;
+  --rvr-info-fg: #0059d6;
+  --rvr-info-soft: rgb(10 108 240 / 0.1);
+
+  /* --- Foco --- */
+  --rvr-ring: rgb(10 108 240 / 0.2);
+  --rvr-ring-border: #0a6cf0;
+
+  /* --- Series de gráficos --- */
+  --rvr-chart-1: #0a6cf0;
+  --rvr-chart-2: #8ec5ff;
+  --rvr-chart-grid: rgb(20 45 85 / 0.08);
+  --rvr-track: rgb(20 45 85 / 0.07);
+
+  /* --- Estados de orden --- */
+  --rvr-estado-nueva: #0a6cf0;
+  --rvr-estado-pendiente: #f59e0b;
+  --rvr-estado-aprobada: #1c283c;
+  --rvr-estado-programada: #06a8c8;
+  --rvr-estado-reprogramada: #f97316;
+  --rvr-estado-en-proceso: #3d8bff;
+  --rvr-estado-completada: #16a34a;
+  --rvr-estado-cancelada: #ef4444;
+
+  --rvr-estado-nueva-soft: rgb(10 108 240 / 0.1);
+  --rvr-estado-nueva-fg: #0059d6;
+  --rvr-estado-pendiente-soft: rgb(245 158 11 / 0.15);
+  --rvr-estado-pendiente-fg: #9a5800;
+  --rvr-estado-aprobada-soft: rgb(28 40 60 / 0.09);
+  --rvr-estado-aprobada-fg: #1c283c;
+  --rvr-estado-programada-soft: rgb(6 168 200 / 0.13);
+  --rvr-estado-programada-fg: #06708a;
+  --rvr-estado-reprogramada-soft: rgb(249 115 22 / 0.13);
+  --rvr-estado-reprogramada-fg: #b2490a;
+  --rvr-estado-en-proceso-soft: rgb(61 139 255 / 0.13);
+  --rvr-estado-en-proceso-fg: #0d5bd1;
+  --rvr-estado-completada-soft: rgb(22 163 74 / 0.12);
+  --rvr-estado-completada-fg: #0b7a37;
+  --rvr-estado-cancelada-soft: rgb(239 68 68 / 0.11);
+  --rvr-estado-cancelada-fg: #c42525;
+
+  /* --- Neutro --- */
+  --rvr-neutro-soft: rgb(20 45 85 / 0.07);
+  --rvr-neutro-fg: #3c4a60;
+
+  /* --- Avatares --- */
+  --rvr-av-1: #0a6cf0;
+  --rvr-av-2: #1c283c;
+  --rvr-av-3: #06a8c8;
+  --rvr-av-4: #16a34a;
+  --rvr-av-5: #d97706;
+  --rvr-av-6: #e11d48;
+  --rvr-av-7: #536179;
+
+  /* --- Categóricas --- */
+  --rvr-cat-1: #0a6cf0;
+  --rvr-cat-2: #06a8c8;
+  --rvr-cat-3: #f59e0b;
+  --rvr-cat-4: #1c283c;
+
+  /* --- Acabado: sin degradados; se conservan los nombres --- */
+  --rvr-grad-primary: linear-gradient(var(--rvr-primary), var(--rvr-primary));
+  --rvr-grad-primary-hover: linear-gradient(var(--rvr-primary-hover), var(--rvr-primary-hover));
+  --rvr-grad-danger: linear-gradient(#e03a3a, #e03a3a);
+  --rvr-grad-marca: linear-gradient(#1c283c, #1c283c);
+  --rvr-filo-tinte: rgb(10 108 240 / 0.14);
+  --rvr-filo-luz: none;
+  --rvr-halo-titular: transparent;
+  --rvr-brillo: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --rvr-halo-primary: rgb(10 108 240 / 0.45);
+  --rvr-halo-danger: rgb(224 58 58 / 0.4);
+  --rvr-lateral: none;
+  --rvr-superior: none;
+
+  /* --- Sombras suaves, tipo iOS --- */
+  --rvr-shadow-xs: 0 1px 2px rgb(16 32 64 / 0.05);
+  --rvr-shadow-sm: 0 1px 3px rgb(16 32 64 / 0.07);
+  --rvr-shadow-md: 0 10px 28px -10px rgb(16 32 64 / 0.2);
+  --rvr-shadow-lg: 0 24px 60px -18px rgb(16 32 64 / 0.32);
+  --rvr-shadow-card: 0 1px 2px rgb(16 32 64 / 0.04), 0 10px 30px -14px rgb(16 32 64 / 0.16);
+  --rvr-shadow-card-up: 0 2px 4px rgb(16 32 64 / 0.05), 0 18px 40px -14px rgb(16 32 64 / 0.24);
+}
+
+.dark {
+  --rvr-ink: #0a1120;
+  --rvr-ink-muted: #16223a;
+
+  --rvr-bg: #070d18;
+  --rvr-surface: rgb(22 32 52 / 0.62);
+  --rvr-surface-solid: #121c2e;
+  --rvr-surface-muted: rgb(255 255 255 / 0.05);
+  --rvr-surface-raised: rgb(24 35 56 / 0.95);
+
+  --rvr-glass-luz: rgb(255 255 255 / 0.08);
+  --rvr-glass-borde: rgb(255 255 255 / 0.08);
+
+  --rvr-border: rgb(255 255 255 / 0.08);
+  --rvr-border-strong: rgb(255 255 255 / 0.16);
+
+  --rvr-fg: #eaf1fb;
+  --rvr-fg-muted: #c3cfe0;
+  --rvr-fg-subtle: #9fb0c8;
+  --rvr-fg-faint: #91a2bb;
+
+  --rvr-primary: #0a6cf0;
+  --rvr-primary-hover: #2a82ff;
+  --rvr-primary-strong: #8ec5ff;
+  --rvr-primary-soft: rgb(30 136 255 / 0.16);
+  --rvr-primary-on-soft: #8ec5ff;
+  --rvr-on-primary: #ffffff;
+  --rvr-link: #6db3ff;
+
+  --rvr-brand-bg: #0a1120;
+  --rvr-brand-blob-1: #0a6cf0;
+  --rvr-brand-blob-2: #1e88ff;
+  --rvr-brand-fg: #eaf1fb;
+  --rvr-brand-fg-muted: #9fb0c8;
+  --rvr-brand-fg-subtle: #8ec5ff;
+  --rvr-brand-check-bg: rgb(255 255 255 / 0.08);
+  --rvr-brand-list-fg: #c3cfe0;
+
+  --rvr-success: #22c55e;
+  --rvr-success-fg: #6ee7a0;
+  --rvr-success-soft: rgb(34 197 94 / 0.14);
+
+  --rvr-warning: #fbbf24;
+  --rvr-warning-fg: #fcd37a;
+  --rvr-warning-soft: rgb(251 191 36 / 0.14);
+
+  --rvr-danger: #f87171;
+  --rvr-danger-fg: #fca5a5;
+  --rvr-danger-soft: rgb(248 113 113 / 0.13);
+  --rvr-danger-border: rgb(248 113 113 / 0.36);
+
+  --rvr-info: #3d9bff;
+  --rvr-info-fg: #8ec5ff;
+  --rvr-info-soft: rgb(61 155 255 / 0.15);
+
+  --rvr-ring: rgb(61 155 255 / 0.28);
+  --rvr-ring-border: #3d9bff;
+
+  --rvr-chart-1: #3d9bff;
+  --rvr-chart-2: #8ec5ff;
+  --rvr-chart-grid: rgb(255 255 255 / 0.07);
+  --rvr-track: rgb(255 255 255 / 0.06);
+
+  --rvr-estado-nueva: #3d9bff;
+  --rvr-estado-pendiente: #fbbf24;
+  --rvr-estado-aprobada: #c3cfe0;
+  --rvr-estado-programada: #22c3e0;
+  --rvr-estado-reprogramada: #fb923c;
+  --rvr-estado-en-proceso: #6db3ff;
+  --rvr-estado-completada: #22c55e;
+  --rvr-estado-cancelada: #f87171;
+
+  --rvr-estado-nueva-soft: rgb(61 155 255 / 0.15);
+  --rvr-estado-nueva-fg: #8ec5ff;
+  --rvr-estado-pendiente-soft: rgb(251 191 36 / 0.14);
+  --rvr-estado-pendiente-fg: #fcd37a;
+  --rvr-estado-aprobada-soft: rgb(195 207 224 / 0.12);
+  --rvr-estado-aprobada-fg: #e3ecf8;
+  --rvr-estado-programada-soft: rgb(34 195 224 / 0.14);
+  --rvr-estado-programada-fg: #8ee6f5;
+  --rvr-estado-reprogramada-soft: rgb(251 146 60 / 0.14);
+  --rvr-estado-reprogramada-fg: #fdba8c;
+  --rvr-estado-en-proceso-soft: rgb(109 179 255 / 0.15);
+  --rvr-estado-en-proceso-fg: #b5d8ff;
+  --rvr-estado-completada-soft: rgb(34 197 94 / 0.14);
+  --rvr-estado-completada-fg: #6ee7a0;
+  --rvr-estado-cancelada-soft: rgb(248 113 113 / 0.13);
+  --rvr-estado-cancelada-fg: #fca5a5;
+
+  --rvr-neutro-soft: rgb(255 255 255 / 0.07);
+  --rvr-neutro-fg: #b3c1d6;
+
+  --rvr-av-1: #0a6cf0;
+  --rvr-av-2: #2a3a55;
+  --rvr-av-3: #0891b2;
+  --rvr-av-4: #15803d;
+  --rvr-av-5: #b45309;
+  --rvr-av-6: #be123c;
+  --rvr-av-7: #475569;
+
+  --rvr-cat-1: #3d9bff;
+  --rvr-cat-2: #22c3e0;
+  --rvr-cat-3: #fbbf24;
+  --rvr-cat-4: #c3cfe0;
+
+  --rvr-grad-primary: linear-gradient(var(--rvr-primary), var(--rvr-primary));
+  --rvr-grad-primary-hover: linear-gradient(var(--rvr-primary-hover), var(--rvr-primary-hover));
+  --rvr-grad-danger: linear-gradient(#dc2626, #dc2626);
+  --rvr-grad-marca: linear-gradient(#0a1120, #0a1120);
+  --rvr-filo-tinte: rgb(61 155 255 / 0.18);
+  --rvr-filo-luz: none;
+  --rvr-halo-titular: transparent;
+  --rvr-brillo: inset 0 1px 0 rgb(255 255 255 / 0.14);
+  --rvr-halo-primary: rgb(30 136 255 / 0.5);
+  --rvr-halo-danger: rgb(220 38 38 / 0.5);
+  --rvr-lateral: none;
+  --rvr-superior: none;
+
+  --rvr-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+  --rvr-shadow-sm: 0 1px 3px rgb(0 0 0 / 0.4);
+  --rvr-shadow-md: 0 10px 28px -10px rgb(0 0 0 / 0.6);
+  --rvr-shadow-lg: 0 24px 60px -18px rgb(0 0 0 / 0.7);
+  --rvr-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -14px rgb(0 0 0 / 0.55);
+  --rvr-shadow-card-up: 0 2px 4px rgb(0 0 0 / 0.35), 0 20px 44px -14px rgb(0 0 0 / 0.65);
+}

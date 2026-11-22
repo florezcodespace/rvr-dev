@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RVR Tecnologías S.A.S. — Manual de Identidad Cromática</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — Sistema de color RVR Tecnologías S.A.S.
+   ============================================================ */
+:root{
+  /* Primarios */
+  --rvr-navy-900:#101B2B; --rvr-navy-800:#1B2C45; --rvr-navy-700:#24395A;
+  --rvr-petrol-800:#10474F; --rvr-petrol-700:#155E6B; --rvr-petrol-600:#1E7F8C;
+  --rvr-petrol-300:#7FB7C2; --rvr-petrol-50:#E3F0F3;
+  --rvr-steel-600:#5B7183;
+  /* Neutrales */
+  --surface-canvas:#F4F7F9; --surface-base:#FFFFFF; --surface-sunken:#EAEFF3;
+  --border-structural:#D3DCE3; --border-divider:#E4EAEF; --border-control:#7C8B99;
+  --text-primary:#16212F; --text-secondary:#4A5A6B; --text-tertiary:#5F6E7D;
+  --text-disabled:#8494A1; --text-inverse:#FFFFFF;
+  /* Funcionales */
+  --success-700:#0B5E34; --success-600:#0F7A45; --success-200:#A8D8BE; --success-50:#E8F5EE;
+  --error-600:#B42318;   --error-200:#F3B7B0;   --error-50:#FDECEA;
+  --warning-700:#8A4A05; --warning-600:#B25E09; --warning-200:#F0CFA0; --warning-50:#FDF3E5;
+  --info-600:#14618F;    --info-200:#A9CDE4;    --info-50:#E8F2F9;
+  --notify-600:#C2410C;
+  /* Documento */
+  --rail:#C9D6DD;
+  --shadow-sm:0 1px 2px rgba(27,44,69,.08);
+  --shadow-md:0 4px 14px rgba(27,44,69,.10);
+  --shadow-lg:0 18px 44px rgba(16,27,43,.16);
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--surface-canvas); color:var(--text-primary);
+  font-family:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px; line-height:1.62; letter-spacing:.002em;
+  font-feature-settings:"ss01","liga";
+}
+::selection{background:var(--rvr-petrol-300); color:var(--rvr-navy-900)}
+
+/* ---------- Tipografía ---------- */
+.display{font-family:"Archivo",sans-serif; letter-spacing:-.022em; line-height:1.05; font-weight:700}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-ligatures:none}
+.eyebrow{
+  font-family:"Archivo",sans-serif; font-weight:600; font-size:11px;
+  letter-spacing:.19em; text-transform:uppercase; color:var(--rvr-petrol-700);
+}
+
+/* ---------- Estructura / riel de trazas ---------- */
+.doc{max-width:1160px; margin:0 auto; padding:0 28px 120px}
+.sheet{position:relative; padding-left:76px}
+.sheet::before{
+  content:""; position:absolute; left:23px; top:0; bottom:0; width:2px;
+  background:linear-gradient(180deg,var(--rvr-petrol-300),var(--rail) 12%,var(--rail) 88%,transparent);
+}
+section{position:relative; padding:64px 0 8px; scroll-margin-top:24px}
+section > .node{
+  position:absolute; left:-76px; top:74px; width:48px; height:48px; border-radius:3px;
+  background:var(--surface-base); border:2px solid var(--rvr-navy-800);
+  display:flex; align-items:center; justify-content:center;
+  font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:15px;
+  color:var(--rvr-navy-800); box-shadow:var(--shadow-sm);
+}
+section > .node::after{
+  content:""; position:absolute; right:-22px; width:22px; height:2px; background:var(--rail);
+}
+h2.title{font-family:"Archivo",sans-serif; font-weight:700; font-size:clamp(26px,3.4vw,38px);
+  letter-spacing:-.024em; line-height:1.08; margin:6px 0 6px}
+h3{font-family:"Archivo",sans-serif; font-weight:600; font-size:19px; letter-spacing:-.012em;
+  margin:38px 0 12px; color:var(--rvr-navy-800)}
+h4{font-family:"Archivo",sans-serif; font-weight:600; font-size:15px; letter-spacing:.01em;
+  margin:26px 0 8px; color:var(--rvr-navy-700)}
+p{margin:0 0 14px; max-width:74ch}
+.lead{font-size:18px; color:var(--text-secondary); max-width:70ch}
+strong{font-weight:600; color:var(--rvr-navy-900)}
+
+/* ---------- Portada ---------- */
+.cover{padding:0; border-bottom:1px solid var(--border-structural)}
+.cover-inner{
+  max-width:1160px; margin:0 auto; padding:64px 28px 56px;
+  display:grid; grid-template-columns:1.35fr .95fr; gap:56px; align-items:center;
+}
+.cover h1{
+  font-family:"Archivo",sans-serif; font-weight:700; letter-spacing:-.035em; line-height:.96;
+  font-size:clamp(40px,6.2vw,68px); margin:14px 0 18px; color:var(--rvr-navy-900);
+}
+.cover h1 em{font-style:normal; color:var(--rvr-petrol-700)}
+.meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
+.meta span{
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.04em;
+  padding:6px 11px; border:1px solid var(--border-structural); border-radius:2px;
+  background:var(--surface-base); color:var(--text-secondary);
+}
+.mark{
+  background:var(--surface-base); border:1px solid var(--border-structural);
+  border-radius:4px; padding:26px; box-shadow:var(--shadow-md);
+}
+.mark figcaption{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--text-tertiary);
+  margin-top:16px; letter-spacing:.02em; line-height:1.5;
+}
+
+/* ---------- Índice ---------- */
+.toc{
+  margin:44px 0 0; background:var(--surface-base); border:1px solid var(--border-structural);
+  border-radius:4px; padding:26px 30px;
+}
+.toc ol{margin:14px 0 0; padding:0; list-style:none; counter-reset:t;
+  columns:2; column-gap:44px}
+.toc li{counter-increment:t; break-inside:avoid; padding:7px 0; border-bottom:1px solid var(--border-divider)}
+.toc li a{
+  text-decoration:none; color:var(--text-primary); display:flex; gap:12px; align-items:baseline;
+  font-size:15px;
+}
+.toc li a::before{
+  content:counter(t,decimal-leading-zero); font-family:"IBM Plex Mono",monospace;
+  font-size:12px; color:var(--rvr-petrol-600); font-weight:600;
+}
+.toc li a:hover{color:var(--rvr-petrol-700)}
+
+/* ---------- Muestras de color ---------- */
+.swatch-grid{display:grid; gap:18px; margin:22px 0 8px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.swatch{
+  border:1px solid var(--border-structural); border-radius:4px; overflow:hidden;
+  background:var(--surface-base); box-shadow:var(--shadow-sm); break-inside:avoid;
+}
+.chip{height:132px; padding:14px; display:flex; flex-direction:column; justify-content:space-between}
+.chip .hx{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:15px; letter-spacing:.02em}
+.chip .role{font-family:"Archivo",sans-serif; font-weight:600; font-size:11px; letter-spacing:.14em; text-transform:uppercase; opacity:.82}
+.swatch .body{padding:14px 16px 16px}
+.swatch .nm{font-family:"Archivo",sans-serif; font-weight:600; font-size:15.5px; letter-spacing:-.008em}
+.swatch .rgb{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--text-tertiary); margin-top:3px}
+.swatch .use{font-size:14px; color:var(--text-secondary); margin-top:10px; line-height:1.5}
+.ratio{
+  display:inline-flex; align-items:center; gap:6px; margin-top:11px; padding:3px 8px;
+  border-radius:2px; background:var(--surface-sunken); font-family:"IBM Plex Mono",monospace;
+  font-size:11px; color:var(--text-secondary);
+}
+.ratio b{color:var(--success-700); font-weight:600}
+
+/* Escala tonal */
+.scale{display:flex; border:1px solid var(--border-structural); border-radius:4px; overflow:hidden; margin:14px 0 6px}
+.scale div{flex:1; padding:16px 10px 14px; font-family:"IBM Plex Mono",monospace; font-size:10.5px; line-height:1.7}
+.scale div span{display:block; font-weight:600; font-size:11.5px}
+
+/* ---------- Tablas ---------- */
+.tw{overflow-x:auto; margin:20px 0 10px; border:1px solid var(--border-structural);
+  border-radius:4px; background:var(--surface-base)}
+table{border-collapse:collapse; width:100%; font-size:14.2px; min-width:640px}
+th{
+  text-align:left; font-family:"Archivo",sans-serif; font-weight:600; font-size:11px;
+  letter-spacing:.13em; text-transform:uppercase; color:var(--rvr-navy-800);
+  background:var(--surface-sunken); padding:12px 14px; border-bottom:1px solid var(--border-structural);
+  white-space:nowrap;
+}
+td{padding:12px 14px; border-bottom:1px solid var(--border-divider); vertical-align:top; color:var(--text-secondary)}
+tbody tr:last-child td{border-bottom:none}
+td:first-child{color:var(--text-primary); font-weight:600}
+td code, .code{font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--rvr-navy-800);
+  background:var(--surface-sunken); padding:2px 6px; border-radius:2px; white-space:nowrap}
+.dot{display:inline-block; width:11px; height:11px; border-radius:2px; margin-right:7px;
+  vertical-align:-1px; border:1px solid rgba(22,33,47,.16)}
+
+/* ---------- Notas ---------- */
+.note{
+  border-left:3px solid var(--rvr-petrol-600); background:var(--rvr-petrol-50);
+  padding:16px 20px; border-radius:0 3px 3px 0; margin:22px 0; font-size:15px;
+  color:var(--text-secondary);
+}
+.note .lbl{
+  display:block; font-family:"Archivo",sans-serif; font-weight:600; font-size:11px;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--rvr-petrol-800); margin-bottom:6px;
+}
+
+/* ---------- Componentes demo ---------- */
+.demo{
+  background:var(--surface-base); border:1px solid var(--border-structural); border-radius:4px;
+  padding:24px; margin:20px 0; box-shadow:var(--shadow-sm);
+}
+.demo-label{
+  font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--text-tertiary); margin-bottom:16px;
+}
+.alert{display:flex; gap:13px; padding:14px 16px; border-radius:3px; border:1px solid; margin-bottom:12px}
+.alert:last-child{margin-bottom:0}
+.alert svg{flex:none; margin-top:2px}
+.alert .t{font-weight:600; font-size:14.5px; line-height:1.4}
+.alert .d{font-size:14px; line-height:1.5; margin-top:2px}
+.a-ok{background:var(--success-50); border-color:var(--success-200); color:var(--success-700)}
+.a-err{background:var(--error-50); border-color:var(--error-200); color:var(--error-600)}
+.a-warn{background:var(--warning-50); border-color:var(--warning-200); color:var(--warning-700)}
+.a-info{background:var(--info-50); border-color:var(--info-200); color:var(--info-600)}
+.btn{
+  font-family:"Archivo",sans-serif; font-weight:600; font-size:14px; letter-spacing:.005em;
+  padding:10px 18px; border-radius:3px; border:1px solid transparent; cursor:pointer;
+  transition:background .14s ease, border-color .14s ease;
+}
+.btn:focus-visible{outline:3px solid var(--rvr-petrol-600); outline-offset:2px}
+.b-pri{background:var(--rvr-petrol-600); color:#fff}
+.b-pri:hover{background:var(--rvr-petrol-700)}
+.b-sec{background:var(--surface-base); color:var(--rvr-navy-800); border-color:var(--border-control)}
+.b-sec:hover{background:var(--surface-sunken)}
+.b-ghost{background:transparent; color:var(--rvr-petrol-700)}
+.b-ghost:hover{background:var(--rvr-petrol-50)}
+.b-danger{background:var(--error-600); color:#fff}
+.b-dis{background:var(--surface-sunken); color:var(--text-disabled); cursor:not-allowed; border-color:var(--border-divider)}
+.row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.chipst{
+  display:inline-flex; align-items:center; gap:7px; padding:4px 11px 4px 9px; border-radius:20px;
+  font-size:13px; font-weight:600; border:1px solid;
+}
+.chipst i{width:7px; height:7px; border-radius:50%; background:currentColor; display:block}
+.toast{
+  display:flex; gap:12px; align-items:flex-start; background:var(--rvr-navy-900); color:#fff;
+  padding:14px 16px; border-radius:4px; box-shadow:var(--shadow-lg); max-width:400px;
+  border-left:3px solid var(--success-600);
+}
+.toast .t{font-weight:600; font-size:14.5px}
+.toast .d{font-size:13.5px; color:#C9D6DD; margin-top:2px}
+.modal{
+  max-width:440px; background:var(--surface-base); border-radius:5px; box-shadow:var(--shadow-lg);
+  border:1px solid var(--border-structural); overflow:hidden;
+}
+.modal .hd{padding:20px 22px 0}
+.modal .bd{padding:8px 22px 20px; font-size:14.5px; color:var(--text-secondary)}
+.modal .ft{padding:14px 22px; background:var(--surface-sunken); border-top:1px solid var(--border-divider);
+  display:flex; justify-content:flex-end; gap:10px}
+.icon-badge{width:38px; height:38px; border-radius:50%; display:flex; align-items:center;
+  justify-content:center; margin-bottom:12px}
+
+/* ---------- Matriz de contraste ---------- */
+.pass{color:var(--success-700); font-weight:600}
+.fail{color:var(--error-600); font-weight:600}
+.lvl{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.04em}
+
+/* ---------- Pie ---------- */
+.colophon{
+  margin-top:80px; padding:34px 0 0; border-top:1px solid var(--border-structural);
+  font-size:13.5px; color:var(--text-tertiary); display:flex; justify-content:space-between;
+  flex-wrap:wrap; gap:16px; font-family:"IBM Plex Mono",monospace;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px){
+  .cover-inner{grid-template-columns:1fr; gap:34px; padding:44px 22px 40px}
+  .doc{padding:0 20px 80px}
+  .sheet{padding-left:0}
+  .sheet::before{display:none}
+  section > .node{position:static; margin-bottom:14px}
+  section > .node::after{display:none}
+  .g3,.g4{grid-template-columns:1fr}
+  .toc ol{columns:1}
+  .scale{flex-direction:column}
+}
+@media (min-width:901px) and (max-width:1100px){
+  .g4{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+@media print{
+  body{background:#fff; font-size:11pt}
+  .sheet::before{background:var(--rail)}
+  section{page-break-inside:auto; padding-top:34px}
+  .swatch,.demo,.tw,.note{page-break-inside:avoid}
+  .cover{page-break-after:always}
+  h2.title,h3{page-break-after:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= PORTADA ======================= -->
+<header class="cover">
+  <div class="cover-inner">
+    <div>
+      <div class="eyebrow">Documento normativo · Design System · v1.0</div>
+      <h1 class="display">Identidad<br>Cromática<br><em>RVR Tecnologías</em></h1>
+      <p class="lead">Sistema de color corporativo para la aplicación web y móvil de RVR Tecnologías S.A.S. Define la paleta, los estados, las reglas de aplicación y los criterios de accesibilidad que garantizan una experiencia coherente en todos los puntos de contacto del producto.</p>
+      <div class="meta">
+        <span>RVR TECNOLOGÍAS S.A.S.</span>
+        <span>WEB · iOS · ANDROID</span>
+        <span>WCAG 2.2 NIVEL AA</span>
+        <span>MODO CLARO</span>
+      </div>
+    </div>
+
+    <figure class="mark" style="margin:0">
+      <svg viewBox="0 0 300 190" width="100%" role="img" aria-label="Motivo de trazas de circuito derivado del logotipo de RVR Tecnologías">
+        <defs>
+          <linearGradient id="rvrGrad" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stop-color="#1B2C45"/>
+            <stop offset="55%" stop-color="#2E5A6B"/>
+            <stop offset="100%" stop-color="#7FB7C2"/>
+          </linearGradient>
+        </defs>
+        <g fill="none" stroke="url(#rvrGrad)" stroke-width="9" stroke-linecap="round">
+          <path d="M96 46 H180 a14 14 0 0 1 14 14 V128 a14 14 0 0 1 -14 14 H96 a14 14 0 0 1 -14 -14 V60 a14 14 0 0 1 14 -14 Z"/>
+          <path d="M36 74 H118"/><path d="M36 114 H118"/>
+          <path d="M158 66 H264"/><path d="M158 122 H264"/>
+          <path d="M214 94 H264"/>
+        </g>
+        <g fill="#FFFFFF" stroke="url(#rvrGrad)" stroke-width="7">
+          <circle cx="122" cy="74" r="7"/><circle cx="122" cy="114" r="7"/>
+          <circle cx="154" cy="66" r="7"/><circle cx="154" cy="122" r="7"/>
+        </g>
+        <rect x="86" y="160" width="108" height="14" rx="7" fill="url(#rvrGrad)"/>
+      </svg>
+      <figcaption>Motivo de trazas y terminales tomado del isotipo. El degradado recorre los tres tonos corporativos: Azul Profundo → Acero → Petróleo Claro.</figcaption>
+    </figure>
+  </div>
+</header>
+
+<div class="doc">
+  <nav class="toc" aria-label="Contenido del manual">
+    <div class="eyebrow">Contenido</div>
+    <ol>
+      <li><a href="#s1">Paleta principal</a></li>
+      <li><a href="#s2">Paleta secundaria y superficies</a></li>
+      <li><a href="#s3">Colores funcionales</a></li>
+      <li><a href="#s4">Estados visuales y componentes</a></li>
+      <li><a href="#s5">Justificación psicológica</a></li>
+      <li><a href="#s6">Accesibilidad WCAG 2.2</a></li>
+      <li><a href="#s7">Impacto en la experiencia de usuario</a></li>
+      <li><a href="#s8">Fundamentación académica</a></li>
+      <li><a href="#s9">Anexo: tokens y reglas de uso</a></li>
+    </ol>
+  </nav>
+
+  <div class="sheet">
+
+<!-- ======================= 1. PALETA PRINCIPAL ======================= -->
+<section id="s1">
+  <div class="node">01</div>
+  <div class="eyebrow">Paleta principal</div>
+  <h2 class="title">Colores corporativos</h2>
+  <p class="lead">Tres tonos derivados por muestreo directo del logotipo. Constituyen el núcleo invariable de la marca: ninguna interfaz de RVR puede prescindir de ellos ni sustituirlos por equivalentes aproximados.</p>
+
+  <h3>1.1 Metodología de extracción</h3>
+  <p>Se realizó un análisis de agrupamiento cromático (<span class="code">k-means</span>, k=6) sobre la región del isotipo, descartando el fondo y la tipografía. Los cuatro conglomerados con mayor participación de píxel fueron:</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Muestra del logotipo</th><th>HEX</th><th>HSV</th><th>Participación</th><th>Decisión</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:#323658"></span>Azul oscuro dominante</td><td><code>#323658</code></td><td><code>H234° S43% V35%</code></td><td>40,0 %</td><td>Corregido — subtono violáceo</td></tr>
+        <tr><td><span class="dot" style="background:#64848F"></span>Petróleo del degradado</td><td><code>#64848F</code></td><td><code>H195° S30% V56%</code></td><td>38,8 %</td><td>Intensificado por contraste</td></tr>
+        <tr><td><span class="dot" style="background:#566C7C"></span>Acero intermedio</td><td><code>#566C7C</code></td><td><code>H205° S31% V49%</code></td><td>9,0 %</td><td>Conservado</td></tr>
+        <tr><td><span class="dot" style="background:#919EA8"></span>Gris de transición</td><td><code>#919EA8</code></td><td><code>H206° S14% V66%</code></td><td>3,5 %</td><td>Reasignado a neutrales</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="lbl">Corrección cromática obligatoria</span>
+    El azul dominante del logotipo se sitúa en <strong>H = 234°</strong>, un ángulo que en pantallas retroiluminadas y en tamaños pequeños se percibe con subtono violáceo (los canales R y G quedan casi igualados: R50 · G54 · B88). Dado que la restricción del proyecto excluye cualquier tonalidad morada, violeta o azul violáceo, el matiz se rotó <strong>18° hacia el cian</strong> hasta <strong>H = 216°</strong> y se elevó la saturación para preservar la fuerza visual. El resultado, <code>#1B2C45</code>, mantiene el parentesco perceptual con el logotipo impreso y elimina por completo la deriva violácea en pantalla.
+  </div>
+
+  <h3>1.2 Muestras corporativas</h3>
+  <div class="swatch-grid g3">
+
+    <article class="swatch">
+      <div class="chip" style="background:#1B2C45; color:#fff">
+        <span class="role">Primario</span><span class="hx">#1B2C45</span>
+      </div>
+      <div class="body">
+        <div class="nm">Azul Profundo RVR</div>
+        <div class="rgb">rgb(27, 44, 69) · hsl(216, 44%, 19%)</div>
+        <div class="use"><strong>Función:</strong> color institucional. Barra de navegación superior, encabezados, tipografía de títulos, pie de aplicación, fondos de gráficos y estados de énfasis máximo. Es el color con el que el usuario identifica a RVR antes de leer una sola palabra.</div>
+        <div class="use"><strong>Justificación:</strong> el azul de longitud de onda corta es el matiz que la investigación en psicología del color asocia de forma más estable con competencia, estabilidad y fiabilidad institucional. Su baja luminosidad (V 19 %) transmite solidez y permanencia —atributos exigibles a un proveedor que custodia servidores y sistemas de videovigilancia— sin la agresividad de un negro puro.</div>
+        <div class="ratio">Sobre blanco <b>14,07:1</b> · AAA</div>
+      </div>
+    </article>
+
+    <article class="swatch">
+      <div class="chip" style="background:#1E7F8C; color:#fff">
+        <span class="role">Acción</span><span class="hx">#1E7F8C</span>
+      </div>
+      <div class="body">
+        <div class="nm">Azul Petróleo RVR</div>
+        <div class="rgb">rgb(30, 127, 140) · hsl(187, 65%, 33%)</div>
+        <div class="use"><strong>Función:</strong> color de acción. Botones primarios, enlaces, pestaña activa, casillas y conmutadores seleccionados, indicadores de progreso, anillo de foco. Todo elemento en el que el usuario puede hacer clic o tocar comparte este matiz.</div>
+        <div class="use"><strong>Justificación:</strong> el cian-verdoso ocupa la zona de máxima sensibilidad del sistema visual humano, lo que lo convierte en un excelente vehículo de affordance: atrae la mirada sin recurrir a la saturación estridente del naranja o el rojo. Al proceder del propio degradado del logotipo, la acción queda cromáticamente firmada por la marca.</div>
+        <div class="ratio">Texto blanco encima <b>4,70:1</b> · AA</div>
+      </div>
+    </article>
+
+    <article class="swatch">
+      <div class="chip" style="background:#5B7183; color:#fff">
+        <span class="role">Soporte</span><span class="hx">#5B7183</span>
+      </div>
+      <div class="body">
+        <div class="nm">Acero RVR</div>
+        <div class="rgb">rgb(91, 113, 131) · hsl(207, 18%, 44%)</div>
+        <div class="use"><strong>Función:</strong> tono puente entre la marca y los neutrales. Iconografía secundaria, metadatos, encabezados de tabla, ilustraciones técnicas, bordes de énfasis medio y series secundarias en visualización de datos.</div>
+        <div class="use"><strong>Justificación:</strong> su baja saturación (18 %) lo sitúa perceptualmente entre el color y el gris, permitiendo introducir jerarquías intermedias sin añadir un matiz nuevo al sistema. Evoca el metal de racks, gabinetes y carcasas: el material real del negocio de RVR.</div>
+        <div class="ratio">Sobre blanco <b>5,08:1</b> · AA</div>
+      </div>
+    </article>
+
+  </div>
+
+  <h3>1.3 Escalas tonales operativas</h3>
+  <p>Cada color corporativo se despliega en una escala controlada. Las variantes no son decorativas: cada peldaño tiene una función asignada en los estados de interacción.</p>
+
+  <h4>Escala Azul Profundo</h4>
+  <div class="scale">
+    <div style="background:#101B2B; color:#fff"><span>Navy 900</span>#101B2B · rgb(16,27,43)<br>Fondos de máxima profundidad, toasts</div>
+    <div style="background:#1B2C45; color:#fff"><span>Navy 800 — base</span>#1B2C45 · rgb(27,44,69)<br>Color institucional de referencia</div>
+    <div style="background:#24395A; color:#fff"><span>Navy 700</span>#24395A · rgb(36,57,90)<br>Hover sobre superficies oscuras</div>
+  </div>
+
+  <h4>Escala Azul Petróleo</h4>
+  <div class="scale">
+    <div style="background:#10474F; color:#fff"><span>Petrol 800</span>#10474F<br>Estado presionado</div>
+    <div style="background:#155E6B; color:#fff"><span>Petrol 700</span>#155E6B<br>Hover · texto de enlace (7,38:1)</div>
+    <div style="background:#1E7F8C; color:#fff"><span>Petrol 600 — base</span>#1E7F8C<br>Relleno de acción primaria</div>
+    <div style="background:#7FB7C2; color:#101B2B"><span>Petrol 300</span>#7FB7C2<br>Realces sobre fondo oscuro</div>
+    <div style="background:#E3F0F3; color:#101B2B"><span>Petrol 50</span>#E3F0F3<br>Fondo de selección y chips</div>
+  </div>
+
+  <div class="note">
+    <span class="lbl">Regla de uso</span>
+    El <strong>Petróleo 600</strong> nunca se emplea como color de texto sobre el lienzo <code>#F4F7F9</code> (relación 4,37:1, insuficiente). Para texto y enlaces sobre fondos claros se utiliza siempre el <strong>Petróleo 700</strong> <code>#155E6B</code>, que alcanza 6,86:1. El 600 queda reservado a rellenos, donde el texto blanco encima sí cumple AA.
+  </div>
+</section>
+
+<!-- ======================= 2. PALETA SECUNDARIA ======================= -->
+<section id="s2">
+  <div class="node">02</div>
+  <div class="eyebrow">Paleta secundaria</div>
+  <h2 class="title">Superficies, bordes y tipografía</h2>
+  <p class="lead">Los neutrales ocupan aproximadamente el 85 % del área visible de la aplicación. No son grises puros: todos conservan un matiz frío entre 190° y 214°, lo que evita el choque de temperatura con la marca y produce una interfaz cromáticamente unificada.</p>
+
+  <h3>2.1 Superficies</h3>
+  <div class="swatch-grid g4">
+    <article class="swatch">
+      <div class="chip" style="background:#F4F7F9; color:#16212F; border-bottom:1px solid #D3DCE3">
+        <span class="role">Lienzo</span><span class="hx">#F4F7F9</span>
+      </div>
+      <div class="body">
+        <div class="nm">Lienzo Aplicación</div>
+        <div class="rgb">rgb(244, 247, 249)</div>
+        <div class="use">Fondo general de todas las pantallas. Sobre él se apoyan tarjetas y paneles.</div>
+      </div>
+    </article>
+    <article class="swatch">
+      <div class="chip" style="background:#FFFFFF; color:#16212F; border-bottom:1px solid #D3DCE3">
+        <span class="role">Base</span><span class="hx">#FFFFFF</span>
+      </div>
+      <div class="body">
+        <div class="nm">Superficie Base</div>
+        <div class="rgb">rgb(255, 255, 255)</div>
+        <div class="use">Tarjetas, modales, menús desplegables, filas de tabla y contenedores de formulario.</div>
+      </div>
+    </article>
+    <article class="swatch">
+      <div class="chip" style="background:#EAEFF3; color:#16212F; border-bottom:1px solid #D3DCE3">
+        <span class="role">Hundida</span><span class="hx">#EAEFF3</span>
+      </div>
+      <div class="body">
+        <div class="nm">Superficie Hundida</div>
+        <div class="rgb">rgb(234, 239, 243)</div>
+        <div class="use">Campos de entrada en reposo, encabezados de tabla, barras de progreso vacías y bloques de código.</div>
+      </div>
+    </article>
+    <article class="swatch">
+      <div class="chip" style="background:#E3F0F3; color:#101B2B; border-bottom:1px solid #D3DCE3">
+        <span class="role">Marca</span><span class="hx">#E3F0F3</span>
+      </div>
+      <div class="body">
+        <div class="nm">Superficie de Marca</div>
+        <div class="rgb">rgb(227, 240, 243)</div>
+        <div class="use">Fila seleccionada, etiquetas de filtro activo, fondo de la opción de menú vigente.</div>
+      </div>
+    </article>
+  </div>
+
+  <h3>2.2 Especificación completa de neutrales</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Nombre</th><th>HEX</th><th>RGB</th><th>Uso</th><th>Justificación</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="dot" style="background:#F4F7F9"></span>Lienzo Aplicación</td>
+          <td><code>#F4F7F9</code></td><td><code>244, 247, 249</code></td>
+          <td>Fondo de todas las vistas web y móviles.</td>
+          <td>Un blanco puro de pantalla completa produce deslumbramiento y fatiga acomodativa en jornadas largas. Rebajar la luminancia un 3 % y sesgar el matiz al azul reduce el brillo percibido y hace que las tarjetas blancas floten sin necesidad de sombras pesadas.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#FFFFFF"></span>Superficie Base</td>
+          <td><code>#FFFFFF</code></td><td><code>255, 255, 255</code></td>
+          <td>Tarjetas, modales, menús, filas de datos.</td>
+          <td>Reservar el blanco absoluto para el contenido activo convierte la luminosidad en una señal de jerarquía: lo más claro es lo más importante. Maximiza además el contraste disponible para texto y gráficos.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#EAEFF3"></span>Superficie Hundida</td>
+          <td><code>#EAEFF3</code></td><td><code>234, 239, 243</code></td>
+          <td>Inputs en reposo, cabeceras de tabla, contenedores inertes.</td>
+          <td>Invierte la metáfora de elevación: lo que está por debajo del plano recibe al usuario, lo que está por encima le entrega información. Distingue campos editables sin recurrir a bordes gruesos.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#E3F0F3"></span>Superficie de Marca</td>
+          <td><code>#E3F0F3</code></td><td><code>227, 240, 243</code></td>
+          <td>Selección activa, filtros aplicados, resaltado de resultados.</td>
+          <td>Al derivar del Petróleo 600 con luminosidad elevada, marca la selección con el mismo matiz de la acción. El usuario aprende una sola asociación —cian igual a “esto responde a mí”— y la aplica en toda la interfaz.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#D3DCE3"></span>Borde Estructural</td>
+          <td><code>#D3DCE3</code></td><td><code>211, 220, 227</code></td>
+          <td>Contorno de tarjetas, paneles, tablas y contenedores.</td>
+          <td>Define el límite de cada bloque de contenido con la mínima energía visual necesaria. Sustituye sombras difusas por líneas nítidas, lo que mantiene la interfaz legible en pantallas móviles de bajo contraste y bajo luz solar directa.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#E4EAEF"></span>Divisor</td>
+          <td><code>#E4EAEF</code></td><td><code>228, 234, 239</code></td>
+          <td>Separación entre filas de lista, ítems de menú y secciones de formulario.</td>
+          <td>Más tenue que el borde estructural para respetar la ley de proximidad: el divisor agrupa elementos del mismo nivel sin fragmentar visualmente el bloque que los contiene.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#7C8B99"></span>Borde de Control</td>
+          <td><code>#7C8B99</code></td><td><code>124, 139, 153</code></td>
+          <td>Contorno de inputs, casillas, radios, selects y botones secundarios.</td>
+          <td>Es el único borde que delimita un componente <em>interactivo</em>, por lo que debe alcanzar 3:1 contra el fondo adyacente según el criterio 1.4.11 de WCAG 2.2. Alcanza <strong>3,49:1</strong> sobre blanco y <strong>3,25:1</strong> sobre el lienzo. Ningún control puede usar el borde estructural.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#16212F"></span>Texto Principal</td>
+          <td><code>#16212F</code></td><td><code>22, 33, 47</code></td>
+          <td>Cuerpo de texto, títulos, valores de datos, etiquetas de campo.</td>
+          <td>Negro azulado en lugar de negro puro: reduce el halo cromático que produce el borde de alto contraste sobre pantallas LCD y armoniza con el azul institucional. Alcanza <strong>16,25:1</strong> sobre blanco, holgadamente AAA.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#4A5A6B"></span>Texto Secundario</td>
+          <td><code>#4A5A6B</code></td><td><code>74, 90, 107</code></td>
+          <td>Descripciones, texto de apoyo, subtítulos, ayuda contextual.</td>
+          <td>Un solo escalón de luminosidad separa lo esencial de lo accesorio sin introducir un color nuevo. Mantiene <strong>7,08:1</strong>, cumpliendo AAA incluso en texto pequeño.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#5F6E7D"></span>Texto Terciario</td>
+          <td><code>#5F6E7D</code></td><td><code>102, 117, 133</code></td>
+          <td>Marcas de tiempo, contadores, texto de marcador de posición, leyendas.</td>
+          <td>Tercer nivel de la jerarquía tipográfica. Se detuvo deliberadamente en <strong>4,72:1</strong> —y no más claro— para que ningún dato legible del sistema quede por debajo del umbral AA.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#8494A1"></span>Texto Deshabilitado</td>
+          <td><code>#8494A1</code></td><td><code>132, 148, 161</code></td>
+          <td>Exclusivamente etiquetas de controles inactivos.</td>
+          <td>Con 3,12:1 no cumpliría AA, pero WCAG 2.2 exime explícitamente a los componentes deshabilitados del criterio 1.4.3. La baja legibilidad es aquí una señal funcional intencionada: comunica indisponibilidad antes de que el usuario intente interactuar.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#FFFFFF; border-color:#8494A1"></span>Texto Inverso</td>
+          <td><code>#FFFFFF</code></td><td><code>255, 255, 255</code></td>
+          <td>Texto sobre Azul Profundo, Petróleo 600 y colores funcionales sólidos.</td>
+          <td>Único color de texto autorizado sobre rellenos de marca. Los grises claros sobre fondo oscuro reducen el contraste y provocan irradiación tipográfica en pantallas móviles.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>2.3 Elevación</h3>
+  <p>Las sombras se construyen con el azul institucional y no con negro, para que la penumbra pertenezca a la misma familia cromática que la interfaz.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Nivel</th><th>Valor</th><th>Aplicación</th></tr></thead>
+      <tbody>
+        <tr><td>Elevación 1</td><td><code>0 1px 2px rgba(27,44,69,.08)</code></td><td>Tarjetas en reposo, botones secundarios.</td></tr>
+        <tr><td>Elevación 2</td><td><code>0 4px 14px rgba(27,44,69,.10)</code></td><td>Menús desplegables, tarjetas en hover, tooltips.</td></tr>
+        <tr><td>Elevación 3</td><td><code>0 18px 44px rgba(16,27,43,.16)</code></td><td>Modales, hojas inferiores móviles, notificaciones toast.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ======================= 3. COLORES FUNCIONALES ======================= -->
+<section id="s3">
+  <div class="node">03</div>
+  <div class="eyebrow">Colores funcionales</div>
+  <h2 class="title">Semántica del sistema</h2>
+  <p class="lead">Los colores funcionales comunican el resultado de una operación. Están deliberadamente fuera de la paleta corporativa: si la marca y el estado compartieran matiz, el usuario no podría distinguir “esto es de RVR” de “esto ha fallado”.</p>
+
+  <div class="swatch-grid g4">
+    <article class="swatch">
+      <div class="chip" style="background:#0F7A45; color:#fff"><span class="role">Éxito</span><span class="hx">#0F7A45</span></div>
+      <div class="body"><div class="nm">Verde Confirmación</div><div class="rgb">rgb(15, 122, 69)</div>
+      <div class="use">Operación completada correctamente: equipo registrado, ticket cerrado, respaldo finalizado, pago aprobado, servicio en línea.</div>
+      <div class="ratio">Blanco encima <b>5,40:1</b> · AA</div></div>
+    </article>
+    <article class="swatch">
+      <div class="chip" style="background:#B42318; color:#fff"><span class="role">Error</span><span class="hx">#B42318</span></div>
+      <div class="body"><div class="nm">Rojo Crítico</div><div class="rgb">rgb(180, 35, 24)</div>
+      <div class="use">Fallo que impide continuar: validación rechazada, servidor caído, cámara sin señal, sesión expirada, eliminación irreversible.</div>
+      <div class="ratio">Blanco encima <b>6,57:1</b> · AA</div></div>
+    </article>
+    <article class="swatch">
+      <div class="chip" style="background:#B25E09; color:#fff"><span class="role">Advertencia</span><span class="hx">#B25E09</span></div>
+      <div class="body"><div class="nm">Ámbar Preventivo</div><div class="rgb">rgb(178, 94, 9)</div>
+      <div class="use">Riesgo detectado que aún no bloquea: disco al 85 %, garantía por vencer, mantenimiento vencido, certificado próximo a expirar.</div>
+      <div class="ratio">Blanco encima <b>4,67:1</b> · AA</div></div>
+    </article>
+    <article class="swatch">
+      <div class="chip" style="background:#14618F; color:#fff"><span class="role">Información</span><span class="hx">#14618F</span></div>
+      <div class="body"><div class="nm">Azul Informativo</div><div class="rgb">rgb(20, 97, 143)</div>
+      <div class="use">Contexto neutro sin acción requerida: novedades de versión, condiciones del servicio, sugerencias, ayuda contextual.</div>
+      <div class="ratio">Blanco encima <b>6,70:1</b> · AA</div></div>
+    </article>
+  </div>
+
+  <div class="note">
+    <span class="lbl">Separación entre marca e información</span>
+    El Azul Informativo <code>#14618F</code> se sitúa en <strong>H 202°</strong> y el Petróleo corporativo en <strong>H 187°</strong>: quince grados de separación, suficientes para diferenciarlos en comparación directa. Como esa distancia no es discriminable para todos los usuarios, <strong>ningún estado del sistema se comunica solo con color</strong>. Todo mensaje funcional lleva icono propio y texto explícito, en cumplimiento del criterio 1.4.1 (Uso del color) de WCAG 2.2.
+  </div>
+
+  <h3>3.1 Tokens funcionales completos</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Familia</th><th>Texto e icono</th><th>Base / relleno</th><th>Borde</th><th>Superficie</th><th>Cuándo se utiliza</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="dot" style="background:#0F7A45"></span>Éxito</td>
+          <td><code>#0B5E34</code></td><td><code>#0F7A45</code></td><td><code>#A8D8BE</code></td><td><code>#E8F5EE</code></td>
+          <td>Solo cuando la acción <em>ya terminó</em> y el resultado es verificable. Nunca para anunciar un proceso en curso.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#B42318"></span>Error</td>
+          <td><code>#B42318</code></td><td><code>#B42318</code></td><td><code>#F3B7B0</code></td><td><code>#FDECEA</code></td>
+          <td>Cuando existe una consecuencia real: pérdida de datos, bloqueo del flujo o interrupción del servicio. El uso indiscriminado del rojo produce desensibilización.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#B25E09"></span>Advertencia</td>
+          <td><code>#8A4A05</code></td><td><code>#B25E09</code></td><td><code>#F0CFA0</code></td><td><code>#FDF3E5</code></td>
+          <td>El usuario puede continuar, pero debería revisar algo antes. Siempre acompañada del plazo o el umbral que la origina.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#14618F"></span>Información</td>
+          <td><code>#14618F</code></td><td><code>#14618F</code></td><td><code>#A9CDE4</code></td><td><code>#E8F2F9</code></td>
+          <td>Contenido útil que no exige respuesta. Si el mensaje requiere una decisión, no es informativo: es advertencia.</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:#C2410C"></span>Notificación</td>
+          <td><code>#FFFFFF</code></td><td><code>#C2410C</code></td><td>—</td><td>—</td>
+          <td>Exclusivo del contador de elementos sin leer sobre iconos de campana, bandeja o menú. Su matiz cálido (H 17°) garantiza detección periférica en un entorno completamente frío.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>3.2 Estados de entidad</h3>
+  <p>Los equipos, tickets, contratos y órdenes de servicio de RVR se etiquetan con indicadores de estado normalizados. Se combinan color, forma del punto y texto para que el estado siga siendo legible en escala de grises o para usuarios con discromatopsia.</p>
+
+  <div class="demo">
+    <div class="demo-label">Indicadores de estado — aplicación web y móvil</div>
+    <div class="row">
+      <span class="chipst" style="background:#E8F5EE; border-color:#A8D8BE; color:#0B5E34"><i></i>Activo</span>
+      <span class="chipst" style="background:#FDF3E5; border-color:#F0CFA0; color:#8A4A05"><i></i>Pendiente</span>
+      <span class="chipst" style="background:#EAEFF3; border-color:#D3DCE3; color:#4A5A6B"><i></i>Inactivo</span>
+      <span class="chipst" style="background:#FDECEA; border-color:#F3B7B0; color:#B42318"><i></i>Fuera de servicio</span>
+      <span class="chipst" style="background:#E3F0F3; border-color:#7FB7C2; color:#155E6B"><i></i>En mantenimiento</span>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Estado</th><th>Texto</th><th>Superficie</th><th>Borde</th><th>Cuándo se utiliza</th></tr></thead>
+      <tbody>
+        <tr><td>Activo</td><td><code>#0B5E34</code></td><td><code>#E8F5EE</code></td><td><code>#A8D8BE</code></td><td>Equipo operativo, contrato vigente, cámara transmitiendo, técnico disponible.</td></tr>
+        <tr><td>Pendiente</td><td><code>#8A4A05</code></td><td><code>#FDF3E5</code></td><td><code>#F0CFA0</code></td><td>Solicitud recibida a la espera de asignación, cotización sin aprobar, repuesto en tránsito.</td></tr>
+        <tr><td>Inactivo</td><td><code>#4A5A6B</code></td><td><code>#EAEFF3</code></td><td><code>#D3DCE3</code></td><td>Registro archivado o dado de baja por decisión administrativa. Es un estado neutro, no un fallo: por eso usa gris y no rojo.</td></tr>
+        <tr><td>Fuera de servicio</td><td><code>#B42318</code></td><td><code>#FDECEA</code></td><td><code>#F3B7B0</code></td><td>Falla no planificada que interrumpe el servicio al cliente y exige intervención.</td></tr>
+        <tr><td>En mantenimiento</td><td><code>#155E6B</code></td><td><code>#E3F0F3</code></td><td><code>#7FB7C2</code></td><td>Indisponibilidad planificada y ejecutada por RVR. Se marca con el color de la marca porque la causa es la propia empresa.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ======================= 4. ESTADOS VISUALES ======================= -->
+<section id="s4">
+  <div class="node">04</div>
+  <div class="eyebrow">Estados visuales</div>
+  <h2 class="title">Anatomía de los mensajes</h2>
+  <p class="lead">Todo mensaje del sistema se compone de cuatro capas cromáticas: superficie, borde, icono y texto. Mantener siempre la misma anatomía permite que el usuario reconozca la naturaleza del aviso antes de leerlo.</p>
+
+  <h3>4.1 Mensajes en línea</h3>
+  <div class="demo">
+    <div class="demo-label">Alertas embebidas — ancho completo del contenedor</div>
+
+    <div class="alert a-ok">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0F7A45" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-5.1"/></svg>
+      <div><div class="t">Mantenimiento registrado</div><div class="d">La orden OS-2043 quedó cerrada y el reporte se envió al correo del cliente.</div></div>
+    </div>
+
+    <div class="alert a-err">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.2"/><path d="M12 16.4h.01"/></svg>
+      <div><div class="t">No se pudo conectar con el servidor</div><div class="d">Verifique la conexión del sitio Chapinero y vuelva a intentarlo. Los cambios no se guardaron.</div></div>
+    </div>
+
+    <div class="alert a-warn">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B25E09" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5l8.5 15h-17z"/><path d="M12 10v4"/><path d="M12 16.8h.01"/></svg>
+      <div><div class="t">Almacenamiento al 87 %</div><div class="d">La grabadora NVR-04 alcanzará su capacidad máxima en 6 días. Programe la depuración de video.</div></div>
+    </div>
+
+    <div class="alert a-info">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#14618F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.6h.01"/></svg>
+      <div><div class="t">Nueva versión disponible</div><div class="d">El módulo de inventario ahora permite exportar el histórico de equipos en formato XLSX.</div></div>
+    </div>
+  </div>
+
+  <h3>4.2 Especificación cromática por tipo de mensaje</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Componente</th><th>Fondo</th><th>Borde</th><th>Icono</th><th>Texto</th><th>Notas de aplicación</th></tr></thead>
+      <tbody>
+        <tr><td>Mensaje de éxito</td><td><code>#E8F5EE</code></td><td><code>#A8D8BE</code></td><td><code>#0F7A45</code></td><td><code>#0B5E34</code></td><td>Desaparece a los 5 s si es no bloqueante. Ratio texto/fondo 7,03:1.</td></tr>
+        <tr><td>Mensaje de error</td><td><code>#FDECEA</code></td><td><code>#F3B7B0</code></td><td><code>#B42318</code></td><td><code>#B42318</code></td><td>Persistente hasta que el usuario corrige la causa. Ratio 5,75:1.</td></tr>
+        <tr><td>Advertencia</td><td><code>#FDF3E5</code></td><td><code>#F0CFA0</code></td><td><code>#B25E09</code></td><td><code>#8A4A05</code></td><td>El icono usa el tono 600 y el texto el 700, más oscuro, para alcanzar 6,25:1.</td></tr>
+        <tr><td>Información</td><td><code>#E8F2F9</code></td><td><code>#A9CDE4</code></td><td><code>#14618F</code></td><td><code>#14618F</code></td><td>Descartable. Nunca debe interrumpir una tarea en curso. Ratio 5,90:1.</td></tr>
+        <tr><td>Toast (notificación flotante)</td><td><code>#101B2B</code></td><td>Barra izquierda 3 px del color semántico</td><td>Color semántico en tono 300</td><td><code>#FFFFFF</code> / <code>#C9D6DD</code></td><td>Fondo oscuro invariable: garantiza legibilidad sobre cualquier pantalla y separa el aviso efímero del contenido.</td></tr>
+        <tr><td>Modal</td><td><code>#FFFFFF</code></td><td><code>#D3DCE3</code></td><td>Semántico sobre disco tono 50</td><td><code>#16212F</code> / <code>#4A5A6B</code></td><td>Velo de fondo <code>rgba(16,27,43,.55)</code>. Elevación 3.</td></tr>
+        <tr><td>Confirmación destructiva</td><td><code>#FFFFFF</code></td><td><code>#D3DCE3</code></td><td><code>#B42318</code> sobre <code>#FDECEA</code></td><td><code>#16212F</code></td><td>El botón de confirmación usa relleno <code>#B42318</code>; el de cancelar es secundario y conserva el foco inicial.</td></tr>
+        <tr><td>Insignia de notificación</td><td><code>#C2410C</code></td><td><code>#FFFFFF</code> 2 px</td><td>—</td><td><code>#FFFFFF</code></td><td>Máximo dos dígitos; a partir de 99 se muestra <code>99+</code>.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>4.3 Toast y modal</h3>
+  <div class="demo">
+    <div class="demo-label">Toast de confirmación — esquina inferior derecha en web, superior en móvil</div>
+    <div class="toast">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#A8D8BE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.3l2.4 2.4 4.6-5.1"/></svg>
+      <div><div class="t">Técnico asignado</div><div class="d">Andrés Rivera atenderá el ticket #4821 hoy a las 2:30 p. m.</div></div>
+    </div>
+  </div>
+
+  <div class="demo">
+    <div class="demo-label">Modal de confirmación destructiva</div>
+    <div class="modal">
+      <div class="hd">
+        <div class="icon-badge" style="background:#FDECEA">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"/><path d="M9.5 7V5.4h5V7"/><path d="M6.7 7l.8 11.4h9l.8-11.4"/></svg>
+        </div>
+        <div style="font-family:Archivo,sans-serif;font-weight:600;font-size:17px;color:#16212F">Eliminar el equipo SRV-014</div>
+      </div>
+      <div class="bd">Se borrarán el historial de mantenimientos y las garantías asociadas. Esta acción no se puede deshacer.</div>
+      <div class="ft">
+        <button class="btn b-sec" type="button">Cancelar</button>
+        <button class="btn b-danger" type="button">Eliminar equipo</button>
+      </div>
+    </div>
+  </div>
+
+  <h3>4.4 Botones y estados de interacción</h3>
+  <div class="demo">
+    <div class="demo-label">Jerarquía de acciones</div>
+    <div class="row">
+      <button class="btn b-pri" type="button">Guardar cambios</button>
+      <button class="btn b-sec" type="button">Cancelar</button>
+      <button class="btn b-ghost" type="button">Ver historial</button>
+      <button class="btn b-danger" type="button">Eliminar</button>
+      <button class="btn b-dis" type="button" disabled>No disponible</button>
+    </div>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Elemento</th><th>Reposo</th><th>Hover</th><th>Presionado</th><th>Foco</th><th>Deshabilitado</th></tr></thead>
+      <tbody>
+        <tr><td>Botón primario</td><td><code>#1E7F8C</code></td><td><code>#155E6B</code></td><td><code>#10474F</code></td><td>Anillo 3 px <code>#1E7F8C</code>, desplazado 2 px</td><td><code>#EAEFF3</code> · texto <code>#8494A1</code></td></tr>
+        <tr><td>Botón secundario</td><td>Blanco · borde <code>#7C8B99</code></td><td><code>#EAEFF3</code></td><td><code>#D3DCE3</code></td><td>Igual anillo</td><td>Borde <code>#E4EAEF</code></td></tr>
+        <tr><td>Botón destructivo</td><td><code>#B42318</code></td><td><code>#8F1B12</code></td><td><code>#71150E</code></td><td>Anillo <code>#B42318</code></td><td><code>#EAEFF3</code></td></tr>
+        <tr><td>Enlace de texto</td><td><code>#155E6B</code> subrayado</td><td><code>#10474F</code></td><td><code>#10474F</code></td><td>Anillo <code>#1E7F8C</code></td><td>—</td></tr>
+        <tr><td>Campo de entrada</td><td>Borde <code>#7C8B99</code></td><td>Borde <code>#5B7183</code></td><td>—</td><td>Borde <code>#1E7F8C</code> 2 px + anillo</td><td>Fondo <code>#EAEFF3</code></td></tr>
+        <tr><td>Campo con error</td><td>Borde <code>#B42318</code></td><td>—</td><td>—</td><td>Anillo <code>#B42318</code></td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <span class="lbl">Indicador de foco</span>
+    El anillo de foco nunca se suprime. WCAG 2.2 incorporó los criterios <strong>2.4.11 Foco no oscurecido</strong> y <strong>2.4.13 Apariencia del foco</strong>: el indicador debe tener al menos 2 px de grosor, alcanzar 3:1 contra el fondo y no quedar tapado por barras fijas o encabezados adhesivos. El anillo de Petróleo 600 alcanza 4,70:1 sobre blanco.
+  </div>
+</section>
+
+<!-- ======================= 5. JUSTIFICACIÓN PSICOLÓGICA ======================= -->
+<section id="s5">
+  <div class="node">05</div>
+  <div class="eyebrow">Fundamento</div>
+  <h2 class="title">Justificación psicológica</h2>
+  <p class="lead">Cada decisión cromática de este sistema responde a un mecanismo perceptual o cognitivo verificable, no a preferencias estéticas. Se exponen a continuación los argumentos que sustentan la paleta.</p>
+
+  <h3>5.1 Por qué el azul es la base institucional</h3>
+  <p>El azul es, en los estudios transculturales de preferencia cromática, el matiz con menor tasa de rechazo y mayor asociación con atributos de <strong>competencia, estabilidad y honestidad</strong>. La <em>teoría ecológica de la valencia</em> de Palmer y Schloss explica por qué: las preferencias cromáticas se forman a partir de la experiencia acumulada con los objetos portadores del color, y el azul se vincula a cielo despejado y agua limpia, referentes casi universalmente favorables. Esa carga se traslada a la marca que lo adopta.</p>
+  <p>Para RVR el argumento es más concreto. La empresa administra activos que el cliente no puede supervisar por sí mismo: servidores, redes, cámaras. La relación comercial es, en esencia, una <strong>relación de custodia</strong>. El azul profundo de baja luminosidad —el tono de los uniformes técnicos, los instrumentos de medición y la infraestructura de red— sostiene esa promesa de custodia con mayor eficacia que un rojo o un naranja, matices que la investigación asocia a urgencia y estimulación, estados incompatibles con la sensación de que todo está bajo control.</p>
+
+  <h3>5.2 Por qué el acento es petróleo y no un azul brillante</h3>
+  <p>El sistema visual humano alcanza su máxima sensibilidad fotópica alrededor de los 555 nm y decae abruptamente en el azul puro. Un acento situado en azul profundo obligaría a saturaciones extremas para ser detectado, con el consiguiente costo de fatiga. El cian-verdoso <code>#1E7F8C</code>, en cambio, se acerca al pico de sensibilidad y resulta detectable con una fracción de la energía cromática. Esto permite que la interfaz sea <strong>silenciosa en reposo y elocuente en el punto de acción</strong>.</p>
+  <p>Existe además un argumento de identidad: el petróleo procede del propio degradado del logotipo. Cuando el usuario aprende que “lo cian responde”, cada clic refuerza la marca. La marca deja de ser un adorno en la esquina superior izquierda y pasa a ser el vocabulario operativo del producto.</p>
+
+  <h3>5.3 Por qué se eliminó el subtono violáceo</h3>
+  <p>Más allá del requisito del proyecto, la exclusión tiene sustento técnico. Los azules por encima de 230° concentran energía en longitudes de onda cortas que el cristalino refracta en un plano distinto al del resto del espectro: es la <strong>aberración cromática longitudinal</strong>, responsable de que los bordes violáceos se perciban borrosos o vibrantes, especialmente en usuarios présbitas o con astigmatismo. En una aplicación con densidad de datos —inventarios de equipos, tablas de tickets, registros de red— ese temblor de borde degrada la legibilidad. Rotar el matiz a 216° elimina el problema y mantiene la identidad.</p>
+  <p>En términos semánticos, el violeta se ha consolidado en el sector tecnológico como el color de las plataformas de consumo y entretenimiento. Un proveedor de soporte empresarial que lo adopta compite en un territorio simbólico que no le corresponde.</p>
+
+  <h3>5.4 Cómo influye la paleta en la confianza</h3>
+  <p>La confianza en una interfaz se construye por <strong>coherencia</strong> antes que por belleza. Un sistema con tres colores de marca, cuatro semánticos y una escala de neutrales derivada de un único matiz produce pantallas que se parecen entre sí. Esa previsibilidad es lo que el usuario lee como profesionalismo: si el software es ordenado, se infiere que la operación técnica detrás también lo es.</p>
+  <p>Opera aquí un mecanismo documentado: el <em>efecto de halo estético</em>, descrito por Kurosu y Kashimura y replicado por Tractinsky, según el cual los usuarios juzgan más usable una interfaz que perciben más cuidada, incluso cuando su eficiencia real es idéntica. Para una pyme tecnológica que compite con multinacionales, el sistema cromático es un instrumento de credibilidad medible.</p>
+
+  <h3>5.5 Cómo influye en la percepción de calidad</h3>
+  <p>La percepción de calidad se juega en los detalles que el usuario no verbaliza: sombras teñidas con el azul institucional en lugar de negro puro, fondos que evitan el blanco absoluto para reducir el deslumbramiento, neutrales que conservan un matiz frío común. Ninguno de estos elementos se nota por separado; su ausencia sí. La <strong>fluidez de procesamiento</strong> —la facilidad con que el cerebro codifica un estímulo— se experimenta subjetivamente como agrado y se atribuye erróneamente al objeto: una interfaz fácil de procesar se percibe como un producto mejor construido.</p>
+
+  <h3>5.6 Cómo influye en la toma de decisiones</h3>
+  <p>El color regula qué acción resulta más probable. En el sistema RVR solo una acción por pantalla recibe relleno petróleo sólido; las demás se ofrecen como botón secundario o texto. Esta gradación explota el <strong>efecto Von Restorff</strong>: el elemento que se distingue del conjunto se recuerda y se selecciona con mayor frecuencia. Reducir el número de alternativas visualmente equivalentes acorta el tiempo de decisión conforme a la ley de Hick.</p>
+  <p>En las confirmaciones destructivas la lógica se invierte deliberadamente: el botón de eliminar se colorea de rojo pleno, pero el foco inicial del teclado permanece en “Cancelar”. El color señala el riesgo; la mecánica de interacción protege del error.</p>
+
+  <h3>5.7 Por qué el conjunto es apropiado para una empresa tecnológica</h3>
+  <p>Las plataformas de referencia del sector empresarial —Microsoft, IBM, Atlassian— comparten una gramática cromática reconocible: neutrales fríos dominantes, un azul institucional, un acento único y semántica de estado en verde, ámbar y rojo. Adoptar esa gramática no es imitación, sino <strong>alfabetización de dominio</strong>: el usuario corporativo ya sabe leerla, y ese conocimiento previo se transfiere íntegro a la aplicación de RVR, reduciendo la curva de aprendizaje desde la primera sesión.</p>
+
+  <div class="note">
+    <span class="lbl">Alcance de la argumentación</span>
+    Las asociaciones emocionales del color son <strong>aprendidas y dependientes del contexto cultural</strong>, no reflejos universales. Por ello este manual no atribuye efectos a los matices en abstracto, sino que fundamenta cada decisión en tres pilares verificables: convención sectorial consolidada, mecanismos de percepción visual documentados y cumplimiento de contraste medible. El color psicológicamente adecuado es el que respeta lo que el usuario ya sabe.
+  </div>
+</section>
+
+<!-- ======================= 6. ACCESIBILIDAD ======================= -->
+<section id="s6">
+  <div class="node">06</div>
+  <div class="eyebrow">Accesibilidad</div>
+  <h2 class="title">Conformidad WCAG 2.2</h2>
+  <p class="lead">La paleta no se validó después de diseñarla: se diseñó a partir de los umbrales. Cada tono se ajustó hasta alcanzar el ratio requerido por su función, y las combinaciones que no lo lograron quedaron prohibidas por regla explícita.</p>
+
+  <h3>6.1 Matriz de contraste verificada</h3>
+  <p>Ratios calculados con la fórmula de luminancia relativa de la especificación WCAG. Umbrales: <strong>4,5:1</strong> texto normal AA · <strong>3:1</strong> texto grande (≥ 24 px, o ≥ 18,66 px en negrita) y elementos no textuales · <strong>7:1</strong> texto normal AAA.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Combinación</th><th>Primer plano</th><th>Fondo</th><th>Ratio</th><th>Nivel</th><th>Uso autorizado</th></tr></thead>
+      <tbody>
+        <tr><td>Texto principal sobre tarjeta</td><td><code>#16212F</code></td><td><code>#FFFFFF</code></td><td class="lvl">16,25:1</td><td class="pass">AAA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto principal sobre lienzo</td><td><code>#16212F</code></td><td><code>#F4F7F9</code></td><td class="lvl">15,10:1</td><td class="pass">AAA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto secundario sobre tarjeta</td><td><code>#4A5A6B</code></td><td><code>#FFFFFF</code></td><td class="lvl">7,08:1</td><td class="pass">AAA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto secundario sobre lienzo</td><td><code>#4A5A6B</code></td><td><code>#F4F7F9</code></td><td class="lvl">6,58:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto terciario sobre tarjeta</td><td><code>#5F6E7D</code></td><td><code>#FFFFFF</code></td><td class="lvl">5,23:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto terciario sobre hundida</td><td><code>#5F6E7D</code></td><td><code>#EAEFF3</code></td><td class="lvl">4,52:1</td><td class="pass">AA</td><td>Marcadores de posición</td></tr>
+        <tr><td>Enlace sobre tarjeta</td><td><code>#155E6B</code></td><td><code>#FFFFFF</code></td><td class="lvl">7,38:1</td><td class="pass">AAA</td><td>Todo tamaño</td></tr>
+        <tr><td>Enlace sobre lienzo</td><td><code>#155E6B</code></td><td><code>#F4F7F9</code></td><td class="lvl">6,86:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto en botón primario</td><td><code>#FFFFFF</code></td><td><code>#1E7F8C</code></td><td class="lvl">4,70:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto en barra institucional</td><td><code>#FFFFFF</code></td><td><code>#1B2C45</code></td><td class="lvl">14,07:1</td><td class="pass">AAA</td><td>Todo tamaño</td></tr>
+        <tr><td>Realce sobre barra institucional</td><td><code>#7FB7C2</code></td><td><code>#1B2C45</code></td><td class="lvl">6,33:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto de mensaje de éxito</td><td><code>#0B5E34</code></td><td><code>#E8F5EE</code></td><td class="lvl">7,03:1</td><td class="pass">AAA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto de mensaje de error</td><td><code>#B42318</code></td><td><code>#FDECEA</code></td><td class="lvl">5,75:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto de advertencia</td><td><code>#8A4A05</code></td><td><code>#FDF3E5</code></td><td class="lvl">6,25:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Texto informativo</td><td><code>#14618F</code></td><td><code>#E8F2F9</code></td><td class="lvl">5,90:1</td><td class="pass">AA</td><td>Todo tamaño</td></tr>
+        <tr><td>Borde de control sobre tarjeta</td><td><code>#7C8B99</code></td><td><code>#FFFFFF</code></td><td class="lvl">3,49:1</td><td class="pass">AA no textual</td><td>Inputs, casillas, selects</td></tr>
+        <tr><td>Borde de control sobre lienzo</td><td><code>#7C8B99</code></td><td><code>#F4F7F9</code></td><td class="lvl">3,25:1</td><td class="pass">AA no textual</td><td>Inputs, casillas, selects</td></tr>
+        <tr><td>Anillo de foco</td><td><code>#1E7F8C</code></td><td><code>#FFFFFF</code></td><td class="lvl">4,70:1</td><td class="pass">AA no textual</td><td>Todos los componentes</td></tr>
+        <tr style="background:#FDECEA"><td>Petróleo 600 como texto sobre lienzo</td><td><code>#1E7F8C</code></td><td><code>#F4F7F9</code></td><td class="lvl">4,37:1</td><td class="fail">No cumple</td><td class="fail">Prohibido — usar <code>#155E6B</code></td></tr>
+        <tr style="background:#FDECEA"><td>Acero como texto pequeño sobre lienzo</td><td><code>#5B7183</code></td><td><code>#F4F7F9</code></td><td class="lvl">4,72:1</td><td class="pass">AA</td><td>Permitido solo en texto ≥ 14 px</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>6.2 Criterios de éxito atendidos</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Criterio</th><th>Nivel</th><th>Cómo se satisface en este sistema</th></tr></thead>
+      <tbody>
+        <tr><td>1.4.1 Uso del color</td><td>A</td><td>Ningún estado se comunica solo con color. Cada mensaje incorpora icono con forma distintiva —círculo para éxito e información, triángulo para advertencia, círculo con exclamación para error— y texto explícito. Los enlaces en línea van subrayados.</td></tr>
+        <tr><td>1.4.3 Contraste mínimo</td><td>AA</td><td>Todas las combinaciones autorizadas superan 4,5:1; los tres niveles tipográficos alcanzan como mínimo 4,52:1 sobre cualquier superficie del sistema.</td></tr>
+        <tr><td>1.4.6 Contraste mejorado</td><td>AAA</td><td>Texto principal (16,25:1) y secundario sobre tarjeta (7,08:1) superan el umbral de 7:1, cubriendo la mayor parte del contenido de lectura sostenida.</td></tr>
+        <tr><td>1.4.11 Contraste no textual</td><td>AA</td><td>Bordes de control, iconos funcionales y anillo de foco superan 3:1 contra las superficies adyacentes. Los bordes puramente decorativos se distinguen de los de control mediante tokens separados.</td></tr>
+        <tr><td>1.4.12 Espaciado del texto</td><td>AA</td><td>El sistema no depende de alturas fijas; los contenedores de mensaje crecen con el contenido, permitiendo aumentar interlineado y espaciado sin pérdida de información.</td></tr>
+        <tr><td>2.4.7 Foco visible</td><td>AA</td><td>Anillo de 3 px en Petróleo 600 con desplazamiento de 2 px, presente en todos los componentes interactivos. Nunca se emplea <code>outline: none</code>.</td></tr>
+        <tr><td>2.4.11 Foco no oscurecido</td><td>AA</td><td>Las barras superiores y las hojas inferiores móviles reservan un desplazamiento de contenido equivalente a su altura, de modo que el elemento enfocado nunca queda tapado.</td></tr>
+        <tr><td>2.4.13 Apariencia del foco</td><td>AAA</td><td>El indicador rodea completamente el componente, tiene al menos 2 px de grosor y alcanza 4,70:1 contra el fondo.</td></tr>
+        <tr><td>2.5.8 Tamaño del objetivo</td><td>AA</td><td>Todo objetivo táctil mide como mínimo 24 × 24 px; en móvil se aplica 44 × 44 px, y el color de estado activo abarca el objetivo completo, no solo el icono.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>6.3 Recomendaciones por componente</h3>
+  <h4>Botones</h4>
+  <p>El relleno debe alcanzar 4,5:1 contra el texto que contiene <em>y</em> 3:1 contra la superficie sobre la que se apoya, para que su silueta sea perceptible. Los botones secundarios, al no tener relleno propio, deben delimitarse siempre con el borde de control <code>#7C8B99</code>: un botón sin relleno ni borde no es identificable como control por usuarios con baja visión. En estados hover y presionado el color se oscurece, nunca se aclara, de modo que el contraste con el texto blanco aumenta en lugar de degradarse.</p>
+
+  <h4>Texto</h4>
+  <p>El tamaño mínimo de cuerpo es 16 px en web y 15 px en móvil, con interlineado de 1,5. Ningún texto se coloca sobre imágenes o degradados sin una capa sólida intermedia. El texto terciario se reserva a metadatos: cuando un dato es indispensable para completar una tarea, se eleva al nivel secundario o principal.</p>
+
+  <h4>Enlaces</h4>
+  <p>Se utiliza <code>#155E6B</code> con subrayado permanente en párrafos. Cuando el enlace aparece dentro de un bloque de texto sin subrayado —caso desaconsejado pero admisible en tablas—, debe alcanzar 3:1 respecto al texto circundante <em>además</em> de 4,5:1 respecto al fondo, y presentar subrayado en hover y foco. El estado visitado no cambia de matiz; se distingue por el icono acompañante, evitando introducir el morado convencional del navegador.</p>
+
+  <h3>6.4 Baja visión y visión cromática atípica</h3>
+  <p>Alrededor del 8 % de los hombres presenta alguna deficiencia en la visión del color, mayoritariamente del eje rojo-verde. La paleta responde con tres medidas: <strong>separación en luminosidad</strong> —el verde de éxito y el rojo de error difieren en luminancia relativa, por lo que siguen distinguiéndose en escala de grises—; <strong>redundancia de forma</strong> en todos los iconos de estado; y <strong>etiquetas textuales</strong> obligatorias en indicadores, gráficos y leyendas.</p>
+  <p>Para usuarios con baja visión, el sistema evita el gris claro sobre blanco en cualquier contenido significativo, mantiene los neutrales dentro de un rango estrecho de matiz para que los filtros de alto contraste del sistema operativo no rompan la jerarquía, y admite ampliación hasta el 200 % sin desbordes, ya que ninguna decisión cromática depende de posiciones fijas.</p>
+
+  <h3>6.5 Consideraciones específicas del modo claro</h3>
+  <p>El modo claro tiene un riesgo propio: el exceso de luminancia. Un fondo blanco puro a pantalla completa provoca deslumbramiento y fatiga acomodativa en sesiones largas, situación habitual en el personal técnico de RVR. El lienzo <code>#F4F7F9</code> reduce la luminancia global sin comprometer el contraste, y reserva el blanco para las superficies de contenido, donde el contraste sí es necesario.</p>
+  <p>En dispositivos móviles utilizados en exteriores —instalaciones de cámaras, visitas a sitio— la legibilidad bajo luz solar depende del contraste absoluto más que del matiz. Por ello todas las etiquetas críticas de la aplicación móvil emplean texto principal o secundario, nunca terciario, y los iconos de acción se dibujan con trazos de 2 px como mínimo.</p>
+</section>
+
+<!-- ======================= 7. UX ======================= -->
+<section id="s7">
+  <div class="node">07</div>
+  <div class="eyebrow">Experiencia de usuario</div>
+  <h2 class="title">Qué resuelve el color</h2>
+  <p class="lead">El color no es la capa final del diseño: es un canal de información paralelo al texto, capaz de transmitir estado, jerarquía y disponibilidad sin consumir tiempo de lectura. Estas son sus contribuciones concretas al producto de RVR.</p>
+
+  <h3>7.1 Navegación</h3>
+  <p>La barra superior en Azul Profundo funciona como <strong>marco persistente</strong>: permanece idéntica en todas las vistas y le indica al usuario que sigue dentro del mismo entorno, incluso al saltar entre inventario, tickets y facturación. Dentro de la navegación, la sección vigente se marca con Superficie de Marca y una barra de 3 px en Petróleo 600. Esa doble señal responde a la pregunta “¿dónde estoy?” en una fijación ocular, sin que el usuario deba leer el menú completo.</p>
+
+  <h3>7.2 Reconocimiento visual</h3>
+  <p>La interfaz explota el reconocimiento por encima del recuerdo. El usuario no memoriza que el verde significa éxito: lo reconoce cada vez porque el sistema es <strong>invariable</strong>. Un solo matiz por significado, aplicado sin excepciones en las tres plataformas, convierte el color en un símbolo estable. La regla operativa es estricta: si un verde aparece en un contexto que no es de confirmación, el símbolo se degrada y el usuario vuelve a tener que leer.</p>
+
+  <h3>7.3 Jerarquía de la información</h3>
+  <p>La jerarquía se construye con dos variables independientes que se refuerzan: <strong>luminosidad de la superficie</strong> —lo más claro está más adelante— y <strong>contraste tipográfico</strong> —tres niveles de gris azulado en proporción decreciente—. Esta doble codificación permite ordenar pantallas densas, como el listado de equipos de un cliente corporativo, sin recurrir a más tamaños de fuente ni a líneas divisorias adicionales.</p>
+
+  <h3>7.4 Aprendizaje de la interfaz</h3>
+  <p>La aplicación se apoya deliberadamente en convenciones consolidadas del software empresarial. Esa decisión activa la <strong>ley de Jakob</strong>: los usuarios trasladan a un producto nuevo las expectativas formadas en los productos que ya utilizan. Un técnico de RVR que emplea a diario un ERP o una herramienta de tickets reconoce de inmediato el significado del ámbar y del rojo, y puede concentrar su atención en aprender la lógica del negocio en lugar del vocabulario visual.</p>
+
+  <h3>7.5 Reducción de errores</h3>
+  <p>Tres mecanismos cromáticos previenen errores. Primero, la <strong>diferenciación de riesgo</strong>: las acciones destructivas son las únicas que reciben relleno rojo, de modo que nunca se confunden con una acción rutinaria. Segundo, la <strong>validación en el sitio</strong>: el campo que falla cambia de borde y recibe un mensaje adyacente, evitando que el usuario tenga que buscar el origen del problema. Tercero, la <strong>señalización de indisponibilidad</strong>: los controles deshabilitados se leen como inertes antes de ser pulsados, eliminando el intento fallido.</p>
+
+  <h3>7.6 Carga cognitiva</h3>
+  <p>La memoria de trabajo es un recurso limitado y compartido con la tarea real del usuario. Un sistema con tres colores de marca y cinco significados funcionales impone una carga extrínseca mínima, porque el conjunto de reglas que hay que sostener en memoria es pequeño y consistente. Los neutrales dominantes cumplen aquí una función activa: al ocupar la mayor parte del área, garantizan que cada aparición de color sea <strong>informativa por escasez</strong>. En una interfaz donde todo es color, el color deja de significar.</p>
+
+  <h3>7.7 Velocidad para encontrar acciones importantes</h3>
+  <p>La búsqueda visual se acelera cuando el objetivo posee un atributo que ningún distractor comparte. Al reservar el relleno Petróleo 600 sólido para una única acción principal por pantalla, esa acción se convierte en un <strong>objetivo singular</strong>, localizable en tiempo aproximadamente constante con independencia de cuántos elementos haya alrededor. Si dos botones compiten con el mismo relleno, la búsqueda pasa a ser serial y el tiempo crece con el número de elementos. De ahí que la regla de acción primaria única sea la norma más rígida de este manual.</p>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Dimensión UX</th><th>Recurso cromático</th><th>Resultado esperado</th></tr></thead>
+      <tbody>
+        <tr><td>Orientación</td><td>Marco institucional persistente + marca de sección activa</td><td>Ubicación resuelta sin lectura</td></tr>
+        <tr><td>Reconocimiento</td><td>Un matiz por significado, sin excepciones</td><td>Interpretación automática del estado</td></tr>
+        <tr><td>Jerarquía</td><td>Elevación por luminosidad + tres niveles de texto</td><td>Lectura ordenada de pantallas densas</td></tr>
+        <tr><td>Aprendizaje</td><td>Convención sectorial del software empresarial</td><td>Transferencia desde herramientas conocidas</td></tr>
+        <tr><td>Prevención de error</td><td>Rojo exclusivo para lo destructivo</td><td>Menos acciones irreversibles accidentales</td></tr>
+        <tr><td>Carga cognitiva</td><td>Neutrales dominantes, color escaso</td><td>Atención disponible para la tarea real</td></tr>
+        <tr><td>Eficiencia</td><td>Acción primaria única por pantalla</td><td>Localización en tiempo constante</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ======================= 8. ENSAYO ======================= -->
+<section id="s8">
+  <div class="node">08</div>
+  <div class="eyebrow">Fundamentación académica</div>
+  <h2 class="title">Color, percepción y éxito del software</h2>
+  <p class="lead" style="font-style:italic; border-left:3px solid var(--rvr-navy-800); padding-left:18px">¿Cómo influye la selección de colores en la percepción, usabilidad y experiencia de usuario de un software, y de qué manera puede afectar el éxito o fracaso de una aplicación?</p>
+
+  <div id="ensayo">
+  <p>La selección cromática de un producto de software constituye una decisión de arquitectura de la información y no un componente ornamental del proceso de diseño. El color opera como un canal de codificación preatentiva: la cognición visual procesa diferencias de matiz, saturación y luminancia antes de que intervenga la atención focalizada, de modo que un sistema cromático bien estructurado transmite estado, jerarquía y disponibilidad en el intervalo previo a la lectura. La paleta se convierte así en un instrumento de usabilidad con efectos medibles sobre las tres dimensiones que reconoce la norma ISO 9241-11: eficacia, eficiencia y satisfacción.</p>
+
+  <p>En el plano perceptivo, la psicología del color aporta un marco para anticipar las asociaciones que el usuario proyectará sobre la interfaz. La teoría ecológica de la valencia, formulada por Palmer y Schloss, sostiene que tales asociaciones no son reflejos innatos, sino aprendizajes derivados de la experiencia con los objetos portadores del color y del contexto cultural del observador. De ello se desprende una consecuencia metodológica relevante para el diseño de interfaces: la elección cromática debe justificarse por convención de dominio y coherencia interna antes que por atribuciones simbólicas universales. En el software empresarial, la gramática consolidada —neutrales fríos dominantes, un azul institucional, un acento único y una semántica de estado en verde, ámbar y rojo— constituye un capital de conocimiento previo que el usuario transfiere íntegramente al producto nuevo, fenómeno descrito por la ley de Jakob.</p>
+
+  <p>En el plano de la usabilidad, el color determina la eficiencia de la búsqueda visual. Cuando un objetivo posee un atributo cromático que ningún distractor comparte, su localización se aproxima a un tiempo constante; cuando varios elementos comparten ese atributo, la búsqueda se vuelve serial y el tiempo de tarea crece proporcionalmente al número de elementos presentes. De ahí la exigencia de reservar el color de acción a una sola instancia por pantalla. La codificación redundante del estado —color, forma y etiqueta textual— reduce además la tasa de error, y reservar el matiz de alerta a las operaciones irreversibles previene acciones destructivas accidentales.</p>
+
+  <p>La dimensión de accesibilidad delimita el espacio de soluciones admisibles. Los criterios de contraste establecidos en las WCAG determinan qué combinaciones resultan legibles para usuarios con baja visión, y la prohibición de comunicar información exclusivamente mediante color protege a quienes presentan visión cromática atípica. Una paleta que incumple estos umbrales no es discutible: resulta inutilizable para una fracción significativa de la población, con implicaciones legales crecientes en contratación pública y corporativa.</p>
+
+  <p>En el plano del branding y la experiencia de usuario, la consistencia cromática opera como mecanismo de reconocimiento y de construcción de confianza. El efecto de halo estético, documentado por Kurosu y Kashimura y replicado por Tractinsky, evidencia que los usuarios atribuyen mayor usabilidad a las interfaces percibidas como más cuidadas, aun con rendimiento objetivo equivalente.</p>
+
+  <p>En consecuencia, el color incide sobre el éxito o el fracaso de una aplicación por tres vías acumulativas: condiciona el rendimiento objetivo del usuario, determina el alcance poblacional del producto y modula el juicio de calidad que sostiene la adopción. Un sistema cromático arbitrario introduce carga cognitiva extrínseca, ambigüedad semántica y barreras de acceso; un sistema fundamentado convierte la interfaz en un lenguaje que el usuario aprende una vez y aplica siempre.</p>
+  </div>
+</section>
+
+<!-- ======================= 9. ANEXO ======================= -->
+<section id="s9">
+  <div class="node">09</div>
+  <div class="eyebrow">Anexo</div>
+  <h2 class="title">Tokens y reglas de aplicación</h2>
+
+  <h3>9.1 Proporción de uso</h3>
+  <p>La distribución del color por superficie es tan normativa como los valores. Alterarla desnaturaliza el sistema aunque los códigos sean correctos.</p>
+  <div class="scale" style="border-radius:3px">
+    <div style="background:#F4F7F9; color:#16212F; flex:74"><span>74 % Neutrales</span>Lienzo, superficies, bordes, tipografía</div>
+    <div style="background:#1B2C45; color:#fff; flex:15"><span>15 % Azul Profundo</span>Marco institucional</div>
+    <div style="background:#1E7F8C; color:#fff; flex:8"><span>8 % Petróleo</span>Acciones</div>
+    <div style="background:#B25E09; color:#fff; flex:3"><span>3 % Funcionales</span>Estados</div>
+  </div>
+
+  <h3>9.2 Tokens del sistema</h3>
+  <div class="demo">
+    <div class="demo-label">Variables CSS — implementación de referencia</div>
+    <pre class="mono" style="margin:0; font-size:12.5px; line-height:1.7; overflow-x:auto; color:var(--text-secondary)">:root {
+  <span style="color:#5F6E7D">/* Primarios */</span>
+  --rvr-navy-900: #101B2B;   --rvr-navy-800: #1B2C45;   --rvr-navy-700: #24395A;
+  --rvr-petrol-800: #10474F; --rvr-petrol-700: #155E6B; --rvr-petrol-600: #1E7F8C;
+  --rvr-petrol-300: #7FB7C2; --rvr-petrol-50: #E3F0F3;  --rvr-steel-600: #5B7183;
+
+  <span style="color:#5F6E7D">/* Superficies y bordes */</span>
+  --surface-canvas: #F4F7F9; --surface-base: #FFFFFF;   --surface-sunken: #EAEFF3;
+  --border-structural: #D3DCE3; --border-divider: #E4EAEF; --border-control: #7C8B99;
+
+  <span style="color:#5F6E7D">/* Tipografía */</span>
+  --text-primary: #16212F;   --text-secondary: #4A5A6B; --text-tertiary: #5F6E7D;
+  --text-disabled: #8494A1;  --text-inverse: #FFFFFF;
+
+  <span style="color:#5F6E7D">/* Funcionales */</span>
+  --success-700: #0B5E34; --success-600: #0F7A45; --success-200: #A8D8BE; --success-50: #E8F5EE;
+  --error-600: #B42318;                          --error-200: #F3B7B0;   --error-50: #FDECEA;
+  --warning-700: #8A4A05; --warning-600: #B25E09; --warning-200: #F0CFA0; --warning-50: #FDF3E5;
+  --info-600: #14618F;                           --info-200: #A9CDE4;    --info-50: #E8F2F9;
+  --notify-600: #C2410C;
+
+  <span style="color:#5F6E7D">/* Elevación */</span>
+  --shadow-1: 0 1px 2px rgba(27,44,69,.08);
+  --shadow-2: 0 4px 14px rgba(27,44,69,.10);
+  --shadow-3: 0 18px 44px rgba(16,27,43,.16);
+}</pre>
+  </div>
+
+  <h3>9.3 Prohibiciones</h3>
+  <div class="tw">
+    <table>
+      <thead><tr><th>No se permite</th><th>Motivo</th><th>Alternativa correcta</th></tr></thead>
+      <tbody>
+        <tr><td>Cualquier matiz entre 240° y 300°</td><td>Restricción de identidad: excluye morados, violetas y azules violáceos.</td><td>Azul Profundo <code>#1B2C45</code> o Petróleo <code>#1E7F8C</code>.</td></tr>
+        <tr><td>Dos botones primarios en la misma pantalla</td><td>Anula la singularidad del objetivo y convierte la búsqueda visual en serial.</td><td>Un primario y el resto secundarios o de texto.</td></tr>
+        <tr><td>Petróleo 600 como color de texto sobre el lienzo</td><td>4,37:1, por debajo del umbral AA.</td><td>Petróleo 700 <code>#155E6B</code>.</td></tr>
+        <tr><td>Estados comunicados solo con color</td><td>Incumple el criterio 1.4.1 y excluye a usuarios con visión cromática atípica.</td><td>Color + icono con forma distintiva + texto.</td></tr>
+        <tr><td>Degradados en superficies de contenido</td><td>Impiden garantizar un ratio de contraste estable a lo largo del área.</td><td>Rellenos sólidos. El degradado se reserva al logotipo.</td></tr>
+        <tr><td>Verde para “guardar” y rojo para “cancelar”</td><td>Confunde jerarquía de acción con semántica de estado.</td><td>Petróleo para la acción principal; rojo solo para lo destructivo.</td></tr>
+        <tr><td>Suprimir el anillo de foco</td><td>Incumple los criterios 2.4.7, 2.4.11 y 2.4.13.</td><td>Anillo de 3 px en Petróleo 600.</td></tr>
+        <tr><td>Colores fuera de los tokens declarados</td><td>Introduce deuda visual y rompe la trazabilidad del sistema.</td><td>Solicitar la ampliación formal del token.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>9.4 Gobierno del sistema</h3>
+  <p>Toda incorporación de un color nuevo debe justificarse con un caso de uso que ningún token existente resuelva, documentar sus ratios de contraste contra las tres superficies del sistema y verificar que su matiz no invada el rango prohibido ni el de un color funcional ya asignado. Las variantes tonales se generan modificando luminosidad y saturación, nunca el matiz base, de modo que la familia cromática permanezca cerrada. El manual se versiona junto con la aplicación; cualquier cambio en los valores exige repetir la validación de contraste completa antes de su publicación.</p>
+
+  <div class="note">
+    <span class="lbl">Resumen ejecutivo</span>
+    Tres colores corporativos derivados del logotipo, once neutrales derivados de un único matiz frío, cinco familias funcionales y una regla de proporción. Cada valor está verificado contra WCAG 2.2 en nivel AA como mínimo, y las combinaciones que no alcanzan el umbral figuran expresamente prohibidas. El sistema es cerrado por diseño: su valor reside tanto en lo que autoriza como en lo que excluye.
+  </div>
+</section>
+
+  </div>
+
+  <div class="colophon">
+    <span>RVR Tecnologías S.A.S. — Manual de Identidad Cromática v1.0</span>
+    <span>Ratios de contraste calculados según WCAG 2.2 (fórmula de luminancia relativa)</span>
+  </div>
+</div>
+</body>
+</html>

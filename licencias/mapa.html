@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mapa de licencias · Portal RvR</title>
+  <link rel="icon" href="../public/favicon.svg" />
+  <style>
+    @font-face { font-family: 'Sora'; font-weight: 100 800; src: url('fuentes/sora-latin-wght-normal.woff2') format('woff2-variations'); }
+    @font-face { font-family: 'Sora'; font-weight: 100 800; src: url('fuentes/sora-latin-ext-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0100-02AF, U+1E00-1EFF; }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 200 800; src: url('fuentes/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2-variations'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 200 800; src: url('fuentes/plus-jakarta-sans-latin-ext-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0100-02AF, U+1E00-1EFF; }
+
+    :root {
+      --tinta: #1c283c; --fg: #0f1b2d; --fg-2: #3c4a60; --fg-3: #637189;
+      --azul: #0a6cf0; --azul-suave: #e7f0fe; --borde: #d9e2ee; --fondo: #f4f7fb;
+      --naranja: #c2560c; --naranja-suave: #fff1e6; --naranja-borde: #fbd3b4;
+    }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    html, body { margin: 0; }
+    body { background: #dfe6ef; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: var(--fg); font-variant-numeric: tabular-nums; }
+    h1, h2, h3 { font-family: Sora, sans-serif; margin: 0; letter-spacing: -0.02em; }
+
+    /* Barra de pantalla (no se imprime) */
+    .barra { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 12px 20px; background: rgb(255 255 255 / .85); backdrop-filter: blur(16px); border-bottom: 1px solid var(--borde); }
+    .barra span { font-weight: 700; font-size: 14px; }
+    .barra div { display: flex; gap: 8px; }
+    .barra a, .barra button { display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--borde); background: #fff; color: var(--fg); font: 600 13px inherit; text-decoration: none; cursor: pointer; }
+    .barra button { background: var(--azul); border-color: var(--azul); color: #fff; }
+
+    /* Hoja A3 horizontal */
+    .marco { padding: 24px; overflow: auto; }
+    .hoja {
+      width: 420mm; height: 297mm; margin: 0 auto; background: #fff; position: relative; overflow: hidden;
+      padding: 14mm 14mm 11mm; display: flex; flex-direction: column;
+      box-shadow: 0 30px 80px -30px rgb(20 45 85 / .45);
+      transform-origin: top center;
+    }
+    .hoja::before { content: ''; position: absolute; right: -60mm; top: -70mm; width: 170mm; height: 170mm; border-radius: 50%; background: #e3efff; filter: blur(30mm); opacity: .9; }
+    .hoja > * { position: relative; }
+
+    header.cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; }
+    .cab h1 { font-size: 30pt; font-weight: 800; letter-spacing: -0.035em; line-height: 1; }
+    .cab h1 em { font-style: normal; color: var(--azul); }
+    .cab p { margin: 3mm 0 0; color: var(--fg-2); font-size: 11pt; }
+    .cab .lado { display: flex; align-items: center; gap: 4mm; text-align: right; font-size: 9pt; color: var(--fg-3); }
+    .cab .lado b { display: block; color: var(--fg); font-size: 10pt; }
+    .cab img { width: 15mm; height: 15mm; border-radius: 4mm; }
+
+    /* Raíz */
+    .raiz { align-self: center; margin-top: 7mm; text-align: center; background: var(--tinta); color: #fff; padding: 5mm 10mm; border-radius: 5mm; min-width: 125mm; box-shadow: 0 10mm 20mm -10mm rgb(10 30 70 / .5); }
+    .raiz h2 { font-size: 15pt; font-weight: 800; letter-spacing: .02em; }
+    .raiz p { margin: 1.5mm 0 0; font-size: 9pt; color: #c6d4e8; }
+    .raiz p b { color: #ff9c9c; }
+    .usa { align-self: center; height: 9mm; width: 0; border-left: .5mm solid #9fb0c8; position: relative; }
+    .usa span { position: absolute; left: 2mm; top: 2.5mm; font-size: 8pt; color: var(--fg-3); font-style: italic; }
+
+    /* Ramas */
+    .ramas { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4.5mm; position: relative; padding-top: 6mm; flex: 1; min-height: 0; }
+    .ramas::before { content: ''; position: absolute; top: 0; left: calc((100% - 22.5mm) / 12); right: calc((100% - 22.5mm) / 12); border-top: .5mm solid #9fb0c8; }
+    .rama { display: flex; flex-direction: column; position: relative; min-height: 0; }
+    .rama::before { content: ''; position: absolute; top: -6mm; left: 50%; height: 6mm; border-left: .5mm solid #9fb0c8; }
+    .nodo { min-height: 27mm; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 3mm 2mm; border-radius: 3.5mm; background: var(--azul-suave); border: .4mm solid #bcd6fb; }
+    .nodo h3 { font-size: 10pt; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--tinta); }
+    .nodo p { margin: .8mm 0 0; font-size: 8pt; color: var(--fg-2); }
+    .nodo .ic { display: inline-grid; place-items: center; width: 7mm; height: 7mm; border-radius: 2mm; background: #fff; color: var(--azul); margin-bottom: 1.2mm; }
+    .nodo .ic svg { width: 4mm; height: 4mm; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .conector { height: 3.5mm; border-left: .4mm dashed #9fb0c8; align-self: center; }
+    .caja { flex: 1; border: .4mm solid var(--borde); border-radius: 3.5mm; padding: 3mm 3mm 2.5mm; background: #fff; font-size: 7.8pt; line-height: 1.35; display: flex; flex-direction: column; gap: 1.2mm; }
+    .caja h4 { margin: 1.2mm 0 .3mm; font-size: 7pt; text-transform: uppercase; letter-spacing: .08em; color: var(--fg-3); }
+    .caja h4:first-child { margin-top: 0; }
+    .it { display: flex; justify-content: space-between; align-items: baseline; gap: 2mm; }
+    .it span { color: var(--fg); }
+    .it small { color: var(--fg-3); font-size: 6.6pt; }
+    .lic { flex: none; font-weight: 800; font-size: 7pt; padding: .3mm 1.6mm; border-radius: 99px; background: color-mix(in srgb, var(--c) 13%, #fff); color: color-mix(in srgb, var(--c) 70%, #0f1b2d); border: .25mm solid color-mix(in srgb, var(--c) 35%, #fff); }
+    .rama.servicios .nodo { background: var(--naranja-suave); border-color: var(--naranja-borde); }
+    .rama.servicios .nodo .ic { color: var(--naranja); }
+    .rama.servicios .caja { border-color: var(--naranja-borde); }
+    .nota-serv { margin-top: auto; padding-top: 2mm; border-top: .3mm dashed var(--naranja-borde); font-style: italic; color: var(--fg-3); font-size: 7pt; }
+    .barrita { display: flex; height: 1.6mm; border-radius: 99px; overflow: hidden; gap: .3mm; margin: .6mm 0 .4mm; }
+    .barrita i { display: block; }
+
+    /* Pie: leyenda y reglas */
+    footer.pie { display: grid; grid-template-columns: 1.6fr 1fr; gap: 6mm; margin-top: 5mm; padding-top: 4mm; border-top: .4mm solid var(--borde); }
+    .leyenda { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4mm 5mm; font-size: 7.4pt; color: var(--fg-2); }
+    .leyenda div { display: flex; gap: 1.8mm; align-items: baseline; }
+    .leyenda b { color: var(--fg); white-space: nowrap; }
+    .leyenda i { width: 2.4mm; height: 2.4mm; border-radius: .7mm; flex: none; transform: translateY(.3mm); }
+    .resumen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+    .resumen div { background: var(--fondo); border-radius: 3mm; padding: 2.5mm 3mm; }
+    .resumen b { display: block; font: 800 15pt/1 Sora, sans-serif; }
+    .resumen span { font-size: 7.2pt; color: var(--fg-3); }
+    .firma { grid-column: 1 / -1; display: flex; justify-content: space-between; font-size: 7.2pt; color: var(--fg-3); }
+
+    @page { size: A3 landscape; margin: 0; }
+    @media print {
+      body { background: #fff; }
+      .barra { display: none; }
+      .marco { padding: 0; overflow: visible; }
+      .hoja { box-shadow: none; margin: 0 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="barra">
+    <span>Mapa conceptual · A3 horizontal</span>
+    <div>
+      <a href="index.html">← Página de licencias</a>
+      <button type="button" onclick="print()">Guardar en PDF</button>
+    </div>
+  </div>
+
+  <div class="marco">
+    <div class="hoja" id="hoja">
+      <header class="cab">
+        <div>
+          <h1>Tecnologías y sus <em>licencias</em></h1>
+          <p id="sub"></p>
+        </div>
+        <div class="lado">
+          <div><b id="corte"></b>Fuente: package-lock.json · pubspec.lock</div>
+          <img src="../public/marca/rvr-icono-light-128.png" alt="RvR" />
+        </div>
+      </header>
+
+      <div class="raiz">
+        <h2 id="raiz-nombre"></h2>
+        <p id="raiz-texto"></p>
+      </div>
+      <div class="usa"><span>usa</span></div>
+
+      <div class="ramas" id="ramas"></div>
+
+      <footer class="pie">
+        <div class="leyenda" id="leyenda"></div>
+        <div class="resumen" id="resumen"></div>
+        <div class="firma"><span id="firma"></span><span>Ninguna dependencia es GPL o AGPL: el código propio queda cerrado.</span></div>
+      </footer>
+    </div>
+  </div>
+
+  <script src="datos.js"></script>
+  <script>
+    (function () {
+      var D = window.LICENCIAS, P = D.proyecto
+      var $ = function (id) { return document.getElementById(id) }
+      var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) }
+      var color = function (l) { return (D.familias[l] || D.familias['Propio']).color }
+      var lic = function (l) { return '<span class="lic" style="--c:' + color(l) + '">' + esc(l) + '</span>' }
+      var suma = function (o) { return Object.keys(o).reduce(function (s, k) { return s + o[k] }, 0) }
+      var iconos = {
+        navegador: '<rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M1.5 5.5h13M4 4h.01M6 4h.01"/>',
+        llave: '<path d="M10.5 1.8a3.7 3.7 0 0 0-3.4 5.1L1.8 12.2v2h2v-1.5h1.5v-1.5h1.5l1.4-1.4a3.7 3.7 0 1 0 2.3-8Z"/>',
+        servidor: '<rect x="2" y="2" width="12" height="5" rx="1.5"/><rect x="2" y="9" width="12" height="5" rx="1.5"/><path d="M5 4.5h.01M5 11.5h.01"/>',
+        celular: '<rect x="4" y="1.5" width="8" height="13" rx="2"/><path d="M7 12h2"/>',
+        pincel: '<path d="M13.8 2.2a1.5 1.5 0 0 0-2.1 0L6.5 7.4l2.1 2.1 5.2-5.2a1.5 1.5 0 0 0 0-2.1Z"/><path d="M6.5 9.5c-1.7-.4-3.6.6-3.6 2.6 0 1-.6 1.6-1.4 2 3.2.6 5.6-.6 5.6-3"/>',
+        nube: '<path d="M4.5 12.5a3 3 0 0 1-.4-6 4 4 0 0 1 7.8-.6 3.3 3.3 0 0 1 .1 6.6Z"/>',
+      }
+      var ic = function (n) { return '<span class="ic"><svg viewBox="0 0 16 16">' + iconos[n] + '</svg></span>' }
+
+      $('sub').textContent = P.nombre + ' · Inventario de licencias del proyecto · ' + P.contexto
+      $('corte').textContent = 'Corte: ' + P.corte
+      $('raiz-nombre').textContent = P.nombre.toUpperCase()
+      $('raiz-texto').innerHTML = 'Código propio bajo licencia <b>' + esc(P.licencia.toLowerCase()) + '</b> · © ' + P.año + ' ' + esc(P.titular) + ' · uso exclusivo de ' + esc(P.cliente)
+      $('firma').textContent = '© ' + P.año + ' ' + P.titular + ' · Todos los derechos reservados · ' + P.leyes.join(' · ')
+
+      var mapaIndirectas = { 'web': 'Portal web', 'web-dev': 'Web · desarrollo', 'api': 'API', 'movil': 'App móvil' }
+      var global = {}
+      var ramas = D.capas.map(function (c) {
+        var principales = c.items.filter(function (it) { return it.nota !== 'desarrollo' })
+        var desarrollo = c.items.filter(function (it) { return it.nota === 'desarrollo' })
+        c.items.forEach(function (it) { global[it.licencia] = (global[it.licencia] || 0) + 1 })
+        var fila = function (it) {
+          return '<div class="it"><span>' + esc(it.nombre) + (it.nota && it.nota !== 'desarrollo' ? ' <small>(' + esc(it.nota) + ')</small>' : '') + '</span>' + lic(it.licencia) + '</div>'
+        }
+        var html = principales.map(fila).join('')
+        if (desarrollo.length) html += '<h4>Solo desarrollo</h4>' + desarrollo.map(fila).join('')
+        var ind = D.indirectas.filter(function (x) { return x.capa === mapaIndirectas[c.id] })[0]
+        if (ind) {
+          Object.keys(ind.total).forEach(function (k) { global[k] = (global[k] || 0) + ind.total[k] })
+          var t = suma(ind.total)
+          var claves = Object.keys(ind.total).sort(function (a, b) { return ind.total[b] - ind.total[a] })
+          html += '<h4>Paquetes indirectos · ' + t + '</h4><div class="barrita">' + claves.map(function (k) { return '<i style="width:' + (ind.total[k] / t * 100) + '%;background:' + color(k) + '"></i>' }).join('') + '</div>' +
+            claves.map(function (k) { return '<div class="it"><span>' + ind.total[k] + ' paquete' + (ind.total[k] === 1 ? '' : 's') + '</span>' + lic(k) + '</div>' }).join('')
+        }
+        return '<section class="rama">' +
+          '<div class="nodo">' + ic(c.icono) + '<h3>' + esc(c.titulo) + '</h3><p>' + esc(c.sub) + '</p></div><div class="conector"></div>' +
+          '<div class="caja">' + html + '</div></section>'
+      })
+      ramas.push('<section class="rama servicios">' +
+        '<div class="nodo">' + ic('nube') + '<h3>Servicios externos</h3><p>Términos de uso de cada uno</p></div><div class="conector"></div>' +
+        '<div class="caja">' + D.servicios.map(function (s) { return '<div class="it"><span><b>' + esc(s.nombre) + '</b> — ' + esc(s.uso.toLowerCase()) + '</span></div>' }).join('') +
+        '<div class="nota-serv">No son licencias de software: se rigen por los términos de uso de cada servicio.</div></div></section>')
+      $('ramas').innerHTML = ramas.join('')
+
+      $('leyenda').innerHTML = D.glosario.filter(function (g) { return global[g.clave] }).map(function (g) {
+        return '<div><i style="background:' + color(g.clave) + '"></i><span><b>' + esc(g.clave) + '</b> — ' + esc(g.resumen.split('. ')[0].replace(/\.$/, '')) + '.</span></div>'
+      }).join('')
+
+      var total = suma(global)
+      var permisivas = Object.keys(global).filter(function (k) { return (D.familias[k] || {}).grupo === 'permisiva' }).reduce(function (s, k) { return s + global[k] }, 0)
+      $('resumen').innerHTML = [
+        [D.capas.reduce(function (s, c) { return s + c.items.length }, 0), 'herramientas directas'],
+        [D.indirectas.reduce(function (s, x) { return s + suma(x.total) }, 0), 'paquetes indirectos'],
+        [Math.round(permisivas / total * 100) + ' %', 'con licencia permisiva'],
+      ].map(function (r) { return '<div><b>' + r[0] + '</b><span>' + r[1] + '</span></div>' }).join('')
+
+      // En pantalla, la hoja se encoge para caber a lo ancho.
+      function ajustar() {
+        var hoja = $('hoja'), ancho = hoja.offsetWidth, disponible = document.querySelector('.marco').clientWidth - 48
+        var k = Math.min(1, disponible / ancho)
+        hoja.style.transform = 'scale(' + k + ')'
+        hoja.style.marginBottom = (hoja.offsetHeight * (k - 1)) + 'px'
+      }
+      if (!matchMedia('print').matches) { ajustar(); addEventListener('resize', ajustar) }
+    })()
+  </script>
+</body>
+</html>

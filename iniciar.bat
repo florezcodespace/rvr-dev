@@ -15,11 +15,13 @@ if errorlevel 1 (
 
 for /f "delims=" %%v in ('node -v') do echo  Node %%v detectado.
 
-if not exist "node_modules\vite" (
+if not exist "frontend\node_modules\vite" (
   echo.
   echo  Instalando dependencias, esto tarda 1-2 minutos...
   echo.
+  pushd frontend
   call npm install
+  popd
   if errorlevel 1 (
     echo.
     echo  [X] Fallo la instalacion. Revisa el mensaje de arriba.
@@ -29,11 +31,11 @@ if not exist "node_modules\vite" (
 )
 
 rem ---------------------------------------------------------------- API
-rem El portal trabaja siempre contra la API y PostgreSQL. api\.env lo crea
+rem El portal trabaja siempre contra la API y PostgreSQL. backend\.env lo crea
 rem montar-base.bat con la conexion a la base.
-if not exist "api\.env" (
+if not exist "backend\.env" (
   echo.
-  echo  [X] No hay api\.env: la base de datos no esta configurada.
+  echo  [X] No hay backend\.env: la base de datos no esta configurada.
   echo      Ejecuta primero montar-base.bat ^(crea la base rvr y los archivos .env^)
   echo      y despues vuelve a abrir este archivo.
   echo.
@@ -44,9 +46,11 @@ call :api
 
 echo.
 echo  Levantando el portal en http://localhost:5173
-echo  Para detenerlo: Ctrl + C
+echo  Para detenerlo: Ctrl + C 
 echo.
+pushd frontend
 call npm run dev
+popd
 pause
 exit /b
 
@@ -54,16 +58,16 @@ rem ---------------------------------------------------------------- :api
 rem Abre la API en otra ventana y espera hasta 40 segundos a que responda
 rem /api/salud con la base conectada, para no abrir el portal antes de tiempo.
 :api
-if not exist "api\node_modules\nodemailer" (
+if not exist "backend\node_modules\nodemailer" (
   echo.
   echo  Instalando dependencias de la API...
-  pushd api
+  pushd backend
   call npm install
   popd
 )
 echo.
 echo  Levantando la API en http://localhost:4000/api  ^(ventana aparte, no la cierres^)
-start "API RvR - no cerrar" /D "%~dp0api" cmd /k npm run dev
+start "API RvR - no cerrar" /D "%~dp0backend" cmd /k npm run dev
 echo  Esperando a que la API responda...
 powershell -NoProfile -Command "for ($i = 0; $i -lt 40; $i++) { try { $r = Invoke-RestMethod 'http://localhost:4000/api/salud' -TimeoutSec 2; if ($r.ok) { exit 0 } } catch { }; Start-Sleep -Seconds 1 }; exit 1"
 if errorlevel 1 (

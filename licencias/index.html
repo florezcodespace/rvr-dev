@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Licencias · Portal RvR</title>
+  <meta name="description" content="Licencia del Portal RvR Tecnologías y de las herramientas de terceros que usa." />
+  <link rel="icon" href="../public/favicon.svg" />
+  <script>
+    // Tema antes de pintar: lo guardado o el del sistema.
+    (function () {
+      var modo = null
+      try { modo = localStorage.getItem('rvr-licencias-tema') } catch (e) {}
+      var oscuro = modo ? modo === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+      document.documentElement.classList.toggle('dark', oscuro)
+    })()
+  </script>
+  <style>
+    @font-face { font-family: 'Sora'; font-weight: 100 800; font-display: swap; src: url('fuentes/sora-latin-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: 'Sora'; font-weight: 100 800; font-display: swap; src: url('fuentes/sora-latin-ext-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 200 800; font-display: swap; src: url('fuentes/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 200 800; font-display: swap; src: url('fuentes/plus-jakarta-sans-latin-ext-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+    /* Tokens del estilo «Cristal» (src/styles/tokens.css) */
+    :root {
+      --bg: #edf2f8;
+      --vidrio: rgb(255 255 255 / 0.74);
+      --vidrio-denso: rgb(255 255 255 / 0.9);
+      --vidrio-luz: rgb(255 255 255 / 0.7);
+      --vidrio-borde: rgb(255 255 255 / 0.55);
+      --muted: rgb(232 240 250 / 0.72);
+      --borde: rgb(20 45 85 / 0.1);
+      --borde-fuerte: rgb(20 45 85 / 0.2);
+      --fg: #0f1b2d;
+      --fg-2: #3c4a60;
+      --fg-3: #536179;
+      --primario: #0a6cf0;
+      --primario-hover: #0059d6;
+      --primario-suave: rgb(10 108 240 / 0.1);
+      --primario-en-suave: #0059d6;
+      --enlace: #0059d6;
+      --tinta: #1c283c;
+      --tinta-fg: #ffffff;
+      --tinta-fg-2: #c6d4e8;
+      --tinta-fg-3: #8ec5ff;
+      --exito: #0b7a37;
+      --exito-suave: rgb(22 163 74 / 0.12);
+      --aviso: #9a5800;
+      --aviso-suave: rgb(245 158 11 / 0.15);
+      --peligro: #c42525;
+      --peligro-suave: rgb(239 68 68 / 0.11);
+      --pista: rgb(20 45 85 / 0.07);
+      --sombra: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 18px 50px -24px rgb(20 45 85 / 0.28), 0 2px 8px -4px rgb(20 45 85 / 0.08);
+      --luz-1: #b9d8ff; --luz-2: #cfe3ff; --luz-3: #a9ccff;
+      --c-tinta: #1c283c;
+      --r-control: 12px; --r-tarjeta: 18px; --r-panel: 26px;
+      color-scheme: light;
+    }
+    html.dark {
+      --bg: #070d18;
+      --vidrio: rgb(22 32 52 / 0.62);
+      --vidrio-denso: rgb(24 35 56 / 0.95);
+      --vidrio-luz: rgb(255 255 255 / 0.08);
+      --vidrio-borde: rgb(255 255 255 / 0.08);
+      --muted: rgb(255 255 255 / 0.05);
+      --borde: rgb(255 255 255 / 0.08);
+      --borde-fuerte: rgb(255 255 255 / 0.16);
+      --fg: #eaf1fb;
+      --fg-2: #c3cfe0;
+      --fg-3: #9fb0c8;
+      --primario-hover: #2a82ff;
+      --primario-suave: rgb(30 136 255 / 0.16);
+      --primario-en-suave: #8ec5ff;
+      --enlace: #6db3ff;
+      --tinta: #0f1a2e;
+      --exito: #6ee7a0;
+      --exito-suave: rgb(34 197 94 / 0.14);
+      --aviso: #fcd37a;
+      --aviso-suave: rgb(251 191 36 / 0.14);
+      --peligro: #fca5a5;
+      --peligro-suave: rgb(239 68 68 / 0.16);
+      --pista: rgb(255 255 255 / 0.07);
+      --sombra: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 60px -28px rgb(0 0 0 / 0.7);
+      --c-tinta: #c3cfe0;
+      --luz-1: #0b3a7a; --luz-2: #0a2a5c; --luz-3: #123f86;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 400 15px/1.6 'Plus Jakarta Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-variant-numeric: tabular-nums;
+      transition: background-color .3s, color .3s;
+    }
+    a { color: var(--enlace); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+    :focus-visible { outline: 2px solid var(--primario); outline-offset: 2px; border-radius: 6px; }
+    h1, h2, h3 { font-family: Sora, 'Plus Jakarta Sans', system-ui, sans-serif; letter-spacing: -0.025em; margin: 0; line-height: 1.15; }
+    svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* Luces del fondo: lo que el vidrio deja ver */
+    .luces { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .luces span { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .55; animation: deriva 28s ease-in-out infinite alternate; }
+    .luces span:nth-child(1) { top: -14%; left: -8%; width: 46vw; height: 46vw; background: var(--luz-1); }
+    .luces span:nth-child(2) { top: 30%; right: -12%; width: 40vw; height: 40vw; background: var(--luz-2); animation-delay: -9s; }
+    .luces span:nth-child(3) { bottom: -18%; left: 24%; width: 38vw; height: 38vw; background: var(--luz-3); animation-delay: -17s; }
+    @keyframes deriva { to { transform: translate3d(4vw, 3vh, 0) scale(1.08); } }
+
+    .vidrio {
+      background: var(--vidrio);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid var(--vidrio-borde);
+      box-shadow: var(--sombra);
+    }
+
+    /* Barra superior flotante */
+    .barra {
+      position: sticky; top: 14px; z-index: 20;
+      margin: 14px auto 0; width: min(1180px, calc(100% - 32px));
+      display: flex; align-items: center; gap: 18px;
+      padding: 10px 12px 10px 14px; border-radius: 999px;
+      background: var(--vidrio-denso);
+    }
+    .marca { display: flex; align-items: center; gap: 10px; color: var(--fg); font-weight: 700; line-height: 1.1; }
+    .marca:hover { text-decoration: none; }
+    .marca img { width: 34px; height: 34px; border-radius: 10px; }
+    .marca small { display: block; color: var(--fg-3); font-weight: 500; font-size: 12px; }
+    .marca .oscuro { display: none; }
+    html.dark .marca .claro { display: none; }
+    html.dark .marca .oscuro { display: block; }
+    .barra nav { display: flex; gap: 2px; margin-left: auto; }
+    .barra nav a { padding: 7px 12px; border-radius: 999px; color: var(--fg-2); font-size: 13.5px; font-weight: 600; transition: background .2s, color .2s; }
+    .barra nav a:hover { background: var(--primario-suave); color: var(--primario-en-suave); text-decoration: none; }
+    .barra nav a.activo { background: var(--primario); color: #fff; }
+    .acciones { display: flex; gap: 6px; }
+    .boton {
+      display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px;
+      border-radius: 999px; border: 1px solid var(--borde); background: var(--vidrio);
+      color: var(--fg); font: 600 13.5px/1 inherit; cursor: pointer; white-space: nowrap;
+      transition: background .2s, border-color .2s, transform .2s;
+    }
+    .boton:hover { border-color: var(--borde-fuerte); text-decoration: none; transform: translateY(-1px); }
+    .boton.primario { background: var(--primario); border-color: transparent; color: #fff; }
+    .boton.primario:hover { background: var(--primario-hover); }
+    .boton.icono { width: 38px; padding: 0; justify-content: center; }
+    .sol { display: none; }
+    html.dark .sol { display: block; }
+    html.dark .luna { display: none; }
+
+    main { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 64px; }
+    section { margin-top: 28px; }
+
+    /* Portada */
+    .portada { display: grid; grid-template-columns: 1.05fr 1fr; gap: 24px; align-items: stretch; margin-top: 8px; }
+    .pildora { align-self: flex-start; display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; background: var(--primario-suave); color: var(--primario-en-suave); }
+    .intro { padding: 26px 4px 8px; display: flex; flex-direction: column; }
+    .intro h1 { font-size: clamp(36px, 5vw, 58px); font-weight: 800; letter-spacing: -0.035em; margin: 18px 0 14px; }
+    .intro h1 em { font-style: normal; color: var(--primario); }
+    .intro p.lead { margin: 0; font-size: 17px; color: var(--fg-2); max-width: 46ch; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; color: var(--fg-3); font-size: 13px; }
+    .meta span { display: inline-flex; align-items: center; gap: 6px; }
+    .cifras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: auto; padding-top: 26px; }
+    .cifra { border-radius: var(--r-tarjeta); padding: 14px 14px 12px; }
+    .cifra b { display: block; font: 800 28px/1 Sora, sans-serif; letter-spacing: -0.03em; }
+    .cifra span { display: block; margin-top: 6px; font-size: 12.5px; color: var(--fg-3); line-height: 1.35; }
+    .cifra.ok b { color: var(--exito); }
+
+    /* Tarjeta de la licencia propia */
+    .licencia {
+      position: relative; overflow: hidden; border-radius: var(--r-panel); padding: 28px;
+      background: var(--tinta); color: var(--tinta-fg);
+      box-shadow: 0 30px 70px -30px rgb(10 30 70 / 0.6);
+    }
+    .licencia::before {
+      content: ''; position: absolute; width: 420px; height: 420px; right: -160px; top: -200px; border-radius: 50%;
+      background: #0a6cf0; filter: blur(80px); opacity: .55; pointer-events: none;
+    }
+    .licencia::after {
+      content: ''; position: absolute; width: 300px; height: 300px; left: -120px; bottom: -190px; border-radius: 50%;
+      background: #1e88ff; filter: blur(80px); opacity: .35; pointer-events: none;
+    }
+    .licencia > * { position: relative; }
+    .sello { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; background: rgb(255 255 255 / 0.12); border: 1px solid rgb(255 255 255 / 0.16); font-size: 12.5px; font-weight: 700; }
+    .sello i { width: 7px; height: 7px; border-radius: 50%; background: #ff8a8a; box-shadow: 0 0 0 4px rgb(255 138 138 / 0.18); }
+    .licencia h2 { font-size: 25px; font-weight: 800; margin: 18px 0 4px; }
+    .licencia .derechos { color: var(--tinta-fg-3); font-weight: 600; font-size: 14px; margin: 0 0 14px; }
+    .licencia p { color: var(--tinta-fg-2); margin: 0; font-size: 14.5px; }
+    .leyes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+    .leyes span { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / 0.08); color: var(--tinta-fg-2); border: 1px solid rgb(255 255 255 / 0.1); }
+    .reglas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .regla { display: flex; gap: 11px; padding: 13px; border-radius: 14px; background: rgb(255 255 255 / 0.07); border: 1px solid rgb(255 255 255 / 0.09); }
+    .regla .glifo { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+    .regla .glifo.ok { background: rgb(34 197 94 / 0.18); color: #7ef0ab; }
+    .regla .glifo.no { background: rgb(239 68 68 / 0.2); color: #ffb0b0; }
+    .regla .glifo.candado, .regla .glifo.marca { background: rgb(30 136 255 / 0.22); color: #a8d2ff; }
+    .regla b { display: block; font-size: 13.5px; }
+    .regla span { display: block; font-size: 12.5px; color: var(--tinta-fg-2); line-height: 1.45; margin-top: 2px; }
+
+    /* Encabezados de sección */
+    .cabeza { display: flex; align-items: end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 52px 0 16px; }
+    .cabeza h2 { font-size: 26px; font-weight: 800; }
+    .cabeza p { margin: 6px 0 0; color: var(--fg-3); max-width: 60ch; }
+    .tarjeta { border-radius: var(--r-panel); padding: 22px; }
+
+    /* Distribución por capa */
+    .filas { display: grid; gap: 14px; }
+    .fila { display: grid; grid-template-columns: 190px 1fr 64px; gap: 16px; align-items: center; }
+    .fila .nombre b { display: block; font-size: 14px; }
+    .fila .nombre span { font-size: 12px; color: var(--fg-3); }
+    .apilada { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--pista); gap: 2px; }
+    .apilada i { display: block; height: 100%; min-width: 3px; transform-origin: left; animation: crece .9s cubic-bezier(.22,1,.36,1) both; }
+    .apilada i:first-child { border-radius: 999px 0 0 999px; }
+    .apilada i:last-child { border-radius: 0 999px 999px 0; }
+    @keyframes crece { from { transform: scaleX(0); } }
+    .fila .total { text-align: right; font: 700 15px Sora, sans-serif; }
+    .fila .total small { display: block; font: 500 11px 'Plus Jakarta Sans', sans-serif; color: var(--fg-3); }
+    .leyenda { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--borde); }
+    .leyenda button {
+      display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px 5px 9px; border-radius: 999px;
+      border: 1px solid var(--borde); background: transparent; color: var(--fg-2); font: 600 12.5px/1.2 inherit; cursor: pointer;
+      transition: background .2s, border-color .2s, opacity .2s;
+    }
+    .leyenda button:hover { background: var(--muted); }
+    .leyenda button[aria-pressed="true"] { background: var(--primario-suave); border-color: var(--primario); color: var(--primario-en-suave); }
+    .leyenda button small { color: var(--fg-3); font-weight: 500; }
+    .punto { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+
+    /* Barra de filtros */
+    .herramientas { position: sticky; top: 86px; z-index: 10; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 8px; border-radius: 20px; margin-bottom: 16px; background: var(--vidrio-denso); }
+    .segmentado { display: flex; gap: 2px; padding: 3px; border-radius: 14px; background: var(--muted); overflow-x: auto; scrollbar-width: none; }
+    .segmentado button { border: 0; background: transparent; color: var(--fg-2); font: 600 13px/1 inherit; padding: 9px 12px; border-radius: 11px; cursor: pointer; white-space: nowrap; transition: background .2s, color .2s; }
+    .segmentado button:hover { color: var(--fg); }
+    .segmentado button[aria-pressed="true"] { background: var(--vidrio-denso); color: var(--fg); box-shadow: 0 1px 3px rgb(20 45 85 / 0.14); }
+    html.dark .segmentado button[aria-pressed="true"] { background: rgb(255 255 255 / 0.1); }
+    .segmentado button small { color: var(--fg-3); font-weight: 500; margin-left: 4px; }
+    .buscar { position: relative; flex: 1; min-width: 200px; }
+    .buscar svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--fg-3); }
+    .buscar input {
+      width: 100%; height: 40px; padding: 0 36px 0 36px; border-radius: var(--r-control);
+      border: 1px solid var(--borde); background: var(--vidrio); color: var(--fg); font: 500 14px inherit;
+    }
+    .buscar input::placeholder { color: var(--fg-3); }
+    .buscar input:focus { outline: none; border-color: var(--primario); box-shadow: 0 0 0 4px rgb(10 108 240 / 0.15); }
+    .buscar kbd { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font: 600 11px inherit; color: var(--fg-3); border: 1px solid var(--borde); border-radius: 6px; padding: 2px 6px; }
+    .filtro-licencia { display: none; align-items: center; gap: 6px; padding: 0 6px 0 12px; height: 34px; border-radius: 999px; background: var(--primario-suave); color: var(--primario-en-suave); font-weight: 700; font-size: 12.5px; }
+    .filtro-licencia.visible { display: inline-flex; }
+    .filtro-licencia button { border: 0; background: transparent; color: inherit; cursor: pointer; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; }
+    .filtro-licencia button:hover { background: rgb(10 108 240 / 0.15); }
+
+    /* Tablas */
+    .capas { display: grid; gap: 16px; }
+    .capa { border-radius: var(--r-panel); overflow: hidden; }
+    .capa-cabeza { display: flex; align-items: center; gap: 12px; padding: 18px 22px 14px; }
+    .capa-cabeza .glifo { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: var(--primario-suave); color: var(--primario-en-suave); flex: none; }
+    .capa-cabeza .glifo svg { width: 19px; height: 19px; }
+    .capa-cabeza h3 { font-size: 17px; font-weight: 700; }
+    .capa-cabeza p { margin: 1px 0 0; font-size: 12.5px; color: var(--fg-3); }
+    .capa-cabeza .cuenta { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--fg-3); padding: 4px 10px; border-radius: 999px; background: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th { text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-3); padding: 10px 22px; background: var(--muted); border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde); }
+    tbody td { padding: 13px 22px; border-bottom: 1px solid var(--borde); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr { transition: background .15s; }
+    tbody tr:hover { background: var(--primario-suave); }
+    td.herr { font-weight: 650; }
+    td.herr a { color: var(--fg); display: inline-flex; align-items: center; gap: 6px; }
+    td.herr a svg { width: 13px; height: 13px; color: var(--fg-3); opacity: 0; transition: opacity .2s; }
+    tr:hover td.herr a svg { opacity: 1; }
+    td.herr a:hover { color: var(--enlace); }
+    td.ver { font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 13px; color: var(--fg-2); white-space: nowrap; }
+    td.uso { color: var(--fg-2); }
+    th.lic, td.lic { text-align: right; width: 1%; white-space: nowrap; }
+    .nota { display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--muted); color: var(--fg-3); vertical-align: 1px; }
+    .nota.demo { background: var(--aviso-suave); color: var(--aviso); }
+    .insignia {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 8px; border-radius: 999px;
+      font: 700 12px/1.2 inherit; border: 1px solid color-mix(in srgb, var(--c) 32%, transparent);
+      background: color-mix(in srgb, var(--c) 12%, transparent); color: var(--fg);
+      cursor: pointer; transition: transform .15s, background .15s;
+    }
+    .insignia:hover { transform: translateY(-1px); background: color-mix(in srgb, var(--c) 20%, transparent); text-decoration: none; }
+    .insignia i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+    .vacio { display: none; text-align: center; padding: 48px 20px; border-radius: var(--r-panel); color: var(--fg-3); }
+    .vacio b { display: block; color: var(--fg); font-size: 16px; margin-bottom: 4px; }
+    .vacio.visible { display: block; }
+
+    /* Indirectas */
+    .rejilla-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .indirecta { border-radius: var(--r-tarjeta); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .indirecta .arriba { display: flex; justify-content: space-between; align-items: baseline; }
+    .indirecta h3 { font-size: 14.5px; font-weight: 700; }
+    .indirecta .n { font: 800 26px/1 Sora, sans-serif; letter-spacing: -0.03em; }
+    .indirecta .apilada { height: 8px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .chips span { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--fg-2); padding: 3px 9px 3px 7px; border-radius: 999px; background: var(--muted); }
+    .chips b { color: var(--fg); }
+    .indirecta small { color: var(--fg-3); font-size: 12px; margin-top: auto; }
+
+    /* Servicios */
+    .servicios td.herr { width: 32%; }
+
+    /* Glosario */
+    .rejilla-glosario { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+    .termino { border-radius: var(--r-tarjeta); padding: 18px; display: flex; flex-direction: column; gap: 10px; transition: transform .25s, box-shadow .25s; scroll-margin-top: 110px; }
+    .termino:hover { transform: translateY(-3px); }
+    .termino.destacado { animation: destello 1.6s ease-out; }
+    @keyframes destello { 0%, 30% { box-shadow: 0 0 0 3px var(--primario), var(--sombra); } 100% { box-shadow: var(--sombra); } }
+    .termino .arriba { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .termino h3 { font-size: 15.5px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .termino .tipo { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+    .tipo.permisiva { background: var(--exito-suave); color: var(--exito); }
+    .tipo.copyleft { background: var(--aviso-suave); color: var(--aviso); }
+    .tipo.fuentes, .tipo.propio { background: var(--primario-suave); color: var(--primario-en-suave); }
+    .tipo.pendiente { background: var(--peligro-suave); color: var(--peligro); }
+    .termino p { margin: 0; font-size: 13.5px; color: var(--fg-2); }
+    .termino ul { list-style: none; margin: auto 0 0; padding: 10px 0 0; border-top: 1px dashed var(--borde-fuerte); display: grid; gap: 4px; }
+    .termino li { display: flex; gap: 7px; font-size: 12.5px; color: var(--fg-3); }
+    .termino li::before { content: '→'; color: var(--primario); font-weight: 700; }
+    .termino .usos { font-size: 12px; color: var(--fg-3); }
+    .termino .usos b { color: var(--fg); }
+
+    /* Cumplimiento */
+    .cumple { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; list-style: none; margin: 0; padding: 0; }
+    .cumple li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--fg-2); padding: 10px 0; }
+    .cumple .glifo { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; flex: none; }
+    .cumple .si { background: var(--exito-suave); color: var(--exito); }
+    .cumple .pend { background: var(--aviso-suave); color: var(--aviso); }
+
+    footer { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 40px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--fg-3); font-size: 12.5px; border-top: 1px solid var(--borde); }
+
+    /* Entrada al hacer scroll */
+    .revela { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+    .revela.visto { opacity: 1; transform: none; }
+
+    @media (max-width: 1020px) {
+      .portada { grid-template-columns: 1fr; }
+      .rejilla-4 { grid-template-columns: 1fr 1fr; }
+      .barra nav { display: none; }
+      .acciones { margin-left: auto; }
+    }
+    @media (max-width: 720px) {
+      main { padding-top: 20px; }
+      .barra { border-radius: 22px; }
+      .boton .texto { display: none; }
+      .boton:not(.icono) { width: 38px; padding: 0; justify-content: center; }
+      .cifras { grid-template-columns: 1fr 1fr; }
+      .reglas, .cumple, .rejilla-4 { grid-template-columns: 1fr; }
+      .licencia, .tarjeta { padding: 20px; }
+      .fila { grid-template-columns: 1fr 56px; gap: 6px 12px; }
+      .fila .nombre { grid-column: 1 / -1; }
+      .herramientas { top: 78px; }
+      .buscar kbd { display: none; }
+      thead { display: none; }
+      tbody tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 18px; border-bottom: 1px solid var(--borde); }
+      tbody td { padding: 0; border: 0; }
+      td.herr { grid-column: 1; }
+      td.lic { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+      td.ver { grid-column: 1; font-size: 12px; }
+      td.uso { grid-column: 1 / -1; font-size: 13px; }
+      .servicios td.herr { width: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .revela { opacity: 1; transform: none; }
+      html { scroll-behavior: auto; }
+    }
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      :root, html.dark { --bg: #fff; --vidrio: #fff; --vidrio-denso: #fff; --muted: #f1f5fa; --fg: #0f1b2d; --fg-2: #3c4a60; --fg-3: #536179; --borde: #dde4ee; --tinta: #1c283c; }
+      body { font-size: 12px; }
+      .luces, .barra, .herramientas, .leyenda button[aria-pressed] small { display: none !important; }
+      .vidrio { box-shadow: none; backdrop-filter: none; border: 1px solid #dde4ee; }
+      .revela { opacity: 1; transform: none; }
+      main { padding-top: 0; }
+      .portada { grid-template-columns: 1fr; }
+      .capa, .tarjeta, .indirecta, .termino { break-inside: avoid; }
+      .licencia { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .apilada i, .punto, .insignia { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="luces" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header class="barra vidrio">
+    <a class="marca" href="#resumen">
+      <img class="claro" src="../public/marca/rvr-icono-light-128.png" alt="" />
+      <img class="oscuro" src="../public/marca/rvr-icono-dark-128.png" alt="" />
+      <span>Portal RvR<small>Licencias</small></span>
+    </a>
+    <nav aria-label="Secciones">
+      <a href="#resumen">Resumen</a>
+      <a href="#distribucion">Distribución</a>
+      <a href="#inventario">Inventario</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#glosario">Glosario</a>
+    </nav>
+    <div class="acciones">
+      <a class="boton" href="mapa.html" title="Mapa conceptual">
+        <svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="3" r="1.6"/><circle cx="3" cy="13" r="1.6"/><circle cx="13" cy="13" r="1.6"/><path d="M8 4.6v3.4M8 8H3v3.4M8 8h5v3.4"/></svg>
+        <span class="texto">Mapa conceptual</span>
+      </a>
+      <button class="boton" type="button" id="imprimir" title="Imprimir o guardar en PDF">
+        <svg class="i" viewBox="0 0 16 16"><path d="M4 6V1.75h8V6M4 12H2.5A1 1 0 0 1 1.5 11V7a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H12"/><path d="M4 9.5h8v5H4z"/></svg>
+        <span class="texto">PDF</span>
+      </button>
+      <button class="boton icono" type="button" id="tema" aria-label="Cambiar tema">
+        <svg class="i luna" viewBox="0 0 16 16"><path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1Z"/></svg>
+        <svg class="i sol" viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3 3l1 1M12 12l1 1M3 13l1-1M12 4l1-1"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Portada: qué es y la licencia propia -->
+    <section class="portada" id="resumen">
+      <div class="intro revela">
+        <span class="pildora">
+          <svg class="i" viewBox="0 0 16 16"><path d="M8 1.5 2.5 3.8v3.6c0 3.3 2.3 6 5.5 7.1 3.2-1.1 5.5-3.8 5.5-7.1V3.8L8 1.5Z"/><path d="m5.7 8 1.6 1.6 3-3.2"/></svg>
+          Propiedad intelectual
+        </span>
+        <h1>Licencias del <em>sistema</em></h1>
+        <p class="lead">Qué licencia tiene el Portal RvR y cada herramienta de terceros que lo hace funcionar, explicado en palabras simples.</p>
+        <div class="meta">
+          <span><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg><span id="corte"></span></span>
+          <span><svg class="i" viewBox="0 0 16 16"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13M6.5 8.5h4M6.5 11h4"/></svg>package-lock.json · pubspec.lock</span>
+        </div>
+        <div class="cifras" id="cifras"></div>
+      </div>
+
+      <article class="licencia revela" aria-labelledby="titulo-licencia">
+        <span class="sello"><i></i><span id="tipo-licencia"></span></span>
+        <h2 id="titulo-licencia"></h2>
+        <p class="derechos">Todos los derechos reservados.</p>
+        <p id="texto-licencia"></p>
+        <div class="leyes" id="leyes"></div>
+        <div class="reglas" id="reglas"></div>
+      </article>
+    </section>
+
+    <!-- Cuántas licencias de cada tipo hay por capa -->
+    <section id="distribucion">
+      <div class="cabeza revela">
+        <div>
+          <h2>Licencias por capa</h2>
+          <p>Paquetes directos e indirectos de cada parte del sistema. Toca una licencia para filtrar el inventario.</p>
+        </div>
+      </div>
+      <div class="tarjeta vidrio revela">
+        <div class="filas" id="filas"></div>
+        <div class="leyenda" id="leyenda"></div>
+      </div>
+    </section>
+
+    <!-- Inventario detallado -->
+    <section id="inventario">
+      <div class="cabeza revela">
+        <div>
+          <h2>Inventario de herramientas</h2>
+          <p>Cada herramienta directa con su versión, para qué se usa y su licencia. Las marcadas como «desarrollo» no se entregan al usuario.</p>
+        </div>
+      </div>
+      <div class="herramientas vidrio revela">
+        <div class="segmentado" id="segmentado" role="group" aria-label="Filtrar por capa"></div>
+        <div class="buscar">
+          <svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.75"/><path d="m10.5 10.5 3.5 3.5"/></svg>
+          <input id="buscar" type="search" placeholder="Buscar herramienta, uso o licencia" autocomplete="off" aria-label="Buscar" />
+          <kbd>/</kbd>
+        </div>
+        <span class="filtro-licencia" id="filtro-licencia">
+          <span></span>
+          <button type="button" aria-label="Quitar filtro de licencia"><svg class="i" viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8"/></svg></button>
+        </span>
+      </div>
+      <div class="capas" id="capas"></div>
+      <div class="vacio vidrio" id="vacio"><b>Sin resultados</b>Prueba con otra palabra o quita el filtro de licencia.</div>
+    </section>
+
+    <!-- Indirectas -->
+    <section id="indirectas">
+      <div class="cabeza revela">
+        <div>
+          <h2>Dependencias indirectas</h2>
+          <p>Paquetes que instalan las herramientas de arriba por su cuenta. No se cuentan los binarios hechos para cada sistema operativo.</p>
+        </div>
+      </div>
+      <div class="rejilla-4" id="rejilla-indirectas"></div>
+    </section>
+
+    <!-- Servicios externos -->
+    <section id="servicios">
+      <div class="cabeza revela">
+        <div>
+          <h2>Servicios externos</h2>
+          <p>No son licencias de software: cada servicio se rige por sus propios términos de uso.</p>
+        </div>
+      </div>
+      <div class="capa vidrio servicios revela">
+        <table>
+          <thead><tr><th>Servicio</th><th>Uso</th><th class="lic">Términos</th></tr></thead>
+          <tbody id="tabla-servicios"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Glosario -->
+    <section id="glosario">
+      <div class="cabeza revela">
+        <div>
+          <h2>Qué permite cada licencia</h2>
+          <p>Resumen de cada licencia del inventario. No reemplaza el texto legal: cada nombre enlaza a la fuente oficial.</p>
+        </div>
+      </div>
+      <div class="rejilla-glosario" id="rejilla-glosario"></div>
+    </section>
+
+    <!-- Cumplimiento -->
+    <section id="cumplimiento">
+      <div class="cabeza revela">
+        <div>
+          <h2>Cómo cumple el proyecto</h2>
+          <p>Lo que piden las licencias de terceros y en qué va el proyecto.</p>
+        </div>
+      </div>
+      <div class="tarjeta vidrio revela">
+        <ul class="cumple" id="cumple"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span id="pie"></span>
+    <span>Texto completo de la licencia en <a href="LICENCIA.md">LICENCIA.md</a></span>
+  </footer>
+
+  <script src="datos.js"></script>
+  <script>
+    (function () {
+      var D = window.LICENCIAS
+      var P = D.proyecto
+      var $ = function (id) { return document.getElementById(id) }
+      var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) }
+
+      var oficiales = {
+        'MIT': 'https://opensource.org/license/mit', 'MIT-0': 'https://opensource.org/license/mit-0',
+        'ISC': 'https://opensource.org/license/isc-license-txt', 'BSD-2-Clause': 'https://opensource.org/license/bsd-2-clause',
+        'BSD-3-Clause': 'https://opensource.org/license/bsd-3-clause', 'Apache-2.0': 'https://www.apache.org/licenses/LICENSE-2.0',
+        'PostgreSQL': 'https://www.postgresql.org/about/licence/', 'MPL-2.0': 'https://www.mozilla.org/MPL/2.0/', 'CC-BY-4.0': 'https://creativecommons.org/licenses/by/4.0/deed.es',
+        'OFL-1.1': 'https://openfontlicense.org',
+      }
+      var iconos = {
+        ok: '<path d="m3.5 8.5 3 3 6-7"/>',
+        no: '<path d="m4 4 8 8M12 4l-8 8"/>',
+        candado: '<rect x="3" y="7" width="10" height="7" rx="1.8"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/>',
+        marca: '<path d="M8 1.5 9.9 5.6l4.4.5-3.3 3 .9 4.4L8 11.3l-3.9 2.2.9-4.4-3.3-3 4.4-.5L8 1.5Z"/>',
+        navegador: '<rect x="1.5" y="2.5" width="13" height="11" rx="2"/><path d="M1.5 5.5h13M4 4h.01M6 4h.01"/>',
+        llave: '<path d="M10.5 1.8a3.7 3.7 0 0 0-3.4 5.1L1.8 12.2v2h2v-1.5h1.5v-1.5h1.5l1.4-1.4a3.7 3.7 0 1 0 2.3-8Z"/><circle cx="11" cy="5" r=".8"/>',
+        servidor: '<rect x="2" y="2" width="12" height="5" rx="1.5"/><rect x="2" y="9" width="12" height="5" rx="1.5"/><path d="M5 4.5h.01M5 11.5h.01"/>',
+        celular: '<rect x="4" y="1.5" width="8" height="13" rx="2"/><path d="M7 12h2"/>',
+        pincel: '<path d="M13.8 2.2a1.5 1.5 0 0 0-2.1 0L6.5 7.4l2.1 2.1 5.2-5.2a1.5 1.5 0 0 0 0-2.1Z"/><path d="M6.5 9.5c-1.7-.4-3.6.6-3.6 2.6 0 1 -.6 1.6-1.4 2 3.2.6 5.6-.6 5.6-3"/>',
+        afuera: '<path d="M6.5 3H3v10h10V9.5M9 2h5v5M14 2 7.5 8.5"/>',
+        reloj: '<circle cx="8" cy="8" r="6"/><path d="M8 5v3.2l2 1.3"/>',
+      }
+      var svg = function (n) { return '<svg class="i" viewBox="0 0 16 16">' + iconos[n] + '</svg>' }
+      var color = function (lic) {
+        var c = (D.familias[lic] || D.familias['Propio']).color
+        return c === '#1c283c' ? 'var(--c-tinta)' : c // la tinta se aclara en modo oscuro
+      }
+      var insignia = function (lic) {
+        return '<a class="insignia" href="#lic-' + encodeURIComponent(lic) + '" data-lic="' + esc(lic) + '" style="--c:' + color(lic) + '"><i></i>' + esc(lic) + '</a>'
+      }
+      var suma = function (o) { return Object.keys(o).reduce(function (s, k) { return s + o[k] }, 0) }
+
+      /* Cabecera y licencia propia */
+      $('corte').textContent = 'Corte: ' + P.corte
+      $('tipo-licencia').textContent = P.licencia
+      $('titulo-licencia').textContent = '© ' + P.año + ' ' + P.titular
+      $('texto-licencia').textContent = 'Licencia de uso no exclusiva e intransferible otorgada a ' + P.cliente + (/\.$/.test(P.cliente) ? '' : '.') + ' Obra protegida por el derecho de autor en Colombia.'
+      $('leyes').innerHTML = P.leyes.map(function (l) { return '<span>' + esc(l) + '</span>' }).join('')
+      $('reglas').innerHTML = P.reglas.map(function (r) {
+        return '<div class="regla"><span class="glifo ' + r.icono + '">' + svg(r.icono) + '</span><div><b>' + esc(r.titulo) + '</b><span>' + esc(r.texto) + '</span></div></div>'
+      }).join('')
+      $('pie').textContent = '© ' + P.año + ' ' + P.titular + ' · ' + P.nombre + ' · ' + P.contexto
+
+      /* Conteos por capa: directas + indirectas, agrupadas por licencia */
+      var mapaIndirectas = { 'web': 'Portal web', 'web-dev': 'Web · desarrollo', 'api': 'API', 'movil': 'App móvil' }
+      var porCapa = D.capas.map(function (c) {
+        var cuenta = {}
+        c.items.forEach(function (it) { cuenta[it.licencia] = (cuenta[it.licencia] || 0) + 1 })
+        var ind = D.indirectas.filter(function (x) { return x.capa === mapaIndirectas[c.id] })[0]
+        if (ind) Object.keys(ind.total).forEach(function (k) { cuenta[k] = (cuenta[k] || 0) + ind.total[k] })
+        return { capa: c, cuenta: cuenta, directas: c.items.length, indirectas: ind ? suma(ind.total) : 0 }
+      })
+      var global = {}
+      porCapa.forEach(function (p) { Object.keys(p.cuenta).forEach(function (k) { global[k] = (global[k] || 0) + p.cuenta[k] }) })
+      var orden = Object.keys(global).sort(function (a, b) { return global[b] - global[a] })
+
+      var directas = D.capas.reduce(function (s, c) { return s + c.items.length }, 0)
+      var indirectas = D.indirectas.reduce(function (s, x) { return s + suma(x.total) }, 0)
+      var total = suma(global)
+      var permisivas = orden.filter(function (k) { return (D.familias[k] || {}).grupo === 'permisiva' }).reduce(function (s, k) { return s + global[k] }, 0)
+      var pct = Math.round((permisivas / total) * 100)
+      $('cifras').innerHTML = [
+        ['', directas, 'herramientas directas'],
+        ['', indirectas, 'paquetes indirectos'],
+        ['', pct + ' %', 'con licencia permisiva'],
+        ['ok', 0, 'GPL o AGPL: el código propio queda cerrado'],
+      ].map(function (c) { return '<div class="cifra vidrio ' + c[0] + '"><b>' + c[1] + '</b><span>' + c[2] + '</span></div>' }).join('')
+
+      $('filas').innerHTML = porCapa.map(function (p) {
+        var t = suma(p.cuenta)
+        var segs = orden.filter(function (k) { return p.cuenta[k] }).map(function (k, i) {
+          return '<i style="width:' + (p.cuenta[k] / t * 100) + '%;background:' + color(k) + ';animation-delay:' + (i * 60) + 'ms" title="' + esc(k) + ': ' + p.cuenta[k] + '"></i>'
+        }).join('')
+        return '<div class="fila"><div class="nombre"><b>' + esc(p.capa.titulo) + '</b><span>' + p.directas + ' directas · ' + p.indirectas + ' indirectas</span></div>' +
+          '<div class="apilada" role="img" aria-label="' + esc(p.capa.titulo + ': ' + orden.filter(function (k) { return p.cuenta[k] }).map(function (k) { return k + ' ' + p.cuenta[k] }).join(', ')) + '">' + segs + '</div>' +
+          '<div class="total">' + t + '<small>paquetes</small></div></div>'
+      }).join('')
+      $('leyenda').innerHTML = orden.map(function (k) {
+        return '<button type="button" data-lic="' + esc(k) + '" aria-pressed="false"><span class="punto" style="background:' + color(k) + '"></span>' + esc(k) + ' <small>' + global[k] + '</small></button>'
+      }).join('')
+
+      /* Inventario */
+      $('segmentado').innerHTML = '<button type="button" data-capa="todas" aria-pressed="true">Todas<small>' + directas + '</small></button>' +
+        D.capas.map(function (c) { return '<button type="button" data-capa="' + c.id + '" aria-pressed="false">' + esc(c.titulo) + '<small>' + c.items.length + '</small></button>' }).join('')
+
+      $('capas').innerHTML = D.capas.map(function (c) {
+        var filas = c.items.map(function (it) {
+          var nombre = it.url ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.nombre) + svg('afuera') + '</a>' : esc(it.nombre)
+          var nota = it.nota ? '<span class="nota' + (it.nota === 'solo demo' ? ' demo' : '') + '">' + esc(it.nota) + '</span>' : ''
+          var texto = [it.nombre, it.uso, it.licencia, it.nota || '', c.titulo].join(' ').toLowerCase()
+          return '<tr data-lic="' + esc(it.licencia) + '" data-texto="' + esc(texto) + '"><td class="herr">' + nombre + nota + '</td><td class="ver">' + esc(it.version) + '</td><td class="uso">' + esc(it.uso) + '</td><td class="lic">' + insignia(it.licencia) + '</td></tr>'
+        }).join('')
+        return '<article class="capa vidrio revela" data-capa="' + c.id + '"><div class="capa-cabeza"><span class="glifo">' + svg(c.icono) + '</span><div><h3>' + esc(c.titulo) + '</h3><p>' + esc(c.sub) + '</p></div><span class="cuenta">' + c.items.length + '</span></div>' +
+          '<table><thead><tr><th>Herramienta</th><th>Versión</th><th>Uso</th><th class="lic">Licencia</th></tr></thead><tbody>' + filas + '</tbody></table></article>'
+      }).join('')
+
+      var estado = { capa: 'todas', lic: null, q: '' }
+      var quitarAcentos = function (t) { return t.normalize('NFD').replace(/[̀-ͯ]/g, '') }
+      function filtrar() {
+        var q = quitarAcentos(estado.q.trim().toLowerCase())
+        var visibles = 0
+        document.querySelectorAll('.capa[data-capa]').forEach(function (art) {
+          var enCapa = estado.capa === 'todas' || art.dataset.capa === estado.capa
+          var n = 0
+          art.querySelectorAll('tbody tr').forEach(function (tr) {
+            var ok = enCapa && (!estado.lic || tr.dataset.lic === estado.lic) && (!q || quitarAcentos(tr.dataset.texto).indexOf(q) !== -1)
+            tr.hidden = !ok
+            if (ok) n++
+          })
+          art.hidden = n === 0
+          art.querySelector('.cuenta').textContent = n
+          visibles += n
+        })
+        $('vacio').classList.toggle('visible', visibles === 0)
+        document.querySelectorAll('#segmentado button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.capa === estado.capa)) })
+        document.querySelectorAll('#leyenda button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lic === estado.lic)) })
+        var chip = $('filtro-licencia')
+        chip.classList.toggle('visible', !!estado.lic)
+        chip.querySelector('span').textContent = estado.lic ? 'Licencia: ' + estado.lic : ''
+      }
+      $('segmentado').addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return
+        estado.capa = b.dataset.capa; filtrar()
+      })
+      $('leyenda').addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return
+        estado.lic = estado.lic === b.dataset.lic ? null : b.dataset.lic
+        filtrar()
+        if (estado.lic) document.getElementById('inventario').scrollIntoView()
+      })
+      $('filtro-licencia').querySelector('button').addEventListener('click', function () { estado.lic = null; filtrar() })
+      $('buscar').addEventListener('input', function (e) { estado.q = e.target.value; filtrar() })
+      document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); $('buscar').focus() }
+        if (e.key === 'Escape' && document.activeElement === $('buscar')) { $('buscar').value = ''; estado.q = ''; filtrar() }
+      })
+
+      /* Indirectas */
+      $('rejilla-indirectas').innerHTML = D.indirectas.map(function (x) {
+        var t = suma(x.total)
+        var claves = Object.keys(x.total).sort(function (a, b) { return x.total[b] - x.total[a] })
+        return '<article class="indirecta vidrio revela"><div class="arriba"><h3>' + esc(x.capa) + '</h3><span class="n">' + t + '</span></div>' +
+          '<div class="apilada">' + claves.map(function (k) { return '<i style="width:' + (x.total[k] / t * 100) + '%;background:' + color(k) + '"></i>' }).join('') + '</div>' +
+          '<div class="chips">' + claves.map(function (k) { return '<span><span class="punto" style="background:' + color(k) + '"></span>' + esc(k) + ' <b>' + x.total[k] + '</b></span>' }).join('') + '</div>' +
+          '<small>' + esc(x.nota) + '</small></article>'
+      }).join('')
+
+      /* Servicios */
+      $('tabla-servicios').innerHTML = D.servicios.map(function (s) {
+        var terminos = s.url ? '<a class="insignia" style="--c:#0a6cf0" href="' + esc(s.url) + '" target="_blank" rel="noopener"><i></i>Ver términos</a>' : '<span class="nota">' + esc(s.nota) + '</span>'
+        return '<tr><td class="herr">' + esc(s.nombre) + '</td><td class="uso">' + esc(s.uso) + '</td><td class="lic">' + terminos + '</td></tr>'
+      }).join('')
+
+      /* Glosario: solo las licencias que aparecen en el inventario */
+      var tipoClase = { 'Permisiva': 'permisiva', 'Copyleft débil': 'copyleft', 'Fuentes': 'fuentes', 'Propio': 'propio', 'Pendiente': 'pendiente' }
+      $('rejilla-glosario').innerHTML = D.glosario.filter(function (g) { return global[g.clave] }).map(function (g) {
+        var titulo = oficiales[g.clave] ? '<a href="' + oficiales[g.clave] + '" target="_blank" rel="noopener" style="color:inherit">' + esc(g.nombre) + '</a>' : esc(g.nombre)
+        return '<article class="termino vidrio revela" id="lic-' + encodeURIComponent(g.clave) + '"><div class="arriba"><h3><span class="punto" style="background:' + color(g.clave) + '"></span>' + titulo + '</h3><span class="tipo ' + tipoClase[g.tipo] + '">' + esc(g.tipo) + '</span></div>' +
+          '<p>' + esc(g.resumen) + '</p><span class="usos"><b>' + global[g.clave] + '</b> paquete' + (global[g.clave] === 1 ? '' : 's') + ' en el sistema</span>' +
+          '<ul>' + g.pide.map(function (p) { return '<li>' + esc(p) + '</li>' }).join('') + '</ul></article>'
+      }).join('')
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest('a.insignia[data-lic]'); if (!a) return
+        var destino = document.getElementById('lic-' + encodeURIComponent(a.dataset.lic)); if (!destino) return
+        e.preventDefault()
+        destino.scrollIntoView({ block: 'center' })
+        destino.classList.remove('destacado'); void destino.offsetWidth; destino.classList.add('destacado')
+      })
+
+      /* Cumplimiento */
+      $('cumple').innerHTML = D.cumplimiento.map(function (c) {
+        return '<li><span class="glifo ' + (c.hecho ? 'si' : 'pend') + '">' + svg(c.hecho ? 'ok' : 'reloj') + '</span><span>' + esc(c.texto) + '</span></li>'
+      }).join('')
+
+      /* Tema, impresión, menú activo y entradas */
+      $('tema').addEventListener('click', function () {
+        var oscuro = document.documentElement.classList.toggle('dark')
+        try { localStorage.setItem('rvr-licencias-tema', oscuro ? 'dark' : 'light') } catch (e) {}
+      })
+      $('imprimir').addEventListener('click', function () { window.print() })
+
+      var enlaces = document.querySelectorAll('.barra nav a')
+      var secciones = Array.prototype.map.call(enlaces, function (a) { return document.querySelector(a.getAttribute('href')) })
+      if ('IntersectionObserver' in window) {
+        var menu = new IntersectionObserver(function (entradas) {
+          entradas.forEach(function (en) {
+            if (!en.isIntersecting) return
+            enlaces.forEach(function (a) { a.classList.toggle('activo', a.getAttribute('href') === '#' + en.target.id) })
+          })
+        }, { rootMargin: '-40% 0px -55% 0px' })
+        secciones.forEach(function (s) { menu.observe(s) })
+
+        var revela = new IntersectionObserver(function (entradas) {
+          entradas.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('visto'); revela.unobserve(en.target) } })
+        }, { rootMargin: '0px 0px -8% 0px' })
+        document.querySelectorAll('.revela').forEach(function (el) { revela.observe(el) })
+      } else {
+        document.querySelectorAll('.revela').forEach(function (el) { el.classList.add('visto') })
+      }
+      window.addEventListener('beforeprint', function () { document.querySelectorAll('.revela').forEach(function (el) { el.classList.add('visto') }) })
+    })()
+  </script>
+</body>
+</html>

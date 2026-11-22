@@ -37,3 +37,7 @@ dist-ssr
 # Copias locales que no van al repositorio
 _respaldos/
 _to_delete/
+
+# Claude Code: worktrees y ajustes locales
+.claude/worktrees/
+.claude/settings.local.json
