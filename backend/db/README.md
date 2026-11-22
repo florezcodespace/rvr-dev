@@ -12,7 +12,7 @@ criterios de aceptación. En total, **20 tablas y 2 vistas**.
 | `99-datos-demo.sql` | **Opcional.** Clientes, técnicos, franjas, ~65 cotizaciones y ~45 órdenes con su venta, abonos, visitas y reporte técnico | Solo en la base de pruebas o de sustentación |
 | `03-kpis.sql` | Las consultas de Reportes, Indicadores y Estadísticas para comprobarlas a mano. Solo `SELECT` | Cuando quieras consultar |
 | `montar.ps1` | Lo usa `montar-base.bat` (raíz del proyecto): crea la base, la carga y escribe los `.env` | Para montar o reiniciar |
-| `anterior-15-tablas/`, `anterior-11-tablas/` | Los modelos anteriores, tal como estaban | Solo de consulta |
+| `migraciones/` | Cambios incrementales del esquema | Para actualizar bases existentes tras comprobar su versión |
 
 > ⚠️ `01-esquema.sql` borra las tablas antes de crearlas. Sirve para montar la
 > base desde cero, **nunca** sobre una base con datos reales.

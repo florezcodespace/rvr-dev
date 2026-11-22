@@ -35,6 +35,9 @@ dist-ssr
 *.dump
 
 # Copias locales que no van al repositorio
+/_entrega/
+/Claude outputs/
+/subir-a-github.bat
 _respaldos/
 _to_delete/
 
