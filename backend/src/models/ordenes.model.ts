@@ -328,9 +328,9 @@ export async function listar(p: z.infer<typeof filtroOrdenes>) {
 /** Cotizaciones aprobadas que aún no generan orden (CA_44_01 / CA_44_04). */
 export async function cotizacionesAprobadas() {
   const filas = await consultar<{ id: number; cliente: string; monto_total: number; fecha_respuesta: Date | null; items: number }>(
-    `SELECT q.id, trim(c.nombres || ' ' || c.apellidos) AS cliente, q.monto_total, q.fecha_respuesta,
+    `SELECT q.id, q.titular_nombre AS cliente, q.monto_total, q.fecha_respuesta,
             (SELECT count(*) FROM detalle_cotizacion dc WHERE dc.cotizacion_id = q.id)::int AS items
-       FROM cotizacion q JOIN cliente c ON c.id = q.cliente_id
+       FROM cotizacion q
       WHERE q.estado = 'aprobada' AND q.orden_id IS NULL
         AND NOT EXISTS (SELECT 1 FROM detalle_cotizacion dc JOIN detalle_orden d ON d.detalle_cotizacion_id = dc.id
                          WHERE dc.cotizacion_id = q.id)

@@ -8,6 +8,9 @@ import type { GarantiaDetalle } from '@shared/domain/garantias'
 export type { ServicioCatalogo } from '@shared/lib/catalogo'
 
 export interface Perfil {
+  modalidad: 'personal' | 'empresarial'
+  razonSocial: string
+  nitEmpresa: string
   id: number
   tipoDocumento: string
   documento: string
@@ -41,6 +44,7 @@ export interface MiCotizacion {
 }
 
 export interface MiCotizacionDetalle {
+  cliente: { nombre: string; tipoDocumento: string; documento: string }
   id: number
   numero: string
   fecha: string
@@ -97,7 +101,7 @@ export const portalService = {
   catalogo: cargarCatalogo,
   resumen: () => api.get<Resumen>('/portal/resumen'),
   perfil: () => api.get<Perfil>('/portal/perfil'),
-  actualizarPerfil: (d: { nombres: string; apellidos: string; telefono: string; direccion: string; correo: string }) =>
+  actualizarPerfil: (d: { modalidad?: Perfil['modalidad']; razonSocial?: string; nitEmpresa?: string; nombres: string; apellidos: string; telefono: string; direccion: string; correo: string }) =>
     api.put<{ perfil: Perfil; cuenta: Cuenta }>('/portal/perfil', d),
   solicitar: (d: { items: { servicioId: number; cantidad: number }[]; descripcion: string; direccion: string }) =>
     api.post<{ id: number; numero: string; mensaje: string }>('/portal/solicitudes', d),

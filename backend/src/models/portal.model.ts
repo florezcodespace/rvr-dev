@@ -1,3 +1,4 @@
+import { camposEmpresa, guardarEmpresa, validarEmpresa } from '../utils/empresa.js'
 import { z } from 'zod'
 import { consultar, enTransaccion, unaFila } from '../db.js'
 import { notificarConPermiso } from '../utils/avisos.js'
@@ -24,6 +25,7 @@ export const idPortal = z.coerce.number().int().positive()
 /** HU_76 · Consultar mis datos de perfil */
 export async function perfil(clienteId: number) {
   const c = await unaFila<{
+    razon_social: string | null; nit_empresa: string | null
     id: number; tipo_documento: string; documento_identidad: string; nombres: string; apellidos: string; telefono: string | null
     direccion: string | null; correo: string | null; fecha_registro: Date; estado: string
   }>(`SELECT * FROM cliente WHERE id = $1`, [clienteId])
@@ -31,6 +33,9 @@ export async function perfil(clienteId: number) {
   // CA_76_02 · la contraseña nunca se muestra
   return {
     id: c.id,
+    modalidad: c.razon_social ? 'empresarial' : 'personal',
+    razonSocial: c.razon_social ?? '',
+    nitEmpresa: c.nit_empresa ?? '',
     tipoDocumento: c.tipo_documento,
     documento: c.documento_identidad,
     nombres: c.nombres,
@@ -44,12 +49,13 @@ export async function perfil(clienteId: number) {
 }
 
 export const datosPerfil = z.object({
+  ...camposEmpresa,
   nombres: textoRequerido(100, 'Los nombres'),
   apellidos: textoRequerido(100, 'Los apellidos'),
   telefono: telefono.refine((v) => v !== null, 'El teléfono es obligatorio'),
   direccion: textoRequerido(150, 'La dirección'),
   correo: correoRequerido,
-})
+}).superRefine(validarEmpresa)
 
 /**
  * HU_77 · Actualizar mis datos. CA_77_02: el documento no se edita.
@@ -61,6 +67,7 @@ export async function actualizarPerfil(clienteId: number, usuarioId: number, d: 
     throw new ErrorHttp(409, 'CORREO_EN_USO', 'Ese correo ya está en uso por otra cuenta.')
   }
   await enTransaccion(async (tx) => {
+    await guardarEmpresa(tx, clienteId, d)
     // CA_77_05 · se actualiza el registro del cliente (y su cuenta de acceso)
     await consultar(
       `UPDATE cliente SET nombres = $2, apellidos = $3, telefono = $4, direccion = $5, correo = $6 WHERE id = $1`,

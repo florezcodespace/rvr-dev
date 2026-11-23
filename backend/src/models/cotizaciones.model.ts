@@ -20,6 +20,7 @@ interface FilaCot {
   id: number
   cliente_id: number
   cliente: string
+  tipo_documento: string
   documento: string
   telefono: string | null
   correo: string | null
@@ -43,7 +44,7 @@ interface FilaCot {
 }
 
 const SELECT_COT = `
-  SELECT q.id, q.cliente_id, trim(c.nombres || ' ' || c.apellidos) AS cliente, c.documento_identidad AS documento,
+  SELECT q.id, q.cliente_id, q.titular_nombre AS cliente, q.titular_documento AS documento, q.titular_tipo_documento AS tipo_documento,
          c.telefono, c.correo, c.direccion AS cliente_direccion, c.usuario_id AS cliente_usuario,
          q.fecha_cotizacion, q.monto_total, q.estado, q.fecha_envio, q.fecha_respuesta, q.motivo_rechazo,
          q.origen, q.descripcion, q.direccion, q.orden_id, oo.codigo_orden AS orden_origen_codigo,
@@ -64,7 +65,7 @@ const SELECT_COT = `
 const aResumen = (f: FilaCot) => ({
   id: f.id,
   numero: numeroCotizacion(f.id),
-  cliente: { id: f.cliente_id, nombre: f.cliente, documento: f.documento },
+  cliente: { id: f.cliente_id, nombre: f.cliente, tipoDocumento: f.tipo_documento, documento: f.documento },
   fecha: iso(f.fecha_cotizacion),
   montoTotal: f.monto_total,
   estado: f.estado,
@@ -95,7 +96,7 @@ export async function detalleCotizacion(id: number, conexion: Conexion = pool) {
   return {
     ...aResumen(f),
     cliente: {
-      id: f.cliente_id, nombre: f.cliente, documento: f.documento, telefono: f.telefono ?? '',
+      id: f.cliente_id, nombre: f.cliente, tipoDocumento: f.tipo_documento, documento: f.documento, telefono: f.telefono ?? '',
       correo: f.correo ?? '', direccion: f.cliente_direccion ?? '', tieneCuenta: f.cliente_usuario !== null,
     },
     descripcion: f.descripcion ?? '',

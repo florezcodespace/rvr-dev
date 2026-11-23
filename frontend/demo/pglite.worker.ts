@@ -7,6 +7,7 @@ import { PGlite } from '@electric-sql/pglite'
 import { worker } from '@electric-sql/pglite/worker'
 import esquema from '../../backend/db/01-esquema.sql?raw'
 import catalogos from '../../backend/db/02-catalogos.sql?raw'
+import migrarEmpresa from '../../backend/db/migraciones/2026-11-23-cuenta-empresarial.sql?raw'
 import demo from '../../backend/db/99-datos-demo.sql?raw'
 
 interface Meta {
@@ -33,6 +34,11 @@ async function abrir(dataDir: string | undefined, zona: string) {
     await db.exec(catalogos)
     await db.exec(demo)
     console.info(`[demo] base de demostración creada en ${Math.round(performance.now() - t)} ms`)
+  } else {
+    const { rows: columnas } = await db.query(
+      "SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'cotizacion' AND column_name = 'titular_nombre'",
+    )
+    if (!columnas.length) await db.exec(migrarEmpresa)
   }
   return db
 }

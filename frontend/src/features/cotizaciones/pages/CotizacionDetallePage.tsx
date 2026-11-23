@@ -122,7 +122,7 @@ export default function CotizacionDetallePage() {
           <Bloque titulo="Cliente">
             <Datos columnas={1} items={[
               { label: 'Nombre', valor: tiene('clientes.ver_detalle') ? <Link to={DETALLE.cliente(c.cliente.id)} className="text-link hover:underline">{c.cliente.nombre}</Link> : c.cliente.nombre },
-              { label: 'Documento', valor: <span className="font-mono">{c.cliente.documento}</span> },
+              { label: 'Documento', valor: <span className="font-mono">{c.cliente.tipoDocumento} {c.cliente.documento}</span> },
               { label: 'Teléfono', valor: c.cliente.telefono || '—' },
               { label: 'Portal', valor: c.cliente.tieneCuenta ? 'Tiene cuenta: recibe el aviso' : 'Sin cuenta en el portal' },
             ]} />

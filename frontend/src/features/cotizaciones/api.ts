@@ -4,7 +4,7 @@ import type { EstadoCotizacion } from '@shared/domain/estados'
 export interface CotizacionResumen {
   id: number
   numero: string
-  cliente: { id: number; nombre: string; documento: string }
+  cliente: { id: number; nombre: string; tipoDocumento: string; documento: string }
   fecha: string
   montoTotal: number
   estado: EstadoCotizacion
@@ -29,7 +29,7 @@ export interface ItemDetalle {
 }
 
 export interface CotizacionDetalle extends Omit<CotizacionResumen, 'cliente'> {
-  cliente: { id: number; nombre: string; documento: string; telefono: string; correo: string; direccion: string; tieneCuenta: boolean }
+  cliente: { id: number; nombre: string; tipoDocumento: string; documento: string; telefono: string; correo: string; direccion: string; tieneCuenta: boolean }
   descripcion: string
   direccion: string
   fechaRespuesta: string | null

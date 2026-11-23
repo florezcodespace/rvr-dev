@@ -26,6 +26,9 @@ export interface Sesion {
 }
 
 export interface DatosRegistro {
+  modalidad?: 'personal' | 'empresarial'
+  razonSocial?: string
+  nitEmpresa?: string
   tipoDocumento: string
   documento: string
   nombres: string

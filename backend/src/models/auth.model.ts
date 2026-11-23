@@ -1,3 +1,4 @@
+import { camposEmpresa, guardarEmpresa, validarEmpresa } from '../utils/empresa.js'
 import { createHash, randomBytes } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
@@ -311,6 +312,7 @@ export async function restablecer(datos: z.infer<typeof datosRestablecer>, ip: s
 
 export const datosRegistro = z
   .object({
+    ...camposEmpresa,
     tipoDocumento,
     documento,
     nombres: textoRequerido(100, 'Los nombres'),
@@ -321,6 +323,7 @@ export const datosRegistro = z
     contrasena: contrasenaSegura,
     confirmacion: z.string(),
   })
+  .superRefine(validarEmpresa)
   .refine((d) => d.contrasena === d.confirmacion, {
     message: 'Las contraseñas no coinciden', path: ['confirmacion'],
   })
@@ -382,6 +385,7 @@ export async function registrar(d: z.infer<typeof datosRegistro>) {
         [existente.id, usuario!.id, d.nombres, d.apellidos, d.telefono, d.direccion, d.correo, d.tipoDocumento],
         tx,
       )
+      await guardarEmpresa(tx, existente.id, d)
       return existente.id
     }
 
@@ -392,6 +396,7 @@ export async function registrar(d: z.infer<typeof datosRegistro>) {
       [d.documento, d.nombres, d.apellidos, d.telefono, d.direccion, d.correo, usuario!.id, d.tipoDocumento],
       tx,
     )
+    await guardarEmpresa(tx, cliente!.id, d)
     return cliente!.id
   })
 

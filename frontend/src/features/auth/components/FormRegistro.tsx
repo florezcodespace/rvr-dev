@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { camposEmpresa, validarEmpresa } from '@shared/domain/empresa'
 import { IconCheck } from '@shared/components/icons'
 import { Alert, Button, Input } from '@shared/components/ui'
 import { Select } from '@shared/components/form/Campos'
@@ -13,6 +14,7 @@ import { reglaContrasena } from '../pages/reglas'
 
 const esquema = z
   .object({
+    ...camposEmpresa,
     tipoDocumento: z.string().min(1, 'Selecciona el tipo de documento'),
     documento: z.string().trim().transform(limpiarDocumento),
     nombres: z.string().trim().min(1, 'Los nombres son obligatorios').max(100),
@@ -23,6 +25,7 @@ const esquema = z
     contrasena: reglaContrasena,
     confirmacion: z.string(),
   })
+  .superRefine(validarEmpresa)
   .refine((d) => d.contrasena === d.confirmacion, { message: 'Las contraseñas no coinciden', path: ['confirmacion'] })
   .superRefine((d, ctx) => {
     const error = errorDocumento(d.tipoDocumento, d.documento)
@@ -35,7 +38,8 @@ type Valores = z.output<typeof esquema>
 export function FormRegistro({ onIrALogin }: { onIrALogin: () => void }) {
   const [listo, setListo] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const { register, handleSubmit, formState, setError: marcar } = useForm<Entrada, unknown, Valores>({ resolver: zodResolver(esquema), defaultValues: { tipoDocumento: 'CC' } })
+  const { control, register, handleSubmit, formState, setError: marcar } = useForm<Entrada, unknown, Valores>({ resolver: zodResolver(esquema), defaultValues: { tipoDocumento: 'CC', modalidad: 'personal' } })
+  const empresarial = useWatch({ control, name: 'modalidad' }) === 'empresarial'
   const e = formState.errors
 
   const enviar = async (v: Valores) => {
@@ -70,13 +74,20 @@ export function FormRegistro({ onIrALogin }: { onIrALogin: () => void }) {
   return (
     <div>
       <form noValidate onSubmit={handleSubmit(enviar)} className="grid grid-cols-1 gap-x-3.5 gap-y-3 sm:grid-cols-2">
-        {/* [Feedback 5] Identificación → nombre → contacto → ubicación → acceso */}
+        <Select label="Tipo de cuenta" {...register('modalidad')}>
+          <option value="personal">Personal</option>
+          <option value="empresarial">Empresarial</option>
+        </Select>
+        {empresarial && <>
+          <Input label="Razón social" maxLength={180} error={e.razonSocial?.message} {...register('razonSocial')} />
+          <Input label="NIT de la empresa" maxLength={11} error={e.nitEmpresa?.message} {...register('nitEmpresa')} />
+        </>}
         <Select label="Tipo de documento" error={e.tipoDocumento?.message} {...register('tipoDocumento')}>
           {TIPOS_DOCUMENTO.map((t) => <option key={t.valor} value={t.valor}>{t.label}</option>)}
         </Select>
         <Input label="Número de documento" autoComplete="off" error={e.documento?.message} {...register('documento')} />
-        <Input label="Nombres" autoComplete="given-name" error={e.nombres?.message} {...register('nombres')} />
-        <Input label="Apellidos" autoComplete="family-name" error={e.apellidos?.message} {...register('apellidos')} />
+        <Input label={empresarial ? 'Nombres del contacto' : 'Nombres'} autoComplete="given-name" error={e.nombres?.message} {...register('nombres')} />
+        <Input label={empresarial ? 'Apellidos del contacto' : 'Apellidos'} autoComplete="family-name" error={e.apellidos?.message} {...register('apellidos')} />
         <Input label="Correo" type="email" autoComplete="email" error={e.correo?.message} {...register('correo')} />
         <Input label="Teléfono" type="tel" autoComplete="tel" error={e.telefono?.message} {...register('telefono')} />
         <Input className="sm:col-span-2" label="Dirección" autoComplete="street-address" error={e.direccion?.message} {...register('direccion')} />

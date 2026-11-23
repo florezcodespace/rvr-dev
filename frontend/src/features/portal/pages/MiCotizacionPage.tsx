@@ -53,6 +53,7 @@ export default function MiCotizacionPage() {
               <SobreOscuro><EstadoBadge meta={ESTADO_COTIZACION_META[c.estado]} /></SobreOscuro>
             </div>
             <h1 className="mt-3 mb-0 font-mono text-[30px] leading-none font-bold tracking-[-0.5px] text-white sm:text-[38px]">{c.numero}</h1>
+            <p className="mt-2 text-sm text-white">Titular: {c.cliente.nombre} · {c.cliente.tipoDocumento} {c.cliente.documento}</p>
             {/* Recorrido de la cotización */}
             <ol className="m-0 mt-6 grid max-w-[560px] list-none grid-cols-3 gap-2 p-0">
               {pasos.map((p) => (

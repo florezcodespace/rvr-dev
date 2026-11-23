@@ -31,6 +31,8 @@ Table agendamiento {
 }
 
 Table cliente {
+  razon_social varchar(180)
+  nit_empresa varchar(11)
   id integer [pk, increment]
   tipo_documento varchar(3) [not null, default: 'CC', note: 'valores: CC, CE, TI, NIT, PP, PEP (feedback)']
   documento_identidad varchar(20) [not null, unique]
@@ -46,6 +48,9 @@ Table cliente {
 }
 
 Table cotizacion {
+  titular_nombre varchar(201) [not null]
+  titular_documento varchar(50) [not null]
+  titular_tipo_documento varchar(10) [not null]
   id integer [pk, increment]
   cliente_id integer [not null]
   fecha_cotizacion timestamp [not null, default: `now()`]

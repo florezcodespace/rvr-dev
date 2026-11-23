@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { z } from 'zod'
+import { camposEmpresa, validarEmpresa } from '@shared/domain/empresa'
 import { useAuth } from '@features/auth'
 import { CambioContrasena } from '@features/perfil'
 import { IconCandado } from '@shared/components/icons'
@@ -14,12 +15,13 @@ import { EncabezadoPortal } from '../components/EncabezadoPortal'
 import { PanelTinta, TituloBloque } from '../components/kit'
 
 const esquema = z.object({
+  ...camposEmpresa,
   nombres: z.string().trim().min(1, 'Los nombres son obligatorios').max(100),
   apellidos: z.string().trim().min(1, 'Los apellidos son obligatorios').max(100),
   telefono: z.string().trim().regex(/^[0-9+\s()-]{7,20}$/, 'Escribe un teléfono válido'),
   direccion: z.string().trim().min(5, 'Escribe la dirección').max(150),
   correo: z.string().trim().toLowerCase().email('Correo no válido').max(100),
-})
+}).superRefine(validarEmpresa)
 
 /**
  * HU_76 · Consultar mis datos (solo lectura, sin la contraseña: CA_76_02) ·
@@ -60,8 +62,8 @@ export default function MiPerfilPage() {
           <div className="mt-8 flex items-center gap-4">
             <Avatar nombre={nombre} className="!size-[72px] !rounded-[22px] !text-[24px] ring-4 ring-white/15" />
             <div className="min-w-0">
-              <div className="text-[24px] leading-tight font-extrabold tracking-[-0.6px] text-white">{nombre}</div>
-              <div className="mt-1 font-mono text-[14px] text-[#c6d4e8]">{p.tipoDocumento} {p.documento}</div>
+              <div className="text-[24px] leading-tight font-extrabold tracking-[-0.6px] text-white">{p.razonSocial || nombre}</div>
+              <div className="mt-1 font-mono text-[14px] text-[#c6d4e8]">{p.modalidad === 'empresarial' ? `NIT ${p.nitEmpresa} · Contacto: ${nombre}` : `Personal · ${p.tipoDocumento} ${p.documento}`}</div>
             </div>
           </div>
           <div className="mt-8 grid grid-cols-3 gap-2">
@@ -116,12 +118,16 @@ export default function MiPerfilPage() {
       </div>
 
       <FormularioModal
-        key={`${p.id}-${p.correo}-${p.telefono}`}
+        key={JSON.stringify(p)}
         abierto={editando}
         onCerrar={() => setEditando(false)}
         titulo="Actualizar mis datos"
-        descripcion="El documento de identidad no se puede cambiar."
+        descripcion="El titular elegido se aplicará a las próximas cotizaciones. Los nombres y apellidos identifican a la persona de contacto."
         campos={[
+          { nombre: 'modalidad', label: 'Tipo de cuenta', tipo: 'select', valorInicial: p.modalidad,
+            opciones: [{ valor: 'personal', label: 'Personal' }, { valor: 'empresarial', label: 'Empresarial' }] },
+          { nombre: 'razonSocial', label: 'Razón social', valorInicial: p.razonSocial, max: 180, obligatorio: true, visibleSi: (v) => v.modalidad === 'empresarial' },
+          { nombre: 'nitEmpresa', label: 'NIT de la empresa', valorInicial: p.nitEmpresa, max: 11, obligatorio: true, visibleSi: (v) => v.modalidad === 'empresarial' },
           { nombre: 'documento', label: 'Documento de identidad', valorInicial: p.documento, soloLectura: true, ancho: 'completo' },
           { nombre: 'nombres', label: 'Nombres', obligatorio: true, valorInicial: p.nombres, max: 100 },
           { nombre: 'apellidos', label: 'Apellidos', obligatorio: true, valorInicial: p.apellidos, max: 100 },
