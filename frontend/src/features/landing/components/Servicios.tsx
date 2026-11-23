@@ -1,6 +1,6 @@
 import type { ComponentType, SVGProps } from 'react'
 import { formatearMoneda } from '@shared/lib/format'
-import { CATALOGO, desdeCategoria } from '../datos'
+import type { ServicioCatalogo } from '@shared/lib/catalogo'
 import { IcoAlarma, IcoCctv, IcoMantenimiento, IcoRedes, IcoServidores } from './iconos'
 import { IconoApp, Revelable, TituloSeccion } from './Seccion'
 
@@ -20,7 +20,7 @@ const FRENTES: Frente[] = [
 ]
 
 /** Los cinco frentes, cada uno con sus servicios reales y su precio desde. */
-export function Servicios() {
+export function Servicios({ catalogo }: { catalogo: ServicioCatalogo[] }) {
   return (
     <section id="servicios" className="py-20 sm:py-24">
       <div className="mx-auto max-w-[1200px] px-5 sm:px-8">
@@ -34,7 +34,7 @@ export function Servicios() {
         <div role="list" className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FRENTES.map((frente, indice) => {
             const Icono = frente.icono
-            const servicios = CATALOGO.filter((s) => s.categoria === frente.categoria)
+            const servicios = catalogo.filter((s) => s.categoria === frente.categoria)
             return (
               <Revelable
                 key={frente.titulo}
@@ -47,9 +47,9 @@ export function Servicios() {
                   <IconoApp className="transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-3">
                     <Icono width="22" height="22" />
                   </IconoApp>
-                  <span className="rounded-full bg-primary-soft px-3 py-1 text-[12.5px] font-semibold text-primary-on-soft">
-                    Desde {formatearMoneda(desdeCategoria(frente.categoria))}
-                  </span>
+                  {servicios.length > 0 && <span className="rounded-full bg-primary-soft px-3 py-1 text-[12.5px] font-semibold text-primary-on-soft">
+                    Desde {formatearMoneda(Math.min(...servicios.map((s) => s.precioBase)))}
+                  </span>}
                 </div>
                 <div>
                   <h3 className="m-0 text-[19px] leading-[1.25] font-bold tracking-[-0.4px] text-fg">{frente.titulo}</h3>

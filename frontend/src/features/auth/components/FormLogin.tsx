@@ -1,14 +1,12 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { z } from 'zod'
 import { CuentasDemo } from '@app/demo/CuentasDemo'
-import { rutaInicial } from '@app/layouts/navigation'
 import { ROUTES } from '@app/routes/paths'
 import { Alert, Button, Checkbox, Input } from '@shared/components/ui'
 import { InputContrasena } from '@shared/components/form/InputContrasena'
-import { hayCarrito } from '@shared/hooks/useCarrito'
 import { ErrorApi } from '@shared/lib/api'
 import { STORAGE_KEYS, storage } from '@shared/lib/storage'
 import { varsCss } from '@shared/lib/varsCss'
@@ -24,8 +22,6 @@ type Valores = z.infer<typeof esquema>
 /** HU_13 · Iniciar sesión con nombre de usuario o correo y contraseña (cuerpo del formulario). */
 export function FormLogin() {
   const { login, aviso } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
   const [error, setError] = useState<{ titulo: string; detalle?: string } | null>(null)
   const recordado = storage.get<string>(STORAGE_KEYS.rememberedEmail, '')
 
@@ -37,14 +33,7 @@ export function FormLogin() {
   const enviar = async (v: Valores) => {
     setError(null)
     try {
-      const cuenta = await login(v.usuario, v.contrasena, v.recordarme)
-      const desde = (location.state as { from?: { pathname: string } } | null)?.from?.pathname
-      // CA_13_03 · al panel según el rol
-      if (cuenta.tipo === 'cliente') {
-        navigate(hayCarrito() ? ROUTES.portalSolicitar : desde?.startsWith('/portal') ? desde : ROUTES.portal, { replace: true })
-      } else {
-        navigate(desde && !desde.startsWith('/portal') ? desde : rutaInicial(cuenta), { replace: true })
-      }
+      await login(v.usuario, v.contrasena, v.recordarme)
     } catch (fallo) {
       if (fallo instanceof ErrorApi) {
         const restantes = fallo.extra.intentosRestantes

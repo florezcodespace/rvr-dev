@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ROUTES } from '@app/routes/paths'
 import { prefiereMenosMovimiento } from '@shared/hooks/useContador'
 import { useCarrito } from '@shared/hooks/useCarrito'
 import { cn } from '@shared/lib/cn'
 import { formatearDuracion, formatearGarantia, formatearMoneda } from '@shared/lib/format'
-import { CATALOGO, CATEGORIAS } from '../datos'
+import type { ServicioCatalogo } from '@shared/lib/catalogo'
+import { descargarPdf, nombreConFecha } from '@shared/lib/exportar'
+import { useAuth } from '@features/auth'
 import { IcoFlecha } from './iconos'
 import { Revelable, TituloSeccion } from './Seccion'
 
@@ -41,13 +43,16 @@ function CifraViva({ valor }: { valor: number }) {
  * recibo de vidrio se arma solo (total desde, anticipo, tiempo y garantía).
  * «Solicitar esta cotización» deja los servicios en su solicitud del portal.
  */
-export function Cotizador() {
-  const [categoria, setCategoria] = useState<string>(CATEGORIAS[0])
-  const [marcados, setMarcados] = useState<number[]>([1])
-  const { agregar } = useCarrito()
+export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
+  const categorias = [...new Set(catalogo.map((s) => s.categoria))]
+  const { usuario } = useAuth()
+  const [titular, setTitular] = useState('')
+  const [categoria, setCategoria] = useState<string>(categorias[0]!)
+  const [marcados, setMarcados] = useState<number[]>(() => catalogo.slice(0, 1).map((s) => s.id))
+  const { agregar, tiene } = useCarrito()
   const navigate = useNavigate()
 
-  const elegidos = useMemo(() => CATALOGO.filter((s) => marcados.includes(s.id)), [marcados])
+  const elegidos = catalogo.filter((s) => marcados.includes(s.id))
   const total = elegidos.reduce((s, x) => s + x.precioBase, 0)
   const minutos = elegidos.reduce((s, x) => s + x.duracionMin, 0)
   const garantias = elegidos.map((x) => x.diasGarantia)
@@ -61,10 +66,30 @@ export function Cotizador() {
   const alternar = (id: number) =>
     setMarcados((actual) => (actual.includes(id) ? actual.filter((x) => x !== id) : [...actual, id]))
 
-  const solicitar = () => {
+  const solicitar = (destino: string) => {
     if (!elegidos.length) return
-    elegidos.forEach((s) => agregar({ servicioId: s.id, nombre: s.nombre, categoria: s.categoria, precioBase: s.precioBase }))
-    navigate(ROUTES.portalSolicitar)
+    elegidos.filter((s) => !tiene(s.id)).forEach((s) => agregar({ servicioId: s.id, nombre: s.nombre, categoria: s.categoria, precioBase: s.precioBase }))
+    navigate(destino)
+  }
+
+  const guardarPdf = () => {
+    if (!titular.trim() || !elegidos.length) return
+    descargarPdf<ServicioCatalogo>(
+      nombreConFecha('cotizacion-estimada-rvr', 'pdf'),
+      { titulo: 'Cotización estimada', lineas: [
+        `A nombre de: ${titular.trim()}`,
+        'Precios de referencia en pesos colombianos. RvR confirma el valor final al enviar la cotización.',
+      ] },
+      [
+        { titulo: 'Servicio', valor: (s) => s.nombre, ancho: 3 },
+        { titulo: 'Duración', valor: (s) => formatearDuracion(s.duracionMin) },
+        { titulo: 'Garantía', valor: (s) => formatearGarantia(s.diasGarantia) },
+        { titulo: 'Precio desde', valor: (s) => s.precioBase, tipo: 'moneda' },
+      ],
+      elegidos,
+      ['Total estimado', null, null, total],
+      [{ etiqueta: 'Anticipo estimado (50 %)', valor: formatearMoneda(Math.round(total / 2)) }],
+    )
   }
 
   const cuantosEn = (c: string) => elegidos.filter((s) => s.categoria === c).length
@@ -84,7 +109,7 @@ export function Cotizador() {
             <div className="min-w-0">
               {/* Control segmentado tipo iOS */}
               <div role="tablist" aria-label="Categorías" className="flex gap-1 overflow-x-auto rounded-[16px] bg-surface-muted p-1 [scrollbar-width:none]">
-                {CATEGORIAS.map((c) => {
+                {categorias.map((c) => {
                   const sel = c === categoria
                   const n = cuantosEn(c)
                   return (
@@ -109,7 +134,7 @@ export function Cotizador() {
               </div>
 
               <ul key={categoria} className="escalonado m-0 mt-4 flex list-none flex-col gap-2 p-0">
-                {CATALOGO.filter((s) => s.categoria === categoria).map((s) => {
+                {catalogo.filter((s) => s.categoria === categoria).map((s) => {
                   const on = marcados.includes(s.id)
                   return (
                     <li key={s.id} className="anim-entrada">
@@ -191,15 +216,25 @@ export function Cotizador() {
                   ))}
                 </dl>
 
-                <button
+                <form className="mt-5 border-t border-border-base pt-4" onSubmit={(e) => { e.preventDefault(); guardarPdf() }}>
+                  <label className="block text-sm font-semibold text-fg" htmlFor="titular-estimacion">A nombre de</label>
+                  <input id="titular-estimacion" autoComplete="name" maxLength={100} required value={titular}
+                    onChange={(e) => setTitular(e.target.value)} className="mt-2 w-full rounded-xl border border-border-base bg-surface-raised p-3 text-fg" />
+                  <button type="submit" disabled={!titular.trim() || !elegidos.length} className="mt-3 w-full rounded-xl border border-border-strong p-3 font-semibold text-fg disabled:opacity-60">
+                    Guardar estimación en PDF
+                  </button>
+                </form>
+                {(!usuario || usuario.tipo === 'cliente') && <button
                   type="button"
-                  onClick={solicitar}
+                  onClick={() => solicitar(usuario ? ROUTES.portalSolicitar : ROUTES.registro)}
                   disabled={!elegidos.length}
                   className="pintura-boton boton-liquido mt-5 flex h-[52px] w-full cursor-pointer items-center justify-center gap-2 rounded-[16px] text-[15px] font-semibold text-on-primary disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Solicitar esta cotización
+                  {usuario ? 'Solicitar esta cotización' : 'Registrarme con esta selección'}
                   <IcoFlecha width="16" height="16" />
-                </button>
+                </button>}
+                {!usuario && <button type="button" disabled={!elegidos.length} onClick={() => solicitar(ROUTES.login)}
+                  className="mt-3 w-full text-sm font-semibold text-link disabled:opacity-60">Ya tengo cuenta · Iniciar sesión</button>}
                 <p className="m-0 mt-3 text-[12.5px] leading-[1.5] text-fg-subtle">
                   Precios base de referencia. El valor final lo confirma la cotización que RvR le
                   envía a su portal. <Link to={ROUTES.catalogo} className="font-semibold text-link hover:underline">Ver catálogo completo</Link>

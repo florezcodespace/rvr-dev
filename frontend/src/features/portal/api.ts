@@ -1,18 +1,11 @@
-import { api, pedir } from '@shared/lib/api'
-import type { CategoriaServicio, EstadoCotizacion, EstadoItem, EstadoOrden, EstadoPago, EstadoVisita } from '@shared/domain/estados'
+import { cargarCatalogo } from '@shared/lib/catalogo'
+import { api } from '@shared/lib/api'
+import type { EstadoCotizacion, EstadoItem, EstadoOrden, EstadoPago, EstadoVisita } from '@shared/domain/estados'
 import type { Cuenta } from '@features/auth'
 import type { EstadoRevision } from '@shared/domain/estados'
 import type { GarantiaDetalle } from '@shared/domain/garantias'
 
-export interface ServicioCatalogo {
-  id: number
-  nombre: string
-  descripcion: string
-  precioBase: number
-  categoria: CategoriaServicio
-  duracionMin: number
-  diasGarantia: number
-}
+export type { ServicioCatalogo } from '@shared/lib/catalogo'
 
 export interface Perfil {
   id: number
@@ -101,8 +94,7 @@ export interface ArchivoAdjunto {
 }
 
 export const portalService = {
-  catalogo: (p: { q?: string; categoria?: string }) =>
-    pedir<{ categorias: CategoriaServicio[]; items: ServicioCatalogo[] }>('/publico/servicios', { params: p, sinSesion: true }),
+  catalogo: cargarCatalogo,
   resumen: () => api.get<Resumen>('/portal/resumen'),
   perfil: () => api.get<Perfil>('/portal/perfil'),
   actualizarPerfil: (d: { nombres: string; apellidos: string; telefono: string; direccion: string; correo: string }) =>

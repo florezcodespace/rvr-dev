@@ -1,3 +1,5 @@
+import { cargarCatalogo } from '@shared/lib/catalogo'
+import { useRecurso } from '@shared/hooks/useRecurso'
 import { useEffect } from 'react'
 import { CierreLanding } from '../components/CierreLanding'
 import { CintaSectores } from '../components/CintaSectores'
@@ -14,6 +16,9 @@ import { Servicios } from '../components/Servicios'
  * navegación flotante y entradas animadas. Sin fotos ni degradados.
  */
 export default function LandingPage() {
+  const { datos, cargando, error, recargar } = useRecurso(cargarCatalogo, undefined)
+  const servicios = datos?.items ?? []
+
   // El portal interno no usa desplazamiento suave; aquí sí (anclas).
   useEffect(() => {
     const raiz = document.documentElement
@@ -49,10 +54,15 @@ export default function LandingPage() {
       <main>
         <PortalMarca />
         <CintaSectores />
-        <Servicios />
+        <Servicios catalogo={servicios} />
         <PortalVivo />
         <ProcesoTrabajo />
-        <Cotizador />
+        {servicios.length ? <Cotizador catalogo={servicios} /> : (
+          <section id="cotizador" aria-label="Cotizador" className="mx-auto max-w-[1200px] px-5 py-12">
+            <p role="status">{cargando ? 'Cargando servicios…' : error || 'Actualmente no hay servicios disponibles para cotizar.'}</p>
+            {error && <button type="button" className="text-link underline" onClick={recargar}>Reintentar carga del catálogo</button>}
+          </section>
+        )}
         <PorQueElegirnos />
         <CierreLanding />
       </main>
