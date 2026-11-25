@@ -153,14 +153,15 @@
 }
 
 .dark {
+  --rvr-glass-sat: 110%;
   --rvr-ink: #0a1120;
   --rvr-ink-muted: #16223a;
 
-  --rvr-bg: #070d18;
-  --rvr-surface: rgb(22 32 52 / 0.62);
-  --rvr-surface-solid: #121c2e;
+  --rvr-bg: #10161f;
+  --rvr-surface: rgb(29 40 54 / 0.78);
+  --rvr-surface-solid: #192330;
   --rvr-surface-muted: rgb(255 255 255 / 0.05);
-  --rvr-surface-raised: rgb(24 35 56 / 0.95);
+  --rvr-surface-raised: rgb(33 45 60 / 0.96);
 
   --rvr-glass-luz: rgb(255 255 255 / 0.08);
   --rvr-glass-borde: rgb(255 255 255 / 0.08);
@@ -173,8 +174,8 @@
   --rvr-fg-subtle: #9fb0c8;
   --rvr-fg-faint: #91a2bb;
 
-  --rvr-primary: #0a6cf0;
-  --rvr-primary-hover: #2a82ff;
+  --rvr-primary: #316aab;
+  --rvr-primary-hover: #356fae;
   --rvr-primary-strong: #8ec5ff;
   --rvr-primary-soft: rgb(30 136 255 / 0.16);
   --rvr-primary-on-soft: #8ec5ff;
@@ -182,8 +183,8 @@
   --rvr-link: #6db3ff;
 
   --rvr-brand-bg: #0a1120;
-  --rvr-brand-blob-1: #0a6cf0;
-  --rvr-brand-blob-2: #1e88ff;
+  --rvr-brand-blob-1: #345d90;
+  --rvr-brand-blob-2: #42719b;
   --rvr-brand-fg: #eaf1fb;
   --rvr-brand-fg-muted: #9fb0c8;
   --rvr-brand-fg-subtle: #8ec5ff;
@@ -194,7 +195,7 @@
   --rvr-success-fg: #6ee7a0;
   --rvr-success-soft: rgb(34 197 94 / 0.14);
 
-  --rvr-warning: #fbbf24;
+  --rvr-warning: #d5ae6e;
   --rvr-warning-fg: #fcd37a;
   --rvr-warning-soft: rgb(251 191 36 / 0.14);
 
@@ -203,22 +204,22 @@
   --rvr-danger-soft: rgb(248 113 113 / 0.13);
   --rvr-danger-border: rgb(248 113 113 / 0.36);
 
-  --rvr-info: #3d9bff;
+  --rvr-info: #80a7d2;
   --rvr-info-fg: #8ec5ff;
   --rvr-info-soft: rgb(61 155 255 / 0.15);
 
   --rvr-ring: rgb(61 155 255 / 0.28);
-  --rvr-ring-border: #3d9bff;
+  --rvr-ring-border: #80a7d2;
 
-  --rvr-chart-1: #3d9bff;
+  --rvr-chart-1: #80a7d2;
   --rvr-chart-2: #8ec5ff;
   --rvr-chart-grid: rgb(255 255 255 / 0.07);
   --rvr-track: rgb(255 255 255 / 0.06);
 
-  --rvr-estado-nueva: #3d9bff;
-  --rvr-estado-pendiente: #fbbf24;
+  --rvr-estado-nueva: #80a7d2;
+  --rvr-estado-pendiente: #d5ae6e;
   --rvr-estado-aprobada: #c3cfe0;
-  --rvr-estado-programada: #22c3e0;
+  --rvr-estado-programada: #79b6c7;
   --rvr-estado-reprogramada: #fb923c;
   --rvr-estado-en-proceso: #6db3ff;
   --rvr-estado-completada: #22c55e;
@@ -244,7 +245,7 @@
   --rvr-neutro-soft: rgb(255 255 255 / 0.07);
   --rvr-neutro-fg: #b3c1d6;
 
-  --rvr-av-1: #0a6cf0;
+  --rvr-av-1: #345d90;
   --rvr-av-2: #2a3a55;
   --rvr-av-3: #0891b2;
   --rvr-av-4: #15803d;
@@ -252,9 +253,9 @@
   --rvr-av-6: #be123c;
   --rvr-av-7: #475569;
 
-  --rvr-cat-1: #3d9bff;
-  --rvr-cat-2: #22c3e0;
-  --rvr-cat-3: #fbbf24;
+  --rvr-cat-1: #80a7d2;
+  --rvr-cat-2: #79b6c7;
+  --rvr-cat-3: #d5ae6e;
   --rvr-cat-4: #c3cfe0;
 
   --rvr-grad-primary: linear-gradient(var(--rvr-primary), var(--rvr-primary));
@@ -265,7 +266,7 @@
   --rvr-filo-luz: none;
   --rvr-halo-titular: transparent;
   --rvr-brillo: inset 0 1px 0 rgb(255 255 255 / 0.14);
-  --rvr-halo-primary: rgb(30 136 255 / 0.5);
+  --rvr-halo-primary: rgb(48 93 143 / 0.30);
   --rvr-halo-danger: rgb(220 38 38 / 0.5);
   --rvr-lateral: none;
   --rvr-superior: none;

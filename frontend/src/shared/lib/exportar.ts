@@ -4,6 +4,8 @@
  * los filtros aplicados, la fecha de generación y el período (CA_62_03).
  */
 
+import logoPdf from './rvr-logo-pdf.jpg?inline'
+
 export interface ColumnaExport<T> {
   titulo: string
   valor: (fila: T) => string | number | null | undefined
@@ -342,7 +344,7 @@ export function descargarPdf<T>(
     ops.push(`BT ${color} rg /${negrilla ? 'F2' : 'F1'} ${t} Tf ${x.toFixed(2)} ${yy.toFixed(2)} Td (${escPdf(s)}) Tj ET`)
 
   const cabeceraTabla = () => {
-    ops.push(`0.31 0.27 0.9 rg ${M} ${(y - altoFila + 4).toFixed(2)} ${anchoUtil} ${altoFila} re f`)
+    ops.push(`0.09 0.28 0.48 rg ${M} ${(y - altoFila + 4).toFixed(2)} ${anchoUtil} ${altoFila} re f`)
     let x = M
     columnas.forEach((c, i) => {
       const w = anchos[i]!
@@ -359,8 +361,9 @@ export function descargarPdf<T>(
     ops = []
     y = H - M
     if (primera) {
-      txt(M, y - 14, 'RvR Tecnologías S.A.S. · Portal RvR', 9, true, '0.31 0.27 0.9')
-      txt(M, y - 34, encabezado.titulo, 17, true)
+      ops.push(`q 40 0 0 40 ${M} ${y - 40} cm /Marca Do Q`)
+      txt(M + 50, y - 14, 'RvR Tecnologías S.A.S. · Portal RvR', 9, true, '0.09 0.28 0.48')
+      txt(M + 50, y - 36, encabezado.titulo, 20, true)
       y -= 50
       for (const linea of [...encabezado.lineas, generadoEl()]) {
         txt(M, y, linea, 9, false, '0.35 0.37 0.42')
@@ -371,7 +374,7 @@ export function descargarPdf<T>(
         const anchoCaja = Math.min(170, anchoUtil / resumen.length - 8)
         resumen.forEach((r, i) => {
           const x = M + i * (anchoCaja + 8)
-          ops.push(`0.94 0.95 1 rg ${x} ${(y - 34).toFixed(2)} ${anchoCaja} 38 re f`)
+          ops.push(`0.91 0.95 0.98 rg ${x} ${(y - 34).toFixed(2)} ${anchoCaja} 38 re f`)
           txt(x + 8, y - 12, recortar(r.etiqueta.toUpperCase(), anchoCaja - 16, 7, true), 7, true, '0.4 0.42 0.48')
           txt(x + 8, y - 27, recortar(r.valor, anchoCaja - 16, 12, true), 12, true)
         })
@@ -408,7 +411,7 @@ export function descargarPdf<T>(
 
   if (totales) {
     if (y - altoFila < M + 24) nuevaPagina(false)
-    ops.push(`0.93 0.94 1 rg ${M} ${(y - altoFila + 4).toFixed(2)} ${anchoUtil} ${altoFila} re f`)
+    ops.push(`0.87 0.92 0.97 rg ${M} ${(y - altoFila + 4).toFixed(2)} ${anchoUtil} ${altoFila} re f`)
     let x = M
     totales.forEach((v, i) => {
       const w = anchos[i]!
@@ -439,11 +442,13 @@ export function descargarPdf<T>(
   const raiz = agregar('')
   const f1 = agregar('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>')
   const f2 = agregar('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>')
+  const jpeg = atob(logoPdf.split(',')[1]!)
+  const marca = agregar(`<< /Type /XObject /Subtype /Image /Width 128 /Height 128 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n${jpeg}\nendstream`)
   const kids: number[] = []
   for (const p of paginas) {
     const flujo = p.join('\n')
     const contenido = agregar(`<< /Length ${flujo.length} >>\nstream\n${flujo}\nendstream`)
-    kids.push(agregar(`<< /Type /Page /Parent ${raiz} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${f1} 0 R /F2 ${f2} 0 R >> >> /Contents ${contenido} 0 R >>`))
+    kids.push(agregar(`<< /Type /Page /Parent ${raiz} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /XObject << /Marca ${marca} 0 R >> /Font << /F1 ${f1} 0 R /F2 ${f2} 0 R >> >> /Contents ${contenido} 0 R >>`))
   }
   objetos[catalogo - 1] = `<< /Type /Catalog /Pages ${raiz} 0 R >>`
   objetos[raiz - 1] = `<< /Type /Pages /Kids [${kids.map((k) => `${k} 0 R`).join(' ')}] /Count ${kids.length} >>`

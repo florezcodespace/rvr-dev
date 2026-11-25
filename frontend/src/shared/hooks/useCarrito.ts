@@ -14,6 +14,7 @@ export interface ItemCarrito {
 }
 
 const CLAVE = 'rvr.carrito'
+export const CLAVE_REPUESTOS = 'rvr.carrito.repuestos'
 const EVENTO = 'rvr:carrito'
 
 const leer = () => storage.get<ItemCarrito[]>(CLAVE, [])
@@ -32,6 +33,7 @@ export function useCarrito() {
   }, [])
 
   const guardar = useCallback((siguiente: ItemCarrito[]) => {
+    if (!siguiente.length) storage.remove(CLAVE_REPUESTOS)
     storage.set(CLAVE, siguiente)
     setItems(siguiente)
     window.dispatchEvent(new Event(EVENTO))

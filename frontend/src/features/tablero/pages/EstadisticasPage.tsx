@@ -13,7 +13,7 @@ import { formatearFechaHora, formatearMoneda } from '@shared/lib/format'
 import { tableroService } from '../api'
 import { rangoPorDefecto } from '../rango'
 import { SelectorRango } from '../SelectorRango'
-import { Cabeza, Cifra, Delta, EnVivo, FilaBarra, MapaCalor, MiniBarras, TableroWidgets, type DefWidget } from '../Widgets'
+import { Cabeza, Cifra, Delta, EnVivo, FilaBarra, MapaCalor, MiniBarras, ordenDelTablero, TableroWidgets, type DefWidget } from '../Widgets'
 
 const PENDIENTES = [
   { k: 'por_valorar', t: 'Solicitudes por valorar', a: `${ROUTES.cotizaciones}?estado=solicitada` },
@@ -43,6 +43,7 @@ export default function EstadisticasPage() {
   const cargar = useCallback((p: typeof params) => tableroService.estadisticas(p), [])
   const { datos: e, error, cargando } = useRecurso(cargar, params)
 
+  const claveTablero = `rvr.tablero.${usuario?.id ?? 'anon'}`
   const widgets: DefWidget[] = e
     ? (() => {
         const hoy = hoyISO()
@@ -238,13 +239,30 @@ export default function EstadisticasPage() {
       />
       {error && <Alert tone="danger" title="No pudimos cargar las estadísticas" description={error} />}
       {!e && !error && (
-        <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-4">
-          {[2, 1, 1, 2, 1, 1].map((a, i) => <Skeleton key={i} className={a === 2 ? 'h-[230px] rounded-[24px] md:col-span-2' : 'h-[230px] rounded-[24px]'} />)}
+        <div role="status" aria-label="Cargando estadísticas">
+          <Skeleton className="mb-3.5 h-4 w-64 max-w-full" />
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-4">
+            {ordenDelTablero(claveTablero, ['ordenes', 'ingresos', 'aprobacion', 'pendientes', 'cartera', 'visitas', 'servicios', 'estados', 'cotizaciones', 'metodos']).map((id) => (
+              <div key={id} aria-hidden="true" className={`vidrio flex min-h-48 flex-col gap-4 rounded-[24px] border border-[var(--rvr-glass-borde)] p-5 ${['ordenes', 'pendientes', 'servicios', 'metodos'].includes(id) ? 'md:col-span-2' : ''}`}>
+                <Skeleton className="h-3 w-2/5" />
+                <Skeleton className="h-8 w-1/3" />
+                {id === 'ingresos' || id === 'ordenes' ? (
+                  <div className="mt-auto flex h-14 items-end gap-1">
+                    {[35, 60, 48, 74, 56, 88, 63, 95].map((altura) => (
+                      <div key={altura} className="flex-1" style={{ height: altura + '%' }}><Skeleton className="h-full rounded-sm" /></div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-auto space-y-3"><Skeleton className="h-3 w-full" /><Skeleton className="h-3 w-3/4" /></div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {e && (
-        <div className={cargando ? 'opacity-70 transition-opacity' : undefined}>
-          <TableroWidgets clave={`rvr.tablero.${usuario?.id ?? 'anon'}`} widgets={widgets} nombres={NOMBRES} />
+        <div aria-busy={cargando} className={cargando ? 'opacity-70 transition-opacity' : undefined}>
+          <TableroWidgets clave={claveTablero} widgets={widgets} nombres={NOMBRES} />
         </div>
       )}
     </div>

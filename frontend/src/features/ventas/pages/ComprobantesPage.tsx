@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@features/auth'
-import { DETALLE } from '@app/routes/paths'
+import { DETALLE, ROUTES } from '@app/routes/paths'
 import { EstadoBadge, Listado, VisorArchivo, type Columna } from '@shared/components/data'
 import { Datos } from '@shared/components/detalle'
 import { AreaTexto } from '@shared/components/form/Campos'
@@ -22,6 +22,7 @@ const cargar = ventasService.comprobantes.bind(ventasService)
  * venta y se aprueban (se registra el abono) o se rechazan con el motivo.
  */
 export default function ComprobantesPage() {
+  const { tiene } = useAuth()
   const f = useFiltros(['estado'] as const, { estado: 'pendiente' })
   const { datos, cargando, error, recargar } = useRecurso(cargar, f.params)
   const [params, setParams] = useSearchParams()
@@ -54,8 +55,9 @@ export default function ComprobantesPage() {
   return (
     <>
       <Listado
-        eyebrow="Venta – Órdenes"
-        titulo="Comprobantes de pago"
+        eyebrow="Pagos de clientes"
+        titulo="Revisión de pagos"
+        acciones={tiene('abonos.listar') && <Link to={ROUTES.abonos} className="rounded-xl bg-primary-soft px-4 py-3 text-sm font-semibold text-primary-on-soft">Ver abonos registrados</Link>}
         descripcion="Pagos que los clientes reportan desde el portal. El saldo solo baja cuando apruebas el comprobante."
         barra={
           <>

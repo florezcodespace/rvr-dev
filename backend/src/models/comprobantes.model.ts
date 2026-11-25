@@ -34,7 +34,10 @@ export const datosComprobante = z.object({
     }, { error: 'Adjunta la foto o el PDF del comprobante' })
     .refine((a) => a.datos.startsWith(`data:${a.tipo};base64,`), { message: 'El archivo no es válido', path: ['datos'] }),
 })
-  .superRefine(revisarPago)
+  .superRefine((d, ctx) => {
+    // Reporte por referencia y archivo; los clientes anteriores envían además datos del método.
+    if (d.detalle || !d.referencia?.trim()) revisarPago(d, ctx)
+  })
   .transform((d) => ({ ...d, detalle: limpiarDetalle(d.metodoPago, d.detalle) }))
 
 /** Lo usa el portal: guarda el comprobante de una venta del cliente. */

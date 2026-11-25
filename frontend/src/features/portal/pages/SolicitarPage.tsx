@@ -7,7 +7,8 @@ import { Alert } from '@shared/components/ui'
 import { CATEGORIAS_SERVICIO } from '@shared/domain/estados'
 import { cn } from '@shared/lib/cn'
 import { varsCss } from '@shared/lib/varsCss'
-import { useCarrito } from '@shared/hooks/useCarrito'
+import { storage } from '@shared/lib/storage'
+import { CLAVE_REPUESTOS, useCarrito } from '@shared/hooks/useCarrito'
 import { useToast } from '@shared/hooks/useToast'
 import { mensajeDe } from '@shared/lib/api'
 import { formatearMoneda } from '@shared/lib/format'
@@ -24,7 +25,10 @@ export default function SolicitarPage() {
   const { items, cambiarCantidad, quitar, vaciar, estimado } = useCarrito()
   const { mostrar } = useToast()
   const navigate = useNavigate()
-  const [descripcion, setDescripcion] = useState('')
+  const [descripcion, setDescripcion] = useState(() => {
+    const repuestos = storage.get(CLAVE_REPUESTOS, '')
+    return repuestos ? `Repuestos por valorar: ${repuestos}` : ''
+  })
   const [direccion, setDireccion] = useState('')
   const [errores, setErrores] = useState<{ descripcion?: string; direccion?: string; general?: string }>({})
   const [enviando, setEnviando] = useState(false)

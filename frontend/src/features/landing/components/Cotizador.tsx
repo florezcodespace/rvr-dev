@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ROUTES } from '@app/routes/paths'
 import { prefiereMenosMovimiento } from '@shared/hooks/useContador'
-import { useCarrito } from '@shared/hooks/useCarrito'
+import { storage } from '@shared/lib/storage'
+import { CLAVE_REPUESTOS, useCarrito } from '@shared/hooks/useCarrito'
 import { cn } from '@shared/lib/cn'
 import { formatearDuracion, formatearGarantia, formatearMoneda } from '@shared/lib/format'
 import type { ServicioCatalogo } from '@shared/lib/catalogo'
@@ -47,7 +48,11 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
   const categorias = [...new Set(catalogo.map((s) => s.categoria))]
   const { usuario } = useAuth()
   const [titular, setTitular] = useState('')
-  const [categoria, setCategoria] = useState<string>(categorias[0]!)
+  const [categoria, setCategoria] = useState('Todos')
+  const [busqueda, setBusqueda] = useState('')
+  const [repuestos, setRepuestos] = useState(() => storage.get(CLAVE_REPUESTOS, ''))
+  const normalizar = (texto: string) => texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  const visibles = catalogo.filter((s) => (categoria === 'Todos' || s.categoria === categoria) && normalizar(s.nombre + ' ' + s.categoria).includes(normalizar(busqueda.trim())))
   const [marcados, setMarcados] = useState<number[]>(() => catalogo.slice(0, 1).map((s) => s.id))
   const { agregar, tiene } = useCarrito()
   const navigate = useNavigate()
@@ -69,6 +74,7 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
   const solicitar = (destino: string) => {
     if (!elegidos.length) return
     elegidos.filter((s) => !tiene(s.id)).forEach((s) => agregar({ servicioId: s.id, nombre: s.nombre, categoria: s.categoria, precioBase: s.precioBase }))
+    storage.set(CLAVE_REPUESTOS, repuestos.trim())
     navigate(destino)
   }
 
@@ -78,6 +84,7 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
       nombreConFecha('cotizacion-estimada-rvr', 'pdf'),
       { titulo: 'Cotización estimada', lineas: [
         `A nombre de: ${titular.trim()}`,
+        ...(repuestos.trim() ? ['Repuestos por valorar (fuera del total):', ...(repuestos.trim().replace(/\s+/g, ' ').match(/.{1,90}(?:\s|$)|.{1,90}/g) ?? [])] : []),
         'Precios de referencia en pesos colombianos. RvR confirma el valor final al enviar la cotización.',
       ] },
       [
@@ -107,11 +114,13 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
         <Revelable retraso={100} className="mt-10">
           <div className="vidrio grid gap-6 rounded-[32px] border border-[var(--rvr-glass-borde)] p-4 sm:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-8 lg:p-8">
             <div className="min-w-0">
-              {/* Control segmentado tipo iOS */}
-              <div role="tablist" aria-label="Categorías" className="flex gap-1 overflow-x-auto rounded-[16px] bg-surface-muted p-1 [scrollbar-width:none]">
-                {categorias.map((c) => {
+              <label htmlFor="buscar-cotizador" className="mb-2 block text-lg font-bold text-fg">Servicios disponibles</label>
+              <input id="buscar-cotizador" type="search" placeholder="Buscar por servicio o categoría" value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)} className="mb-3 w-full rounded-2xl border border-border-strong bg-surface-raised px-4 py-3 text-fg" />
+              <div role="tablist" aria-label="Categorías" className="flex flex-wrap gap-1 rounded-[16px] bg-surface-muted p-1 [scrollbar-width:none]">
+                {['Todos', ...categorias].map((c) => {
                   const sel = c === categoria
-                  const n = cuantosEn(c)
+                  const n = c === 'Todos' ? elegidos.length : cuantosEn(c)
                   return (
                     <button
                       key={c}
@@ -134,35 +143,35 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
               </div>
 
               <ul key={categoria} className="escalonado m-0 mt-4 flex list-none flex-col gap-2 p-0">
-                {catalogo.filter((s) => s.categoria === categoria).map((s) => {
+                {visibles.map((s) => {
                   const on = marcados.includes(s.id)
                   return (
                     <li key={s.id} className="anim-entrada">
                       <label
                         className={cn(
-                          'flex cursor-pointer items-center gap-4 rounded-[18px] border p-4 transition-all duration-200',
+                          'flex cursor-pointer items-center gap-2 sm:gap-4 rounded-[18px] border p-4 transition-all duration-200',
                           on ? 'border-[var(--rvr-filo-tinte)] bg-primary-soft' : 'border-border-base bg-surface-raised hover:border-border-strong',
                         )}
                       >
                         <span className="min-w-0 flex-1">
                           <span className="block text-[15px] font-semibold text-fg">{s.nombre}</span>
                           <span className="block text-[13px] text-fg-subtle tabular-nums">
-                            Desde {formatearMoneda(s.precioBase)} · {formatearDuracion(s.duracionMin)} · garantía de {formatearGarantia(s.diasGarantia)}
+                            {s.categoria} · {formatearDuracion(s.duracionMin)} · garantía de {formatearGarantia(s.diasGarantia)}
                           </span>
                         </span>
-                        {/* Interruptor tipo iOS */}
+                        <strong className="shrink-0 text-sm tabular-nums text-primary-on-soft">{formatearMoneda(s.precioBase)}</strong>
                         <input type="checkbox" className="peer sr-only" checked={on} onChange={() => alternar(s.id)} />
                         <span
                           aria-hidden="true"
                           className={cn(
-                            'relative h-[30px] w-[50px] flex-none rounded-full transition-colors duration-200 peer-focus-visible:ring-[3px] peer-focus-visible:ring-[var(--rvr-ring)]',
+                            'relative h-[26px] w-[44px] flex-none rounded-full transition-colors duration-200 peer-focus-visible:ring-[3px] peer-focus-visible:ring-[var(--rvr-ring)]',
                             on ? 'bg-primary' : 'bg-[var(--rvr-border-strong)]',
                           )}
                         >
                           <span
                             className={cn(
-                              'absolute top-[3px] left-[3px] size-6 rounded-full bg-white shadow-[0_2px_6px_rgb(0_0_0/0.2)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                              on && 'translate-x-5',
+                              'absolute top-[3px] left-[3px] size-5 rounded-full bg-white shadow-[0_2px_6px_rgb(0_0_0/0.2)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
+                              on && 'translate-x-[18px]',
                             )}
                           />
                         </span>
@@ -171,6 +180,11 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
                   )
                 })}
               </ul>
+              {!visibles.length && <p role="status" className="p-3 text-sm text-fg-muted">Sin servicios para esta búsqueda.</p>}
+              <label htmlFor="repuestos-cotizador" className="mt-5 block text-sm font-bold text-fg">Repuestos o insumos (opcional)</label>
+              <p id="ayuda-repuestos" className="my-1 text-sm text-fg-muted">Indique la pieza, referencia y cantidad. RvR confirmará el precio al valorar la solicitud.</p>
+              <textarea id="repuestos-cotizador" aria-describedby="ayuda-repuestos" rows={2} maxLength={240} value={repuestos}
+                onChange={(e) => setRepuestos(e.target.value)} className="w-full rounded-2xl border border-border-base bg-surface-raised p-3 text-fg" />
             </div>
 
             {/* Recibo */}
@@ -196,9 +210,10 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
                   <p className="m-0 mt-4 text-[14px] text-fg-subtle">Active al menos un servicio para armar la cotización.</p>
                 )}
 
+                {repuestos.trim() && <p className="mt-3 rounded-xl bg-surface-muted p-3 text-sm text-fg-muted"><strong>Repuestos por valorar</strong><br />{repuestos}</p>}
                 <div className="mt-5 border-t border-border-base pt-4">
                   <div className="text-[13px] text-fg-subtle">Total desde</div>
-                  <div className="mt-1 text-[40px] leading-none font-extrabold tracking-[-1.5px] text-fg tabular-nums">
+                  <div className="mt-1 text-primary-on-soft text-[40px] leading-none font-extrabold tracking-[-1.5px] tabular-nums">
                     <CifraViva valor={total} />
                   </div>
                 </div>
@@ -219,9 +234,17 @@ export function Cotizador({ catalogo }: { catalogo: ServicioCatalogo[] }) {
                 <form className="mt-5 border-t border-border-base pt-4" onSubmit={(e) => { e.preventDefault(); guardarPdf() }}>
                   <label className="block text-sm font-semibold text-fg" htmlFor="titular-estimacion">A nombre de</label>
                   <input id="titular-estimacion" autoComplete="name" maxLength={100} required value={titular}
-                    onChange={(e) => setTitular(e.target.value)} className="mt-2 w-full rounded-xl border border-border-base bg-surface-raised p-3 text-fg" />
-                  <button type="submit" disabled={!titular.trim() || !elegidos.length} className="mt-3 w-full rounded-xl border border-border-strong p-3 font-semibold text-fg disabled:opacity-60">
-                    Guardar estimación en PDF
+                    placeholder="Nombre de la persona o empresa" aria-describedby="ayuda-pdf"
+                    onChange={(e) => setTitular(e.target.value)} className="mt-2 min-h-12 w-full rounded-2xl border border-border-strong bg-surface-raised px-4 text-base text-fg placeholder:text-fg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link" />
+                  <p id="ayuda-pdf" className="mt-2 text-sm text-fg-subtle">
+                    {elegidos.length ? 'Este nombre aparecerá en la estimación.' : 'Seleccione al menos un servicio para descargar la estimación.'}
+                  </p>
+                  <button type="submit" disabled={!titular.trim() || !elegidos.length}
+                    className="mt-3 flex min-h-12 w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-transparent bg-primary px-4 py-3 font-semibold text-on-primary shadow-[var(--rvr-shadow-sm)] transition-[background-color,transform] enabled:hover:bg-primary-hover enabled:active:scale-[0.985] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link disabled:cursor-not-allowed disabled:border-border-base disabled:bg-surface-muted disabled:text-fg-subtle disabled:shadow-none motion-reduce:transition-none motion-reduce:active:scale-100">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 3v12m-5-5 5 5 5-5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+                    </svg>
+                    Descargar estimación en PDF
                   </button>
                 </form>
                 {(!usuario || usuario.tipo === 'cliente') && <button

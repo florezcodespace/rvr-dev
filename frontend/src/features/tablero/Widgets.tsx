@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type DragEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { cn } from '@shared/lib/cn'
 import { aISO, deISO } from '@shared/lib/fechas'
 import { storage } from '@shared/lib/storage'
@@ -21,28 +21,65 @@ const GRIP = (
   </svg>
 )
 
+export function ordenDelTablero(clave: string, porDefecto: string[]) {
+  const guardado = storage.get<string[]>(clave, [])
+  const validos = guardado.filter((id) => porDefecto.includes(id))
+  return [...validos, ...porDefecto.filter((id) => !validos.includes(id))]
+}
+
 /** Rejilla de widgets: arrastra por el asa para reordenar; el orden se recuerda. */
 export function TableroWidgets({ clave, widgets, nombres }: { clave: string; widgets: DefWidget[]; nombres: Record<string, string> }) {
   const porDefecto = widgets.map((w) => w.id)
-  const [orden, setOrden] = useState<string[]>(() => {
-    const guardado = storage.get<string[]>(clave, [])
-    const validos = guardado.filter((id) => porDefecto.includes(id))
-    return [...validos, ...porDefecto.filter((id) => !validos.includes(id))]
-  })
+  const [orden, setOrden] = useState(() => ordenDelTablero(clave, porDefecto))
   const [arrastrando, setArrastrando] = useState<string | null>(null)
   const [sobre, setSobre] = useState<string | null>(null)
   const [aviso, setAviso] = useState('')
   const asaActiva = useRef<string | null>(null)
   const [asa, setAsa] = useState<string | null>(null)
 
+  useEffect(() => {
+    const soltar = () => { asaActiva.current = null; setAsa(null) }
+    window.addEventListener('pointerup', soltar)
+    window.addEventListener('blur', soltar)
+    return () => {
+      window.removeEventListener('pointerup', soltar)
+      window.removeEventListener('blur', soltar)
+    }
+  }, [])
+
   useEffect(() => storage.set(clave, orden), [clave, orden])
 
-  const mover = (id: string, destino: number) =>
+  const rejilla = useRef<HTMLDivElement>(null)
+  const posiciones = useRef(new Map<string, DOMRect>())
+  const recordarPosiciones = () => {
+    posiciones.current.clear()
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    rejilla.current?.querySelectorAll<HTMLElement>('[data-widget]').forEach((el) => {
+      posiciones.current.set(el.dataset.widget!, el.getBoundingClientRect())
+    })
+  }
+  useLayoutEffect(() => {
+    rejilla.current?.querySelectorAll<HTMLElement>('[data-widget]').forEach((el) => {
+      const antes = posiciones.current.get(el.dataset.widget!)
+      if (!antes) return
+      const despues = el.getBoundingClientRect()
+      const x = antes.left - despues.left
+      const y = antes.top - despues.top
+      if (x || y) el.animate([{ translate: `${x}px ${y}px` }, { translate: '0 0' }], {
+        duration: 320, easing: 'cubic-bezier(.22,1,.36,1)',
+      })
+    })
+    posiciones.current.clear()
+  }, [orden])
+
+  const mover = (id: string, destino: number) => {
+    recordarPosiciones()
     setOrden((o) => {
       const sin = o.filter((x) => x !== id)
       sin.splice(Math.max(0, Math.min(destino, sin.length)), 0, id)
       return sin
     })
+  }
 
   const teclado = (id: string) => (e: KeyboardEvent) => {
     const i = orden.indexOf(id)
@@ -62,17 +99,18 @@ export function TableroWidgets({ clave, widgets, nombres }: { clave: string; wid
       <div className="flex flex-wrap items-center justify-between gap-2 text-[12.5px] text-fg-subtle">
         <span className="flex items-center gap-2"><span className="text-fg-faint">{GRIP}</span> Arrastra los widgets por el asa para ordenar tu tablero.</span>
         {personalizado && (
-          <button type="button" onClick={() => setOrden(porDefecto)} className="cursor-pointer rounded-[10px] px-2.5 py-1 font-semibold text-link transition-colors hover:bg-primary-soft">
+          <button type="button" onClick={() => { recordarPosiciones(); setOrden(porDefecto) }} className="cursor-pointer rounded-[10px] px-2.5 py-1 font-semibold text-link transition-colors hover:bg-primary-soft">
             Restablecer orden
           </button>
         )}
       </div>
-      <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-4">
+      <div ref={rejilla} className="grid grid-cols-1 gap-3.5 md:grid-cols-2 xl:grid-cols-4">
         {orden.map((id) => {
           const w = porId.get(id)
           if (!w) return null
           return (
             <section
+              data-widget={id}
               key={id}
               aria-label={nombres[id]}
               draggable={asa === id}
@@ -87,7 +125,9 @@ export function TableroWidgets({ clave, widgets, nombres }: { clave: string; wid
                 e.preventDefault()
                 setSobre(id)
               }}
-              onDragLeave={() => setSobre((s) => (s === id ? null : s))}
+              onDragLeave={(e) => {
+                if (!(e.relatedTarget instanceof Node && e.currentTarget.contains(e.relatedTarget))) setSobre((s) => s === id ? null : s)
+              }}
               onDrop={(e) => {
                 e.preventDefault()
                 if (arrastrando && arrastrando !== id) mover(arrastrando, orden.indexOf(id))
@@ -102,7 +142,7 @@ export function TableroWidgets({ clave, widgets, nombres }: { clave: string; wid
               className={cn(
                 'widget vidrio group relative flex min-w-0 flex-col rounded-[24px] border border-[var(--rvr-glass-borde)] p-5 transition-[transform,opacity,box-shadow] duration-200',
                 w.ancho === 2 ? 'md:col-span-2' : 'col-span-1',
-                arrastrando === id && 'scale-[0.98] opacity-40',
+                (asa === id || arrastrando === id) && 'widget-en-mano',
                 sobre === id && 'ring-2 ring-primary/50 ring-offset-2 ring-offset-[var(--rvr-bg)]',
               )}
             >

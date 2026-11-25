@@ -207,14 +207,16 @@ export async function decidir(clienteId: number, id: number, d: z.infer<typeof d
 
 /** HU_82 · Consultar mis órdenes (código, servicios, estado y fecha de visita). */
 export async function misOrdenes(clienteId: number) {
-  const filas = await consultar<{ id: number; codigo_orden: string; estado: string; fecha_creacion: Date; servicios: string | null; visita: Date | null; saldo: number | null }>(
+  const filas = await consultar<{ id: number; codigo_orden: string; estado: string; fecha_creacion: Date; servicios: string | null; visita: Date | null; saldo: number | null; anticipo_faltante: number; en_revision: number }>(
     `SELECT o.id, o.codigo_orden, o.estado, o.fecha_creacion,
             (SELECT string_agg(coalesce(s.nombre, dc.descripcion), ', ' ORDER BY dc.id)
                FROM detalle_orden d JOIN detalle_cotizacion dc ON dc.id = d.detalle_cotizacion_id
                LEFT JOIN servicio s ON s.id = dc.servicio_id WHERE d.orden_id = o.id) AS servicios,
             (SELECT a.fecha_programada FROM agendamiento a WHERE a.orden_id = o.id AND a.estado IN ('pendiente', 'cumplida')
               ORDER BY (a.estado = 'pendiente') DESC, a.fecha_programada DESC LIMIT 1) AS visita,
-            v.saldo
+            v.saldo, greatest(0, v.monto_anticipo - v.abonado) AS anticipo_faltante,
+            (SELECT coalesce(sum(cp.monto), 0) FROM comprobante_pago cp
+              WHERE cp.venta_id = v.id AND cp.estado = 'pendiente') AS en_revision
        FROM v_orden_cliente oc JOIN orden o ON o.id = oc.orden_id
        LEFT JOIN v_ventas v ON v.orden_id = o.id AND v.estado_pago <> 'anulada'
       WHERE oc.cliente_id = $1 ORDER BY o.fecha_creacion DESC`,
@@ -222,7 +224,7 @@ export async function misOrdenes(clienteId: number) {
   )
   return filas.map((f) => ({
     id: f.id, codigo: f.codigo_orden, estado: f.estado, fecha: iso(f.fecha_creacion),
-    servicios: f.servicios ?? '', fechaVisita: iso(f.visita), saldo: f.saldo,
+    servicios: f.servicios ?? '', fechaVisita: iso(f.visita), saldo: f.saldo, anticipoFaltante: f.anticipo_faltante, enRevision: f.en_revision,
   }))
 }
 

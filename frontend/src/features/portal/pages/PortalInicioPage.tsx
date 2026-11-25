@@ -4,29 +4,18 @@ import { useAuth } from '@features/auth'
 import { CONTACTO } from '@features/landing/datos'
 import { DETALLE, ROUTES } from '@app/routes/paths'
 import { EstadoBadge } from '@shared/components/data'
-import { IconCalendario, IconChevron, IconCotizaciones, IconHistorial, IconOrdenes, IconPagos, IconReloj, IconServicios } from '@shared/components/icons'
-import { Alert, Avatar, Skeleton, TextoAnimado } from '@shared/components/ui'
+import { IconCalendario, IconCotizaciones, IconHistorial, IconOrdenes, IconServicios } from '@shared/components/icons'
+import { Alert, Skeleton } from '@shared/components/ui'
 import { CATEGORIAS_SERVICIO, ESTADO_COTIZACION_META, ESTADO_ORDEN_META } from '@shared/domain/estados'
 import { useRecurso } from '@shared/hooks/useRecurso'
 import { cn } from '@shared/lib/cn'
 import { formatearFecha, formatearMoneda, saludo } from '@shared/lib/format'
 import { horaDe } from '@shared/lib/fechas'
 import { varsCss } from '@shared/lib/varsCss'
-import { portalService, type MiCotizacion, type MiOrden, type Resumen } from '../api'
-import { CATEGORIA_VISUAL, CifraViva, cuantoFalta, EstadoVacio, fechaAmable, HojaCalendario, IconoCategoria, PanelTinta, RecorridoOrden, TituloBloque } from '../components/kit'
+import { portalService, type MiCotizacion, type MiOrden } from '../api'
+import { CATEGORIA_VISUAL, CifraViva, EstadoVacio, fechaAmable, RecorridoOrden, TituloBloque } from '../components/kit'
 
 const ACTIVAS: MiOrden['estado'][] = ['esperando_anticipo', 'en_proceso', 'en_espera_repuesto']
-
-/** Frase corta con lo que el cliente tiene pendiente, en lenguaje natural. */
-function fraseDelDia(r: Resumen): string {
-  const partes: string[] = []
-  if (r.por_decidir) partes.push(`${r.por_decidir === 1 ? 'una cotización espera' : `${r.por_decidir} cotizaciones esperan`} tu decisión`)
-  if (r.proximaVisita) partes.push(`el técnico te visita ${cuantoFalta(r.proximaVisita.fecha).toLowerCase()}`)
-  if (r.en_valoracion) partes.push(`estamos valorando ${r.en_valoracion === 1 ? 'una solicitud' : `${r.en_valoracion} solicitudes`}`)
-  if (!partes.length) return 'Todo está al día. Cuando necesites algo, solicítalo desde el catálogo.'
-  const texto = partes.length > 1 ? `${partes.slice(0, -1).join(', ')} y ${partes.at(-1)}` : partes[0]
-  return texto.charAt(0).toUpperCase() + texto.slice(1) + '.'
-}
 
 /** Inicio del portal del cliente: lo pendiente, la orden en curso y los atajos. */
 export default function PortalInicioPage() {
@@ -39,111 +28,74 @@ export default function PortalInicioPage() {
   const principal = enCurso[0]
   const porDecidir = cotizaciones?.filter((c) => c.estado === 'pendiente') ?? []
 
+  const anticipo = enCurso.find((o) => o.estado === 'esperando_anticipo' && o.anticipoFaltante > o.enRevision)
+  const revision = ordenes?.find((o) => o.enRevision > 0)
+  const cotizacion = porDecidir[0]
+  const visita = r?.proximaVisita
+  const accion = anticipo ? {
+    etiqueta: 'Anticipo pendiente', titulo: formatearMoneda(anticipo.anticipoFaltante - anticipo.enRevision),
+    detalle: [anticipo.codigo, anticipo.servicios].filter(Boolean).join(' · '),
+    boton: 'Ver anticipo', destino: DETALLE.portalOrden(anticipo.id) + '?vista=pagos',
+  } : revision ? {
+    etiqueta: 'Comprobante en revisión', titulo: formatearMoneda(revision.enRevision),
+    detalle: revision.codigo + ' · RvR está verificando tu pago.', boton: 'Consultar estado', destino: DETALLE.portalOrden(revision.id) + '?vista=pagos',
+  } : cotizacion ? {
+    etiqueta: 'Pendiente de tu decisión', titulo: cotizacion.numero, detalle: cotizacion.resumen,
+    boton: 'Revisar cotización', destino: DETALLE.portalCotizacion(cotizacion.id),
+  } : visita ? {
+    etiqueta: 'Próxima visita', titulo: fechaAmable(visita.fecha), detalle: [horaDe(visita.fecha), visita.tecnico, visita.codigo].join(' · '),
+    boton: 'Ver visita', destino: DETALLE.portalOrden(visita.ordenId),
+  } : principal ? {
+    etiqueta: 'Servicio en curso', titulo: principal.codigo, detalle: principal.servicios, boton: 'Seguir mi orden', destino: DETALLE.portalOrden(principal.id),
+  } : {
+    etiqueta: 'Servicios RvR', titulo: '¿Qué servicio necesitas?', detalle: 'Consulta el catálogo y solicita una cotización.',
+    boton: 'Explorar servicios', destino: ROUTES.portalCatalogo,
+  }
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* ---------- Bienvenida ---------- */}
-      <PanelTinta className="p-6 sm:p-9">
-        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <div>
-            <span className="vidrio-oscuro inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold text-[#8ec5ff]">
-              <span aria-hidden="true" className="anim-latido size-1.5 rounded-full bg-[#22c55e]" />
-              Portal del cliente · RvR Tecnologías
-            </span>
-            <h1 className="mt-4 mb-0 text-[32px] leading-[1.08] font-extrabold tracking-[-1.2px] text-white sm:text-[44px]">
-              <TextoAnimado key={usuario?.nombres} texto={usuario?.nombres ? `${saludo()}, ${usuario.nombres}` : 'Tu portal RvR'} paso={55} />
-            </h1>
-            <p className="anim-entrada mt-3 mb-0 max-w-[520px] text-[15.5px] leading-[1.6] text-[#c6d4e8]" style={varsCss({ '--retraso': '300ms' })}>
-              {r ? fraseDelDia(r) : 'Cargando tu resumen…'}
-            </p>
-            <div className="anim-entrada mt-6 flex flex-wrap gap-3" style={varsCss({ '--retraso': '420ms' })}>
-              <Link to={ROUTES.portalCatalogo} className="pintura-boton boton-liquido-claro inline-flex h-12 items-center gap-2 rounded-[16px] px-5 text-[14.5px] font-semibold">
-                <IconServicios /> Solicitar un servicio
-              </Link>
-              <Link to={ROUTES.portalOrdenes} className="vidrio-oscuro pintura-boton inline-flex h-12 items-center gap-2 rounded-[16px] px-5 text-[14.5px] font-semibold text-white hover:bg-white/15">
-                Ver mis órdenes
-              </Link>
-            </div>
-          </div>
-
-          {/* Pase de la próxima visita */}
-          {r?.proximaVisita ? (
-            <Link
-              to={DETALLE.portalOrden(r.proximaVisita.ordenId)}
-              className="vidrio-oscuro reflejo anim-entrada group flex flex-col gap-4 rounded-[24px] p-5 transition-transform duration-300 hover:-translate-y-1"
-              style={varsCss({ '--retraso': '360ms' })}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[12.5px] font-semibold tracking-wide text-[#8ec5ff] uppercase">Próxima visita</span>
-                <span className="rounded-full bg-[#22c55e]/20 px-2.5 py-1 text-[12px] font-bold text-[#7ee2a0]">{cuantoFalta(r.proximaVisita.fecha)}</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <HojaCalendario fecha={r.proximaVisita.fecha} tamano="lg" oscuro />
-                <div className="min-w-0">
-                  <div className="text-[19px] leading-tight font-bold text-white">{fechaAmable(r.proximaVisita.fecha)}</div>
-                  <div className="mt-1 flex items-center gap-1.5 text-[14px] text-[#c6d4e8]">
-                    <IconReloj width="15" height="15" /> {horaDe(r.proximaVisita.fecha)}
-                  </div>
-                </div>
-              </div>
-              {/* Talón del pase */}
-              <div className="flex items-center justify-between gap-3 border-t border-dashed border-white/20 pt-4">
-                <span className="flex items-center gap-2.5">
-                  <Avatar nombre={r.proximaVisita.tecnico} tamano="lg" />
-                  <span>
-                    <span className="block text-[12px] text-[#9fb6d6]">Tu técnico</span>
-                    <span className="block text-[14px] font-semibold text-white">{r.proximaVisita.tecnico}</span>
-                  </span>
-                </span>
-                <span className="text-right">
-                  <span className="block text-[12px] text-[#9fb6d6]">Orden</span>
-                  <span className="block font-mono text-[13.5px] font-semibold text-white">{r.proximaVisita.codigo}</span>
-                </span>
-              </div>
-            </Link>
-          ) : (
-            r && (
-              <div className="vidrio-oscuro anim-entrada flex flex-col items-center gap-2 rounded-[24px] p-6 text-center">
-                <IconCalendario width="28" height="28" className="text-[#8ec5ff]" />
-                <span className="text-[15px] font-semibold text-white">Sin visitas programadas</span>
-                <span className="text-[13px] text-[#c6d4e8]">Cuando apruebes una cotización, aquí verás el día y el técnico.</span>
-              </div>
-            )
-          )}
-        </div>
-      </PanelTinta>
-
+    <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
+      <h1 className="m-0 lg:col-span-full text-2xl font-semibold tracking-tight text-fg">{saludo()}{usuario?.nombres && `, ${usuario.nombres}`}</h1>
+      {r && <div className="grid gap-4 sm:grid-cols-[1.25fr_1fr] lg:col-span-full xl:col-span-8">
+        <section className="rounded-[24px] border border-border-base bg-surface-raised p-5 sm:p-7 shadow-[var(--rvr-shadow-card)]">
+          <p className="text-sm font-semibold text-primary-on-soft">{accion.etiqueta}</p>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight text-fg">{accion.titulo}</h2>
+          <p className="mt-2 text-sm text-fg-muted">{accion.detalle}</p>
+          <Link to={accion.destino} className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-primary px-5 font-semibold text-on-primary">{accion.boton}</Link>
+        </section>
+        <section className="vidrio rounded-[24px] border border-border-base p-5 sm:p-7">
+          <h2 className="text-sm font-semibold text-fg">{visita ? 'Tu agenda' : 'Mis servicios'}</h2>
+          <p className="my-3 text-xl font-semibold text-fg">{visita ? fechaAmable(visita.fecha) : `${enCurso.length} en curso`}</p>
+          {visita && <p className="mb-3 text-sm text-fg-muted">{horaDe(visita.fecha)} · {visita.tecnico}</p>}
+          <Link to={visita ? DETALLE.portalOrden(visita.ordenId) : ROUTES.portalOrdenes} className="font-semibold text-link">{visita ? 'Ver detalles de la visita' : 'Consultar mis órdenes'}</Link>
+        </section>
+      </div>}
       {error && <Alert tone="danger" title="No pudimos cargar tu resumen" description={error} />}
 
       {/* ---------- Indicadores ---------- */}
       {!r && !error && (
-        <div className="grid grid-cols-2 gap-3.5 xl:grid-cols-4">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-[132px] rounded-[22px]" />)}</div>
+        <div role="status" aria-label="Cargando indicadores" className="grid grid-cols-2 gap-2 lg:col-span-full lg:grid-cols-4 xl:col-span-4 xl:grid-cols-2">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="vidrio flex flex-col gap-3 rounded-[22px] border border-[var(--rvr-glass-borde)] p-4 sm:p-5">
+
+              <Skeleton className="h-6 w-1/3" />
+              <Skeleton className="h-3 w-2/3" />
+            </div>
+          ))}
+        </div>
       )}
       {r && (
-        <div className="escalonado grid grid-cols-2 gap-3.5 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 lg:col-span-full lg:grid-cols-4 xl:col-span-4 xl:grid-cols-2">
           {[
-            { t: 'Por decidir', v: r.por_decidir, d: 'cotizaciones esperan tu respuesta', a: ROUTES.portalCotizaciones, icono: IconCotizaciones, fondo: 'bg-[#f59e0b]', alerta: r.por_decidir > 0 },
-            { t: 'En valoración', v: r.en_valoracion, d: 'solicitudes que RvR prepara', a: ROUTES.portalCotizaciones, icono: IconHistorial, fondo: 'bg-[#0891b2]', alerta: false },
-            { t: 'Órdenes activas', v: r.ordenes_activas, d: `${r.ordenes_finalizadas} finalizada(s) con RvR`, a: ROUTES.portalOrdenes, icono: IconOrdenes, fondo: 'bg-primary', alerta: false },
-            { t: 'Saldo pendiente', v: r.saldo, d: 'de tus órdenes vigentes', a: ROUTES.portalOrdenes, icono: IconPagos, fondo: 'bg-ink dark:bg-[#2b3d5c]', alerta: r.saldo > 0, dinero: true },
+            { t: 'Cotizaciones por decidir', v: r.por_decidir, a: ROUTES.portalCotizaciones },
+            { t: 'En valoración', v: r.en_valoracion, a: ROUTES.portalCotizaciones },
+            { t: 'Órdenes activas', v: r.ordenes_activas, a: ROUTES.portalOrdenes },
+            { t: 'Saldo pendiente', v: r.saldo, a: ROUTES.portalOrdenes, dinero: true },
           ].map((k) => (
-            <Link key={k.t} to={k.a} className="vidrio tarjeta-viva reflejo anim-entrada group relative flex flex-col gap-3 rounded-[22px] border border-[var(--rvr-glass-borde)] p-4 sm:p-5">
-              <div className="flex items-start justify-between gap-2">
-                <span className={cn('flex size-10 items-center justify-center rounded-[13px] text-white shadow-[0_8px_18px_-10px_rgb(10_40_100/0.7)]', k.fondo)}>
-                  <k.icono width="19" height="19" />
-                </span>
-                {k.alerta ? (
-                  <span className="relative flex size-2.5"><span className="anim-latido absolute inset-0 rounded-full bg-[#f59e0b]" /><span className="relative size-2.5 rounded-full bg-[#f59e0b]" /></span>
-                ) : (
-                  <IconChevron width="16" height="16" className="-rotate-90 text-fg-faint transition-transform group-hover:translate-x-0.5" />
-                )}
-              </div>
-              <div className="font-display text-[26px] leading-none font-extrabold tracking-[-0.8px] text-fg sm:text-[32px]">
+            <Link key={k.t} to={k.a} className="flex min-w-0 flex-col justify-center gap-2 rounded-2xl border border-border-base bg-surface-raised px-4 py-3 transition-colors hover:bg-surface-muted">
+              <span className="text-[13px] font-medium text-fg-muted">{k.t}</span>
+              <strong className="font-display text-xl leading-tight tracking-tight text-fg sm:text-2xl">
                 <CifraViva valor={k.v} formato={k.dinero ? formatearMoneda : undefined} />
-              </div>
-              <div>
-                <div className="text-[13.5px] font-bold text-fg">{k.t}</div>
-                <div className="text-[12.5px] text-fg-subtle">{k.d}</div>
-              </div>
+              </strong>
             </Link>
           ))}
         </div>
@@ -151,7 +103,7 @@ export default function PortalInicioPage() {
 
       {/* ---------- Orden en curso + por decidir ---------- */}
       {ordenes && cotizaciones && (
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <div className="grid gap-5 lg:col-span-full lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
           <section className="flex min-w-0 flex-col gap-3">
             <TituloBloque icono={IconOrdenes} titulo={enCurso.length > 1 ? `Tus órdenes en curso (${enCurso.length})` : 'Tu orden en curso'}
               accion={<Link to={ROUTES.portalOrdenes} className="text-[13px] font-semibold text-link hover:underline">Ver todas</Link>} />
@@ -174,7 +126,7 @@ export default function PortalInicioPage() {
                         {o.fechaVisita ? `Visita ${formatearFecha(o.fechaVisita)} · ${horaDe(o.fechaVisita)}` : 'Visita por agendar'}
                       </span>
                       {o.saldo !== null && o.saldo > 0 && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-soft px-3 py-1.5 font-semibold text-warning-fg">Saldo {formatearMoneda(o.saldo)}</span>
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1.5 font-semibold text-fg-muted">Saldo {formatearMoneda(o.saldo)}</span>
                       )}
                     </div>
                   </Link>
@@ -192,7 +144,7 @@ export default function PortalInicioPage() {
               <ul className="escalonado m-0 flex list-none flex-col gap-2.5 p-0">
                 {porDecidir.slice(0, 3).map((c) => (
                   <li key={c.id} className="anim-entrada">
-                    <Link to={DETALLE.portalCotizacion(c.id)} className="vidrio tarjeta-viva reflejo flex items-center gap-4 rounded-[20px] border border-[var(--rvr-glass-borde)] border-l-4 border-l-[#f59e0b] p-4">
+                    <Link to={DETALLE.portalCotizacion(c.id)} className="vidrio tarjeta-viva reflejo flex items-center gap-4 rounded-[20px] border border-[var(--rvr-glass-borde)]  p-4">
                       <div className="min-w-0 flex-1">
                         <div className="font-mono text-[12.5px] font-semibold text-fg-subtle">{c.numero}</div>
                         <div className="line-clamp-1 text-[14px] font-semibold text-fg">{c.resumen || `${c.items} servicio(s)`}</div>
@@ -208,7 +160,7 @@ export default function PortalInicioPage() {
               </ul>
             ) : (
               <div className="vidrio flex items-center gap-4 rounded-[22px] border border-[var(--rvr-glass-borde)] p-5">
-                <span className="flex size-12 flex-none items-center justify-center rounded-full bg-[var(--rvr-estado-completada-soft)] text-[var(--rvr-estado-completada-fg)]">
+                <span className="flex size-12 flex-none items-center justify-center rounded-full bg-surface-muted text-fg-muted">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
                 </span>
                 <span>
@@ -219,8 +171,8 @@ export default function PortalInicioPage() {
             )}
 
             {/* Ayuda */}
-            <div className="mt-1 flex items-center gap-4 rounded-[22px] bg-primary-soft p-5">
-              <span className="flex size-11 flex-none items-center justify-center rounded-[14px] bg-primary text-white">
+            <div className="mt-1 flex items-center gap-4 rounded-[22px] border border-border-base bg-surface-raised p-5">
+              <span className="flex size-11 flex-none items-center justify-center rounded-[14px] bg-surface-muted text-fg-muted">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" /></svg>
               </span>
               <span className="min-w-0 flex-1">
@@ -234,7 +186,7 @@ export default function PortalInicioPage() {
 
       {/* ---------- Actividad + explorar ---------- */}
       {ordenes && cotizaciones && (
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="grid gap-5 lg:col-span-full lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <section className="flex min-w-0 flex-col gap-3">
             <TituloBloque icono={IconHistorial} titulo="Actividad reciente" />
             <Actividad cotizaciones={cotizaciones} ordenes={ordenes} />
@@ -247,7 +199,6 @@ export default function PortalInicioPage() {
                 <Link key={cat} to={`${ROUTES.portalCatalogo}?categoria=${encodeURIComponent(cat)}`}
                   className="vidrio tarjeta-viva reflejo anim-entrada group flex flex-col gap-3 rounded-[20px] border border-[var(--rvr-glass-borde)] p-4"
                   style={varsCss({ '--retraso': `${i * 60}ms` })}>
-                  <IconoCategoria categoria={cat} tamano={42} className="transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
                   <span className="text-[14px] font-bold text-fg">{CATEGORIA_VISUAL[cat].corto}</span>
                 </Link>
               ))}
@@ -280,7 +231,7 @@ function Actividad({ cotizaciones, ordenes }: { cotizaciones: MiCotizacion[]; or
         <li key={e.id} className="anim-entrada" style={varsCss({ '--retraso': `${i * 50}ms` })}>
           <Link to={e.a} className="group flex items-center gap-3.5 rounded-[16px] px-3 py-3 transition-colors hover:bg-surface-muted">
             <span className="relative flex flex-col items-center self-stretch">
-              <span className={cn('z-10 flex size-9 items-center justify-center rounded-[11px] text-white', e.tipo === 'o' ? 'bg-primary' : 'bg-ink dark:bg-[#2b3d5c]')}>
+              <span className="z-10 flex size-9 items-center justify-center rounded-[11px] bg-surface-muted text-fg-muted">
                 {e.tipo === 'o' ? <IconOrdenes width="16" height="16" /> : <IconCotizaciones width="16" height="16" />}
               </span>
               {i < eventos.length - 1 && <span aria-hidden="true" className="absolute top-9 -bottom-3 w-px bg-border-base" />}

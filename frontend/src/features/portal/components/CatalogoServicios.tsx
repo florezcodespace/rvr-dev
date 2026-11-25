@@ -9,7 +9,7 @@ import { cn } from '@shared/lib/cn'
 import { formatearDuracion, formatearGarantia, formatearMoneda } from '@shared/lib/format'
 import { varsCss } from '@shared/lib/varsCss'
 import { portalService } from '../api'
-import { CATEGORIA_VISUAL, IconoCategoria } from './kit'
+import { CATEGORIA_VISUAL } from './kit'
 
 const normalizar = (t: string) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 
@@ -52,18 +52,13 @@ export function CatalogoServicios() {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="¿Qué necesitas? Ej. cámaras, formateo, red wifi…" aria-label="Buscar servicio"
             className="h-14 w-full rounded-[18px] border border-border-base bg-[var(--rvr-surface-raised)] pr-4 pl-12 text-[15px] text-fg outline-none transition-shadow placeholder:text-fg-faint focus:border-[var(--rvr-ring-border)] focus:shadow-[0_0_0_4px_var(--rvr-ring)]" />
         </div>
-        <div role="tablist" aria-label="Categoría" className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+        <div role="tablist" aria-label="Categoría" className="flex flex-wrap gap-2">
           {opciones.map((o) => {
             const activa = categoria === o.valor
             return (
               <button key={o.valor} type="button" role="tab" aria-selected={activa} onClick={() => elegirCategoria(o.valor)}
-                className={cn('flex flex-none cursor-pointer items-center gap-2 rounded-full py-1.5 pr-3.5 pl-1.5 text-[13.5px] font-semibold transition-all duration-200',
+                className={cn('flex flex-none cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-[13.5px] font-semibold transition-all duration-200',
                   activa ? 'bg-primary text-white shadow-[0_8px_18px_-8px_var(--rvr-halo-primary)]' : 'bg-surface-muted text-fg-muted hover:bg-primary-soft hover:text-fg')}>
-                {o.valor === 'todas' ? (
-                  <span className={cn('flex size-7 items-center justify-center rounded-full text-[12px]', activa ? 'bg-white/20' : 'bg-surface')}>✦</span>
-                ) : (
-                  <IconoCategoria categoria={o.valor} tamano={28} className="!rounded-full" />
-                )}
                 {o.label}
                 {o.conteo !== undefined && <span className={cn('rounded-full px-1.5 text-[12px]', activa ? 'bg-white/20' : 'bg-surface text-fg-subtle')}>{o.conteo}</span>}
               </button>
@@ -72,31 +67,28 @@ export function CatalogoServicios() {
         </div>
       </div>
 
-      {!datos && <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-60 w-full rounded-[24px]" />)}</div>}
+      {!datos && <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">{[0, 1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-60 w-full rounded-[24px]" />)}</div>}
       {datos && visibles.length === 0 && (
         <div className="vidrio rounded-[24px] border border-[var(--rvr-glass-borde)] p-10 text-center">
-          <p className="m-0 text-[16px] font-bold text-fg">No encontramos «{q}»</p>
+          <p className="m-0 text-[16px] font-bold text-fg">{q ? `No encontramos «${q}»` : 'Sin servicios en esta categoría'}</p>
           <p className="m-0 mt-1 text-[13.5px] text-fg-muted">Prueba con otra palabra o mira todas las categorías.</p>
+          <button type="button" onClick={() => { setQ(''); elegirCategoria('todas') }} className="mt-3 font-semibold text-link">Ver todos los servicios</button>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {visibles.map((s, i) => {
           const enCarrito = items.find((it) => it.servicioId === s.id)
           const visual = CATEGORIA_VISUAL[s.categoria as CategoriaServicio]
           return (
             <article key={s.id}
-              className={cn('vidrio tarjeta-viva reflejo anim-entrada group relative flex flex-col gap-4 rounded-[24px] border p-5',
+              className={cn('bg-surface-raised shadow-[var(--rvr-shadow-sm)] anim-entrada relative flex flex-col gap-4 rounded-[24px] border p-5',
                 enCarrito ? 'border-[var(--rvr-ring-border)] ring-2 ring-primary/30' : 'border-[var(--rvr-glass-borde)]',
                 recien === s.id && 'portal-pop')}
               style={varsCss({ '--retraso': `${Math.min(i, 8) * 45}ms` })}>
               <div className="flex items-start justify-between gap-3">
-                <IconoCategoria categoria={s.categoria} tamano={48} className="transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105" />
-                {enCarrito ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[12px] font-bold text-white"><IconCheck width="13" height="13" /> {enCarrito.cantidad} en tu solicitud</span>
-                ) : (
-                  <span className="rounded-full bg-surface-muted px-2.5 py-1 text-[12px] font-semibold text-fg-muted">{visual?.corto ?? s.categoria}</span>
-                )}
+                <span className="text-xs font-semibold text-fg-subtle">{visual?.corto ?? s.categoria}</span>
+                {enCarrito && <span className="inline-flex items-center gap-1 rounded-full bg-primary-soft px-2.5 py-1 text-xs font-semibold text-primary-on-soft"><IconCheck width="13" height="13" /> {enCarrito.cantidad} en tu solicitud</span>}
               </div>
               <div className="flex-1">
                 <h3 className="m-0 text-[17px] leading-snug font-bold tracking-[-0.3px] text-fg">{s.nombre}</h3>
@@ -106,7 +98,7 @@ export function CatalogoServicios() {
                 <span title="Tiempo aproximado que tarda el técnico" className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1 font-medium text-fg-muted">
                   <IconReloj width="13" height="13" /> {formatearDuracion(s.duracionMin)}
                 </span>
-                <span title="Cuenta desde que se finaliza el servicio" className="inline-flex items-center gap-1.5 rounded-full bg-[var(--rvr-estado-completada-soft)] px-2.5 py-1 font-medium text-[var(--rvr-estado-completada-fg)]">
+                <span title="Cuenta desde que se finaliza el servicio" className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1 font-medium text-fg-muted">
                   <IconEscudo width="13" height="13" /> Garantía {formatearGarantia(s.diasGarantia)}
                 </span>
               </div>

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { DETALLE, ROUTES } from '@app/routes/paths'
 import { EstadoBadge } from '@shared/components/data'
 import { Volver } from '@shared/components/detalle'
@@ -16,7 +16,8 @@ import { leerComprobante, type Adjunto } from '@shared/lib/archivos'
 import { useRecurso } from '@shared/hooks/useRecurso'
 import { formatearFechaHora, formatearMoneda } from '@shared/lib/format'
 import { portalService } from '../api'
-import { armarPago, DatosDelPago, ElegirMetodo, PAGO_INICIAL, type DatosPago } from '@shared/components/pago'
+import { ElegirMetodo, NOMBRE_OPCION, type OpcionPago } from '@shared/components/pago'
+import { METODO_DE } from '@shared/components/pago/reglas'
 import { AnilloProgreso, cuantoFalta, descargarEventoCalendario, SobreOscuro, fechaAmable, HojaCalendario, PanelTinta, RecorridoOrden, TituloBloque } from '../components/kit'
 
 /**
@@ -25,6 +26,8 @@ import { AnilloProgreso, cuantoFalta, descargarEventoCalendario, SobreOscuro, fe
  * solución aplicada por el técnico (CA_82_04).
  */
 export default function MiOrdenPage() {
+  const [query] = useSearchParams()
+  const pagosPrimero = query.get('vista') === 'pagos'
   const id = Number(useParams().id)
   const cargar = useCallback((oid: number) => portalService.orden(oid), [])
   const { datos: o, error, recargar } = useRecurso(cargar, id)
@@ -37,6 +40,7 @@ export default function MiOrdenPage() {
   const avance = o.venta ? Math.round((o.venta.abonado / Math.max(o.venta.montoTotal, 1)) * 100) : 0
   const enRevision = o.comprobantes.filter((c) => c.estado === 'pendiente').reduce((s, c) => s + c.monto, 0)
   const porReportar = o.venta && o.venta.estadoPago !== 'anulada' ? Math.max(o.venta.saldo - enRevision, 0) : 0
+  const anticipoPendiente = o.venta ? Math.max(0, o.venta.montoAnticipo - o.venta.abonado - enRevision) : 0
   const reclamoAbierto = o.garantia?.historialReclamos.some((r) => r.estado === 'pendiente')
   const g = o.garantia
   const diasGarantia = g ? Math.max(1, Math.round((+new Date(g.fechaFin) - +new Date(g.fechaInicio)) / 86_400_000)) : 0
@@ -47,7 +51,7 @@ export default function MiOrdenPage() {
       <Volver a={ROUTES.portalOrdenes} texto="Mis órdenes" />
 
       {/* ---------- Encabezado con el recorrido ---------- */}
-      <PanelTinta className="p-6 sm:p-8" intensidad={0.6}>
+      {!pagosPrimero && <PanelTinta className="p-6 sm:p-8" intensidad={0.6}>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -62,9 +66,10 @@ export default function MiOrdenPage() {
         <div className="mt-7">
           <RecorridoOrden estado={o.estado} garantiaVigente={g?.vigente} grande oscuro />
         </div>
-      </PanelTinta>
+      </PanelTinta>}
+      {pagosPrimero && <h1 className="text-2xl font-bold text-fg">Pagos de la orden {o.codigo}</h1>}
 
-      {o.estado === 'esperando_anticipo' && <Alert tone="warning" title="Falta el anticipo" description="Para iniciar el servicio se requiere el 50 % del valor. Puedes reportar tu pago aquí mismo con el comprobante." />}
+
       {o.estado === 'en_espera_repuesto' && <Alert tone="info" title="Esperando un repuesto" description="El técnico necesita un repuesto. Revisa tus cotizaciones: hay una por aprobar." />}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -114,7 +119,7 @@ export default function MiOrdenPage() {
         </section>
 
         {/* ---------- Pago ---------- */}
-        <section className="vidrio flex flex-col gap-4 rounded-[24px] border border-[var(--rvr-glass-borde)] p-5">
+        <section className={cn(pagosPrimero && 'order-first', 'vidrio flex flex-col gap-4 rounded-[24px] border border-[var(--rvr-glass-borde)] p-5')}>
           <TituloBloque icono={IconPagos} titulo="Estado de pago" accion={o.venta && <EstadoBadge meta={ESTADO_PAGO_META[o.venta.estadoPago]} />} />
           {o.venta ? (
             <>
@@ -125,13 +130,14 @@ export default function MiOrdenPage() {
                 </AnilloProgreso>
                 <dl className="m-0 grid min-w-[200px] flex-1 grid-cols-2 gap-x-4 gap-y-3 text-[13px]">
                   <div><dt className="text-fg-subtle">Valor total</dt><dd className="m-0 font-display text-[16px] font-extrabold text-fg">{formatearMoneda(o.venta.montoTotal)}</dd></div>
-                  <div><dt className="text-fg-subtle">Anticipo 50 %</dt><dd className="m-0 font-display text-[16px] font-extrabold text-fg">{formatearMoneda(o.venta.montoAnticipo)}</dd></div>
+                  <div><dt className="text-fg-subtle">Anticipo requerido</dt><dd className="m-0 font-display text-[16px] font-extrabold text-fg">{formatearMoneda(o.venta.montoAnticipo)}</dd></div>
                   <div><dt className="text-fg-subtle">Pagado</dt><dd className="m-0 font-display text-[16px] font-extrabold text-[var(--rvr-estado-completada-fg)]">{formatearMoneda(o.venta.abonado)}</dd></div>
                   <div><dt className="text-fg-subtle">Saldo</dt><dd className="m-0 font-display text-[16px] font-extrabold text-fg">{formatearMoneda(o.venta.estadoPago === 'anulada' ? 0 : o.venta.saldo)}</dd></div>
                 </dl>
               </div>
+              {anticipoPendiente > 0 && <div className="rounded-2xl bg-primary-soft p-4"><p className="text-sm text-primary-on-soft">Anticipo por cubrir</p><strong className="text-2xl text-fg">{formatearMoneda(anticipoPendiente)}</strong></div>}
               {porReportar > 0 && (
-                <Button liquido fullWidth size="lg" onClick={() => setPagando(true)}>Reportar un pago</Button>
+                <Button liquido fullWidth size="lg" onClick={() => setPagando(true)}>Ya pagué · Enviar comprobante</Button>
               )}
               {enRevision > 0 && (
                 <p className="m-0 rounded-[14px] bg-primary-soft px-3.5 py-2.5 text-[12.5px] text-primary-on-soft">Tienes {formatearMoneda(enRevision)} en comprobantes por revisar: se descuentan del saldo cuando RvR los apruebe.</p>
@@ -243,18 +249,19 @@ export default function MiOrdenPage() {
           </ol>
         </section>
       </div>
-      {pagando && <ReportarPago ordenId={o.id} maximo={porReportar} onCerrar={() => setPagando(false)} onHecho={recargar} />}
+      {pagando && <ReportarPago ordenId={o.id} maximo={porReportar} sugerido={anticipoPendiente || porReportar} onCerrar={() => setPagando(false)} onHecho={recargar} />}
       {reclamando && <ReclamarGarantia ordenId={o.id} onCerrar={() => setReclamando(false)} onHecho={recargar} />}
     </div>
   )
 }
 
 /** [Feedback 12] El cliente elige cómo pagó, llena sus datos y adjunta el comprobante para que RvR lo apruebe. */
-function ReportarPago({ ordenId, maximo, onCerrar, onHecho }: { ordenId: number; maximo: number; onCerrar: () => void; onHecho: () => void }) {
+function ReportarPago({ ordenId, maximo, sugerido, onCerrar, onHecho }: { ordenId: number; maximo: number; sugerido: number; onCerrar: () => void; onHecho: () => void }) {
   const { mostrar } = useToast()
   const [paso, setPaso] = useState<'metodo' | 'datos'>('metodo')
-  const [monto, setMonto] = useState(String(Math.round(maximo)))
-  const [pago, setPago] = useState<DatosPago>(PAGO_INICIAL)
+  const [monto, setMonto] = useState(String(sugerido))
+  const [opcion, setOpcion] = useState<OpcionPago | null>(null)
+  const [referencia, setReferencia] = useState('')
   const [archivo, setArchivo] = useState<Adjunto | null>(null)
   const [errores, setErrores] = useState<Record<string, string>>({})
   const [enviando, setEnviando] = useState(false)
@@ -275,20 +282,20 @@ function ReportarPago({ ordenId, maximo, onCerrar, onHecho }: { ordenId: number;
     const nuevos: Record<string, string> = {}
     if (!valor || valor <= 0) nuevos.monto = 'Escribe el valor que pagaste'
     else if (valor > maximo) nuevos.monto = `Máximo ${formatearMoneda(maximo)}`
-    if (!pago.opcion) nuevos.metodo = 'Elige cómo pagaste'
+    if (!opcion) nuevos.metodo = 'Elige cómo pagaste'
     setErrores(nuevos)
     if (!Object.keys(nuevos).length) setPaso('datos')
   }
 
   const enviar = async () => {
-    const pedido = armarPago(pago)
-    const nuevos: Record<string, string> = { ...pedido.errores }
+    const nuevos: Record<string, string> = {}
+    if (!referencia.trim()) nuevos.referencia = 'Escribe la referencia del comprobante'
     if (!archivo) nuevos.archivo = 'Adjunta la foto o el PDF del comprobante'
     setErrores(nuevos)
-    if (Object.keys(nuevos).length || !pedido.metodoPago) return
+    if (Object.keys(nuevos).length || !opcion) return
     setEnviando(true)
     try {
-      const r = await portalService.enviarComprobante(ordenId, { monto: Number(monto), metodoPago: pedido.metodoPago, referencia: pedido.referencia, detalle: pedido.detalle, archivo: archivo! })
+      const r = await portalService.enviarComprobante(ordenId, { monto: Number(monto), metodoPago: METODO_DE[opcion], referencia: referencia.trim(), detalle: null, archivo: archivo! })
       mostrar({ tono: 'exito', mensaje: r.mensaje })
       onHecho()
       onCerrar()
@@ -303,7 +310,7 @@ function ReportarPago({ ordenId, maximo, onCerrar, onHecho }: { ordenId: number;
 
   return (
     <Modal abierto onCerrar={onCerrar} ancho="lg"
-      titulo={paso === 'metodo' ? 'Elige cómo pagar' : 'Datos del pago'}
+      titulo={paso === 'metodo' ? '¿Cómo hiciste el pago?' : 'Adjuntar comprobante'}
       descripcion={paso === 'metodo' ? 'Cuéntanos cuánto y cómo pagaste. RvR revisa el comprobante y, al aprobarlo, se descuenta de tu saldo.' : `Valor: ${formatearMoneda(Number(monto))}`}
       pie={paso === 'metodo'
         ? <><Button variant="secondary" onClick={onCerrar}>Cancelar</Button><Button onClick={continuar}>Continuar</Button></>
@@ -312,11 +319,12 @@ function ReportarPago({ ordenId, maximo, onCerrar, onHecho }: { ordenId: number;
         <div className="flex flex-col gap-5">
           <Input label="Valor pagado (COP)" inputMode="numeric" value={monto} onChange={(e) => setMonto(e.target.value.replace(/[^0-9]/g, ''))}
             error={errores.monto} hint={`Por pagar: ${formatearMoneda(maximo)}`} className="sm:max-w-[280px]" />
-          <ElegirMetodo valor={pago.opcion} onChange={(o) => setPago({ ...pago, opcion: o })} efectivo={false} error={errores.metodo} />
+          <ElegirMetodo valor={opcion} onChange={setOpcion} efectivo={false} error={errores.metodo} />
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <DatosDelPago valor={pago} onChange={setPago} errores={errores} onCambiar={() => setPaso('metodo')} />
+          <div className="rounded-xl bg-surface-muted p-3 text-sm font-semibold text-fg">{opcion && NOMBRE_OPCION[opcion]} · {formatearMoneda(Number(monto))}</div>
+          <Input label={opcion === 'pse' ? 'CUS de la transacción' : 'Referencia del comprobante'} value={referencia} maxLength={100} onChange={(e) => setReferencia(e.target.value)} error={errores.referencia} hint="Usa el código de la operación que aparece en tu recibo." />
           <div className="flex flex-col">
             <label htmlFor="comprobante" className="mb-1.5 text-[13px] font-semibold text-fg">Comprobante</label>
             <input id="comprobante" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"

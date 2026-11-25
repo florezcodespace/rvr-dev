@@ -778,3 +778,18 @@ html.splash-activo .landing-nav {
 @media (prefers-reduced-motion: reduce) {
   .widget-barra, .widget-barra-h { animation: none; }
 }
+
+.nav-cristal {
+  background: color-mix(in srgb, var(--rvr-surface-solid) 90%, transparent);
+  border-color: var(--rvr-border-strong);
+  backdrop-filter: blur(30px) saturate(115%);
+  -webkit-backdrop-filter: blur(30px) saturate(115%);
+  box-shadow: inset 0 1px var(--rvr-glass-luz), 0 8px 25px -13px rgb(18 45 75 / .35);
+}
+.widget-en-mano {
+  z-index: 2;
+  box-shadow: 0 18px 44px -12px rgb(14 43 78 / .42), 0 0 0 2px var(--rvr-primary);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .widget-en-mano { transform: translateY(-5px) scale(1.015); }
+}

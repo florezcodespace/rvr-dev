@@ -54,7 +54,7 @@ export function TituloSeccion({
       </span>
       <h2 className="mt-4 mb-0 text-[30px] leading-[1.12] font-extrabold tracking-[-1.1px] text-fg text-balance sm:text-[40px]">
         {titulo}
-        {destacado && <span className="text-primary"> {destacado}</span>}
+        {destacado && <span className="text-primary-on-soft"> {destacado}</span>}
       </h2>
       <p
         className={cn(

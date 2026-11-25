@@ -69,6 +69,8 @@ export interface MiOrden {
   servicios: string
   fechaVisita: string | null
   saldo: number | null
+  anticipoFaltante: number
+  enRevision: number
 }
 
 export interface MiOrdenDetalle {

@@ -14,8 +14,7 @@ const ENLACES = [
 ]
 
 /**
- * Barra de la landing: una isla de vidrio flotante. Arranca más ancha y
- * transparente sobre el hero; al bajar se encoge y toma el vidrio. El enlace
+ * Barra flotante de vidrio esmerilado. Al bajar se encoge. El enlace
  * de la sección visible queda marcado.
  */
 export function NavegacionLanding() {
@@ -65,10 +64,8 @@ export function NavegacionLanding() {
     <header className="landing-nav sticky top-0 z-40 px-3 pt-3 sm:px-5 sm:pt-4">
       <div
         className={cn(
-          'relative mx-auto flex h-[64px] items-center justify-between gap-3 rounded-[22px] border px-3 transition-[max-width,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:px-4',
-          posada || abierto
-            ? 'vidrio max-w-[1120px] border-[var(--rvr-glass-borde)]'
-            : 'max-w-[1200px] border-transparent bg-transparent',
+          'nav-cristal relative mx-auto flex h-[64px] items-center justify-between gap-3 rounded-[22px] border px-3 transition-[max-width,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none sm:px-4',
+          posada || abierto ? 'max-w-[1120px]' : 'max-w-[1200px]',
         )}
       >
         {/* Progreso de lectura de la página */}

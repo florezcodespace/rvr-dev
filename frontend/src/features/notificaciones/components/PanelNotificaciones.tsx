@@ -11,7 +11,7 @@ import type { Notificacion } from '../hooks/useNotificaciones'
 const BOTON =
   'relative flex size-[34px] flex-none cursor-pointer items-center justify-center rounded-[10px] border border-border-base transition-[background-color,color,border-color,transform] duration-150'
 
-export function PanelNotificaciones() {
+export function PanelNotificaciones({ textual = false }: { textual?: boolean } = {}) {
   const [abierto, setAbierto] = useState(false)
   const contenedor = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -37,15 +37,15 @@ export function PanelNotificaciones() {
           sinLeer > 0 ? `Notificaciones, ${sinLeer} sin leer` : 'Notificaciones, ninguna sin leer'
         }
         className={cn(
-          BOTON,
+          textual ? 'relative flex min-h-11 items-center gap-1 rounded-lg text-[13px] font-semibold' : BOTON,
           abierto
             ? 'border-[var(--rvr-ring-border)] bg-primary-soft text-primary-on-soft'
             : 'text-fg-muted hover:-translate-y-px hover:bg-surface-muted hover:text-fg',
         )}
       >
-        <IconCampana />
+        {textual ? 'Avisos' : <IconCampana />}
         {sinLeer > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-[17px] min-w-[17px] items-center justify-center rounded-full border-2 border-surface bg-danger px-1 text-[12px] font-semibold text-white">
+          <span className={textual ? "rounded-full bg-primary-soft px-1 text-primary-on-soft" : "absolute -top-1 -right-1 flex h-[17px] min-w-[17px] items-center justify-center rounded-full border-2 border-surface bg-danger px-1 text-[12px] font-semibold text-white"}>
             {sinLeer > 99 ? '99+' : sinLeer}
           </span>
         )}
@@ -55,7 +55,7 @@ export function PanelNotificaciones() {
         <div
           role="dialog"
           aria-label="Notificaciones"
-          className="anim-entrada absolute top-[calc(100%+10px)] right-0 z-40 flex max-h-[420px] w-[min(94vw,368px)] flex-col overflow-hidden rounded-[20px] border border-[var(--rvr-glass-borde)] vidrio-denso"
+          className={cn(textual && "max-sm:fixed max-sm:inset-x-3 max-sm:top-[105px] max-sm:w-auto", "anim-entrada absolute top-[calc(100%+10px)] right-0 z-40 flex max-h-[420px] w-[min(94vw,368px)] flex-col overflow-hidden rounded-[20px] border border-[var(--rvr-glass-borde)] vidrio-denso")}
         >
           <div className="flex flex-none items-center justify-between gap-3 border-b border-border-base px-4 py-3">
             <div>
